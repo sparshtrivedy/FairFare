@@ -14,7 +14,7 @@ import { MdOutlineBalance } from "react-icons/md";
 
 const Layout = () => {
   return (
-    <div style={{backgroundColor: '#29a329', width: '100%', height: '100%'}}>
+    <div style={{backgroundColor: '#2F4F4F', width: '100%', height: '100%'}}>
         <Navbar bg="dark" data-bs-theme="dark">
             <Container>
                 <Navbar.Brand href="#home">
