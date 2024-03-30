@@ -11,6 +11,7 @@ import {
 import Home from './Home'
 import CreateEvent from './CreateEvent'
 import { MdOutlineBalance } from "react-icons/md";
+import ViewEvent from './ViewEvent'
 
 const Layout = () => {
   return (
@@ -30,6 +31,7 @@ const Layout = () => {
         <Routes>
             <Route path="/home" element={<Home />} />
             <Route path="/create-event" element={<CreateEvent />} />
+            <Route path="/join-event" element={<ViewEvent />} />
         </Routes>
     </div>
   )

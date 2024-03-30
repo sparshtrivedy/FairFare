@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { 
     Form, 
     Button,
@@ -15,8 +15,12 @@ import {
 } from "react-icons/bs";
 import { MdOutlineSafetyDivider, MdDelete, MdAddCircle } from "react-icons/md";
 import { FaPeopleGroup } from "react-icons/fa6";
+import { collection, getDocs, where, query, addDoc } from 'firebase/firestore';
+import { db } from '../firebase-config';
 
 const CreateEvent = () => {
+    const eventsCollectionRef = collection(db, 'events');
+
     const [event, setEvent] = useState({
         name: '',
         date: '',
@@ -41,6 +45,52 @@ const CreateEvent = () => {
             })
         });
     }
+
+    const createEvent = async (e) => {
+        e.preventDefault();
+
+        const memberRefs = [];
+        const itemRefs = [];
+
+        for (const member of event.members) {
+            const memberQuery = query(collection(db, 'members'), where('email', '==', member));
+            const memberSnapshot = await getDocs(memberQuery);
+            if (!memberSnapshot.empty) {
+                memberRefs.push(memberSnapshot.docs[0].ref);
+            } else {
+                await addDoc(collection(db, 'members'), { email: member });
+                const newMemberQuery = query(collection(db, 'members'), where('email', '==', member));
+                const newMemberSnapshot = await getDocs(newMemberQuery);
+                memberRefs.push(newMemberSnapshot.docs[0].ref);
+            }
+        }
+
+        for (const item of event.items) {
+            const itemDocRef = await addDoc(collection(db, 'items'), {
+                itemName: item.itemName,
+                itemQuantity: item.itemQuantity,
+                itemPrice: item.itemPrice,
+            });
+            itemRefs.push(itemDocRef);
+
+            for (const member of item.itemMembers) {
+                await addDoc(collection(db, 'item-member-shares'), {
+                    isSharing: member.isSharing,
+                    share: member.share,
+                    item: itemDocRef,
+                    member: memberRefs[event.members.indexOf(member.email)]
+                })
+            }
+        }
+        
+        await addDoc(eventsCollectionRef, { 
+            eventName: event.name,
+            eventDate: event.date,
+            eventDescription: event.description,
+            eventMembers: memberRefs,
+            eventItems: itemRefs
+        });
+    };
 
     const handleRemoveMembers = (index) => {
         const newMembers = [...event.members];
@@ -278,7 +328,7 @@ const CreateEvent = () => {
                             </Form>
                         </Card.Body>
                         <Card.Footer style={{backgroundColor: '#80b1b3', borderRadius: 0}}>
-                            <Button variant="primary" type="submit" className='my-2'>
+                            <Button variant="primary" type="submit" className='my-2' onClick={createEvent}>
                                 <MdAddCircle /> Create event
                             </Button>
                         </Card.Footer>
