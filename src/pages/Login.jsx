@@ -6,9 +6,11 @@ import {
     Button, 
     Alert, 
     Container,
-    Card
+    Card,
+    Spinner
 } from 'react-bootstrap';
 import { auth } from '../firebase-config';
+import { BsFillLockFill } from "react-icons/bs";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
@@ -26,18 +28,24 @@ const Login = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             console.log('Signed in');
-            setSuccess('Signed in successfully');
-            setIsLoggedIn(true);
-            setUserEmail(email);
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('isLoggedIn', true);
-            navigate('/home');
+            setSuccess('Signed in successfully. Redirecting...');
+            setTimeout(() => {
+                setSuccess('');
+                setIsLoggedIn(true);
+                setUserEmail(email);
+                localStorage.setItem('userEmail', email);
+                localStorage.setItem('isLoggedIn', true);
+                navigate('/home');
+            }, 3000);
         } catch (error) {
             if (error.code === 'auth/invalid-credential') {
                 setError('Invalid email or password');
             } else {
                 setError('An error occurred');
             }
+            setTimeout(() => {
+                setError('');
+            }, 3000);
             console.error(error);
         }
     }
@@ -46,18 +54,28 @@ const Login = () => {
         <Container className='py-3'>
             <Row className='justify-content-center'>
                 <Col xs={6}>
-                    <Card>
-                        <Card.Header className='d-flex align-items-center justify-content-center p-3'>
-                            <h4>Login</h4>
+                    <Card className='border-0'>
+                        <Card.Header className='d-flex align-items-center justify-content-center p-3 flex-column' style={{backgroundColor: '#80b1b3'}}>
+                            <BsFillLockFill size={50} className='my-2 rounded-circle p-2' style={{backgroundColor: '#f7fafa'}} />
+                            <h4>
+                                Login
+                            </h4>
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#f7fafa'}}>
                             {error && 
                                 <Alert variant='danger'>
                                     {error}
                                 </Alert>
                             }
-                            {success && 
-                                <Alert variant='success'>
+                            {success &&
+                                <Alert variant='success' className='d-flex align-items-center justify-content-center'>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        style={{marginRight: '5px'}}
+                                    />
                                     {success}
                                 </Alert>
                             }
@@ -88,7 +106,7 @@ const Login = () => {
                                 </Form.Group>
                             </Form>
                         </Card.Body>
-                        <Card.Footer className='d-flex align-items-center justify-content-center flex-column'>
+                        <Card.Footer className='d-flex align-items-center justify-content-center flex-column' style={{backgroundColor: '#80b1b3'}}>
                             <div className='mb-2'>
                                 <Button onClick={handleSignIn}>
                                     Login

@@ -11,6 +11,7 @@ import {
 import { auth } from '../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
+import { IoMdPersonAdd } from "react-icons/io";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -35,11 +36,14 @@ const Register = () => {
         <Container style={{height: '100%'}} className='py-3'>
             <Row className='justify-content-center'>
                 <Col xs={6}>
-                    <Card>
-                        <Card.Header className='d-flex align-items-center justify-content-center p-3'>
-                            <h4>Register</h4>
+                    <Card className='border-0'>
+                    <Card.Header className='d-flex align-items-center justify-content-center p-3 flex-column' style={{backgroundColor: '#80b1b3'}}>
+                            <IoMdPersonAdd size={50} className='my-2 rounded-circle p-2' style={{backgroundColor: '#f7fafa'}} />
+                            <h4>
+                                Register
+                            </h4>
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#f7fafa'}}>
                             <Form>
                                 {error && 
                                     <Alert variant='danger'>
@@ -72,7 +76,7 @@ const Register = () => {
                                 </Form.Group>
                             </Form>
                         </Card.Body>
-                        <Card.Footer className='d-flex align-items-center justify-content-center flex-column'>
+                        <Card.Footer className='d-flex align-items-center justify-content-center flex-column' style={{backgroundColor: '#80b1b3'}}>
                             <div className='mb-2'>
                                 <Button onClick={handleRegister}>
                                     Register

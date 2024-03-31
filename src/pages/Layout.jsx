@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { 
     Navbar, 
     Container,
@@ -16,20 +16,19 @@ import CreateEvent from './CreateEvent'
 import { MdOutlineBalance } from "react-icons/md";
 import ViewEvent from './ViewEvent';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../App';
 
 const Layout = () => {
+    const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail } = useContext(AuthContext);
+
     const navigate = useNavigate();
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userEmail, setUserEmail] = useState('');
-
     useEffect(() => {
-        if (localStorage.getItem('isLoggedIn')) {
-            console.log('User is logged in');
-            setIsLoggedIn(true);
-            setUserEmail(localStorage.getItem('userEmail'));
-        }
-    }, [])
+        const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const email = localStorage.getItem('userEmail') || '';
+        setIsLoggedIn(loggedIn);
+        setUserEmail(email);
+    }, [setIsLoggedIn, setUserEmail]);
 
     const handleLogout = () => {
         setIsLoggedIn(false);
