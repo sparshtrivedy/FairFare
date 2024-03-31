@@ -40,31 +40,37 @@ const Layout = () => {
 
     return (
         <div style={{ backgroundColor: '#2F4F4F', minHeight: '100vh' }}>
-            <Navbar bg="dark" data-bs-theme="dark">
-                <Container>
-                    <Navbar.Brand href="#home">
-                        <MdOutlineBalance size={25} /> FairFare
-                    </Navbar.Brand>
-                    <Nav className="me-auto">
-                        <Nav.Link href="#home">Home</Nav.Link>
-                        <Nav.Link href="#create-event">Create Event</Nav.Link>
-                        <Nav.Link href="#join-event">Join Event</Nav.Link>
-                    </Nav>
-                    <Navbar.Text className='m-2'>
-                        {isLoggedIn ? `Welcome, ${userEmail}` : 
-                            <Button variant='primary' href='#login'>Login</Button>
-                        }
-                    </Navbar.Text>
-                    <Button variant='danger' onClick={handleLogout}>Logout</Button>
-                </Container>
-            </Navbar>
+            {isLoggedIn &&
+                <Navbar bg="dark" data-bs-theme="dark">
+                    <Container>
+                        <Navbar.Brand href="#home">
+                            <MdOutlineBalance size={25} /> FairFare
+                        </Navbar.Brand>
+                        <Nav className="me-auto">
+                            <Nav.Link href="#home">Home</Nav.Link>
+                            <Nav.Link href="#create-event">Create Event</Nav.Link>
+                            <Nav.Link href="#join-event">Join Event</Nav.Link>
+                        </Nav>
+                        <Navbar.Text className='m-2'>
+                            {isLoggedIn ? `Welcome, ${userEmail}` : 
+                                <Button variant='primary' href='#login'>Login</Button>
+                            }
+                        </Navbar.Text>
+                        <Button variant='danger' onClick={handleLogout}>Logout</Button>
+                    </Container>
+                </Navbar>
+            }
             <Routes>
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/create-event" element={<CreateEvent />} />
-                <Route path="/join-event" element={<ViewEvent />} />
-            </Routes>
+                {isLoggedIn &&
+                    <>
+                        <Route path="/home" element={<Home />} />
+                        <Route path="/create-event" element={<CreateEvent />} />
+                        <Route path="/join-event" element={<ViewEvent />} />
+                    </>
+                }
+                </Routes>
         </div>
     )
 }

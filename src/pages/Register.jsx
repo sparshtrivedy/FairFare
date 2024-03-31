@@ -6,7 +6,8 @@ import {
     Button, 
     Alert, 
     Container,
-    Card
+    Card,
+    Spinner
 } from 'react-bootstrap';
 import { auth } from '../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -18,6 +19,7 @@ const Register = () => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [success, setSuccess] = useState('');
     const [error, setError] = useState('');
 
 
@@ -25,9 +27,16 @@ const Register = () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
             console.log('User registered');
-            navigate('/login');
+            setSuccess('User registered successfully. Redirecting to login...');
+            setTimeout(() => {
+                setSuccess('');
+                navigate('/login');
+            }, 3000);
         } catch (error) {
             setError('An error occurred');
+            setTimeout(() => {
+                setError('');
+            }, 3000);
             console.error(error);
         }
     }
@@ -45,6 +54,18 @@ const Register = () => {
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
                             <Form>
+                                {success &&
+                                    <Alert variant='success' className='d-flex align-items-center justify-content-center'>
+                                        <Spinner
+                                            as="span"
+                                            animation="border"
+                                            size="sm"
+                                            role="status"
+                                            style={{marginRight: '5px'}}
+                                        />
+                                        {success}
+                                    </Alert>
+                                }
                                 {error && 
                                     <Alert variant='danger'>
                                         {error}

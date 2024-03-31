@@ -1,8 +1,12 @@
-import React from 'react'
+import React, {useContext} from 'react'
+import { AuthContext } from '../App'
 
 const Home = () => {
+  const { userEmail } = useContext(AuthContext)
+
   return (
-    <div>Home</div>
+    <h1>Welcome, {userEmail}</h1>
+    
   )
 }
 
