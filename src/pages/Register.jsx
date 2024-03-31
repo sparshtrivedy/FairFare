@@ -13,6 +13,8 @@ import { auth } from '../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { IoMdPersonAdd } from "react-icons/io";
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../firebase-config';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -27,6 +29,10 @@ const Register = () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
             console.log('User registered');
+            const addedUser = await addDoc(collection(db, 'users'), {
+                email: email
+            });
+            console.log('Added document with ID: ', addedUser.id);
             setSuccess('User registered successfully. Redirecting to login...');
             setTimeout(() => {
                 setSuccess('');
