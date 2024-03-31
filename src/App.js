@@ -1,7 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { HashRouter as Router } from 'react-router-dom';
 import Layout from './pages/Layout';
-import Login from './pages/Login';
 
 export const AuthContext = createContext();
 
