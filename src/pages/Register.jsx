@@ -28,11 +28,9 @@ const Register = () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
 
-            const addedUser = await db.collection('users').add({
+            await db.collection('users').add({
                 email
             });
-            console.log('Added user with ID: ', addedUser.id);
-
             setSuccess('User registered successfully. Redirecting to login...');
 
             setTimeout(() => {

@@ -23,43 +23,60 @@ const Home = () => {
   useEffect(() => {
     const getEvents = async () => {
       setIsLoading(true);
+      setUsersEvents([]);
+
       const q = query(collection(db, "events"), where("members", "array-contains", {
         email: userEmail
       }));
+      const usersEventsTemp = [];
+
       const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(async (doc) => {
+
+      for (const doc of querySnapshot.docs) {
         const itemSplits = [];
         const eventRef = doc.ref;
-        console.log(doc.id);
 
         const itemsQuery = query(collection(db, "items"), where("event", "==", eventRef));
         const itemsSnapshot = await getDocs(itemsQuery);
-        itemsSnapshot.forEach((doc) => {
-          itemSplits.push(doc.data().splits);
-        });
-        
-        let total = 0;
-        for (const split of itemSplits) {
-          for (const user of split) {
-            if (user.email === userEmail) {
-              total += user.amount;
+        if (!itemsSnapshot.empty) { 
+          itemsSnapshot.forEach((doc) => {
+            itemSplits.push(doc.data().splits);
+          });
+          
+          let total = 0;
+          for (const split of itemSplits) {
+            for (const user of split) {
+              if (user.email === userEmail) {
+                total += user.amount;
+              }
             }
           }
+          
+          usersEventsTemp.push({
+            eventId: doc.id,
+            eventName: doc.data().name,
+            eventDate: doc.data().date,
+            balance: total,
+            email: userEmail
+          });
         }
-        
-        setUsersEvents([...usersEvents, {
-          email: userEmail,
-          eventId: doc.id,
-          eventName: doc.data().name,
-          eventDate: doc.data().date,
-          balance: total
-        }]);
-      });
+      }
+      
+      setUsersEvents(usersEventsTemp.map((event) => {
+        return {
+          eventId: event.eventId,
+          eventName: event.eventName,
+          eventDate: event.eventDate,
+          balance: event.balance,
+          email: userEmail
+        }
+      }));
+
       setIsLoading(false);
     }
 
     getEvents();
-  }, []);
+  }, [userEmail]);
 
   return (
     <Container style={{height: '100%'}}>

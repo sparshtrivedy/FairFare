@@ -13,6 +13,7 @@ import Home from './Home'
 import Login from './Login'
 import Register from './Register'
 import CreateEvent from './CreateEvent'
+import EditEvent from './EditEvent'
 import { MdOutlineBalance, MdLogout } from "react-icons/md";
 import ViewEvent from './ViewEvent';
 import { useNavigate } from 'react-router-dom';
@@ -69,6 +70,7 @@ const Layout = () => {
                         <Route path="/home" element={<Home />} />
                         <Route path="/create-event" element={<CreateEvent />} />
                         <Route path="/view-event/:eventId" element={<ViewEvent />} />
+                        <Route path="/edit-event/:eventId" element={<EditEvent />} />
                     </>
                 }
                 </Routes>

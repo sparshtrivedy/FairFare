@@ -114,6 +114,8 @@ const CreateEvent = () => {
                 splits: item.splits
             });
         }
+
+        window.location.href = `/#view-event/${eventRef.id}`;
     }
 
     return (
@@ -198,7 +200,6 @@ const CreateEvent = () => {
                                                                 copiedItems.forEach((item, i) => {
                                                                     updateMemberSplits(copiedMembers, copiedItems, i);
                                                                 });
-                                                                console.log(copiedItems);
                                                                 setItems(copiedItems);
                                                             }}>
                                                                 <MdDelete />
@@ -266,7 +267,6 @@ const CreateEvent = () => {
                                                                         onChange={(e) => {
                                                                             let copiedItems = [...items];
                                                                             copiedItems[index].itemPrice = e.target.value;
-                                                                            console.log(copiedItems);
                                                                             updateMemberSplits(event.members, copiedItems, index);
                                                                             setItems(copiedItems);
                                                                         }}
