@@ -13,7 +13,6 @@ import { auth } from '../firebase-config';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from 'react-router-dom';
 import { IoMdPersonAdd } from "react-icons/io";
-import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../firebase-config';
 
 const Register = () => {
@@ -28,21 +27,25 @@ const Register = () => {
     const handleRegister = async () => {
         try {
             await createUserWithEmailAndPassword(auth, email, password);
-            console.log('User registered');
-            const addedUser = await addDoc(collection(db, 'users'), {
-                email: email
+
+            const addedUser = await db.collection('users').add({
+                email
             });
-            console.log('Added document with ID: ', addedUser.id);
+            console.log('Added user with ID: ', addedUser.id);
+
             setSuccess('User registered successfully. Redirecting to login...');
+
             setTimeout(() => {
                 setSuccess('');
                 navigate('/login');
             }, 3000);
         } catch (error) {
             setError('An error occurred');
+
             setTimeout(() => {
                 setError('');
             }, 3000);
+
             console.error(error);
         }
     }

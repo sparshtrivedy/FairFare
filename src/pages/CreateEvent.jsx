@@ -6,7 +6,8 @@ import {
     Col,
     Row,
     Container,
-    Accordion
+    Accordion,
+    Alert
 } from 'react-bootstrap'
 import { 
     BsPersonFillAdd,
@@ -15,320 +16,341 @@ import {
 } from "react-icons/bs";
 import { MdOutlineSafetyDivider, MdDelete, MdAddCircle } from "react-icons/md";
 import { FaPeopleGroup } from "react-icons/fa6";
-import { collection, getDocs, where, query, addDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from '../firebase-config';
 
 const CreateEvent = () => {
-    const eventsCollectionRef = collection(db, 'events');
+    const [memberError, setMemberError] = useState('');
+
+    const [items, setItems] = useState([{ 
+        itemName: '', 
+        itemQuantity: 0, 
+        itemPrice: 0, 
+        splits: []
+    }]);
 
     const [event, setEvent] = useState({
         name: '',
         date: '',
         description: '',
         members: [],
-        items: []
     });
 
-    const handleAddMembers = () => {
-        setEvent({
-            ...event,
-            members: [...event.members, ''],
-            items: event.items.map(item => {
-                return {
-                    ...item,
-                    itemMembers: [...item.itemMembers, {
-                        email: '',
-                        isSharing: false,
-                        share: 0
-                    }]
-                }
-            })
-        });
-    }
-
-    const createEvent = async (e) => {
-        e.preventDefault();
-
-        const memberRefs = [];
-        const itemRefs = [];
-
-        for (const member of event.members) {
-            const memberQuery = query(collection(db, 'members'), where('email', '==', member));
-            const memberSnapshot = await getDocs(memberQuery);
-            if (!memberSnapshot.empty) {
-                memberRefs.push(memberSnapshot.docs[0].ref);
-            } else {
-                await addDoc(collection(db, 'members'), { email: member });
-                const newMemberQuery = query(collection(db, 'members'), where('email', '==', member));
-                const newMemberSnapshot = await getDocs(newMemberQuery);
-                memberRefs.push(newMemberSnapshot.docs[0].ref);
-            }
-        }
-
-        for (const item of event.items) {
-            const itemDocRef = await addDoc(collection(db, 'items'), {
-                itemName: item.itemName,
-                itemQuantity: item.itemQuantity,
-                itemPrice: item.itemPrice,
-            });
-            itemRefs.push(itemDocRef);
-
-            for (const member of item.itemMembers) {
-                await addDoc(collection(db, 'item-member-shares'), {
-                    isSharing: member.isSharing,
-                    share: member.share,
-                    item: itemDocRef,
-                    member: memberRefs[event.members.indexOf(member.email)]
-                })
-            }
-        }
-        
-        await addDoc(eventsCollectionRef, { 
-            eventName: event.name,
-            eventDate: event.date,
-            eventDescription: event.description,
-            eventMembers: memberRefs,
-            eventItems: itemRefs
-        });
-    };
-
-    const handleRemoveMembers = (index) => {
-        const newMembers = [...event.members];
-
-        for (let i = 0; i < event.items.length; i++) {
-            if (event.items[i].itemMembers[index].isSharing) {
-                event.items[i].itemMembers[index].isSharing = false;
-                event.items[i].itemMembers[index].share = 0;
-            }
-
-            const sharingMembers = event.items[i].itemMembers.filter(member => member.isSharing);
-
-            for (let j = 0; j < event.items[i].itemMembers.length; j++) {
-                if (event.items[i].itemMembers[j].isSharing) {
-                    event.items[i].itemMembers[j].share = event.items[i].itemPrice * event.items[i].itemQuantity / sharingMembers.length;
-                }
-            }
-        }
-
-        newMembers.splice(index, 1);
-
-        setEvent({
-            ...event,
-            members: newMembers,
-            items: event.items.map(item => {
-                return {
-                    ...item,
-                    itemMembers: item.itemMembers.filter((member, idx) => idx !== index)
-                }
-            })
-        });
-    }
-
     const handleAddItems = () => {
-        setEvent({
-            ...event,
-            items: [...event.items, {
-                itemName: '',
-                itemQuantity: 0,
-                itemPrice: 0,
-                itemMembers: event.members.map(member => {
-                    return {
-                        email: member,
-                        isSharing: false,
-                        share: 0
-                    }
-                })
-            }]
-        });
+        setItems([...items, {
+            itemName: '',
+            itemPrice: 0,
+            itemQuantity: 0,
+            transferTo: '',
+            splits: event.members.map(member => ({
+                email: member.email,
+                amount: 0,
+                isChecked: false
+            }))
+        }]);
     }
 
-    const handleRemoveItems = (index) => {
-        const newItems = [...event.items];
-        newItems.splice(index, 1);
-        setEvent({
-            ...event,
-            items: newItems
+    const handleItemSplitChange = (index, i) => {
+        let copiedItems = [...items];
+        copiedItems[index].splits[i].isChecked = !copiedItems[index].splits[i].isChecked;
+        updateMemberSplits(event.members, copiedItems, index);
+        setItems(copiedItems);
+    }
+
+    function updateMemberSplits(members, copiedItems, index) {
+        const totalChecked = copiedItems[index].splits.reduce((acc, split) => {
+            if (split.isChecked) {
+                return acc + 1;
+            }
+            return acc;
+        }, 0);
+
+        for (let j = 0; j < members.length; j++) {
+            if (copiedItems[index].splits[j].isChecked) {
+                copiedItems[index].splits[j].amount = (copiedItems[index].itemPrice * copiedItems[index].itemQuantity) / totalChecked;
+            } else {
+                copiedItems[index].splits[j].amount = 0;
+            }
+        }
+    }
+        
+
+    const handleChangeMemberEmail = async (e, index) => {
+        let copiedMembers = [...event.members];
+        copiedMembers[index].email = e.target.value;
+        setEvent({ ...event, members: copiedMembers });
+
+        const memberQuery = query(collection(db, 'users'), where('email', '==', e.target.value));
+        const memberSnapshot = await getDocs(memberQuery);
+        if (memberSnapshot.empty) {
+            setMemberError('User not found. Please make sure this user is registered.');
+        } else {
+            setMemberError('');
+            const numItems = items.length;
+            for (let i = 0; i < numItems; i++) {
+                let copiedItems = [...items];
+                copiedItems[i].splits[index].email = e.target.value;
+                setItems(copiedItems);
+            }
+        }
+    }
+
+    const handleCreateEvent = async (e) => {
+        e.preventDefault();
+        const eventRef = await addDoc(collection(db, 'events'), {
+            name: event.name,
+            date: event.date,
+            description: event.description,
+            members: event.members,
         });
+
+        for (const item of items) {
+            await addDoc(collection(db, 'items'), {
+                event: eventRef,
+                itemName: item.itemName,
+                itemPrice: item.itemPrice,
+                itemQuantity: item.itemQuantity,
+                transferTo: item.transferTo,
+                splits: item.splits
+            });
+        }
     }
 
     return (
         <Container style={{height: '100%'}}>
             <Row className='justify-content-center'>
                 <Col xs={10}>
-                    <Card style={{borderRadius: 0, border: 0}}>
-                        <Card.Header style={{backgroundColor: '#80b1b3', borderRadius: 0}}>
-                            <h4 className='my-2'>
+                    <Card style={{border: 0}} className='my-3'>
+                        <Card.Header style={{backgroundColor: '#80b1b3'}}>
+                            <h4 className='my-1'>
                                 <MdOutlineSafetyDivider size={40} /> Create new event
                             </h4>
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
                             <Form>
-                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                    <Form.Label>Event name</Form.Label>
-                                    <Form.Control 
-                                        type="text" 
-                                        placeholder="Enter event name" 
-                                        onChange={(e) => setEvent({ ...event, name: e.target.value })} 
-                                    />
+                                <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+                                    <Form.Label column sm="2">
+                                        Event name
+                                    </Form.Label>
+                                    <Col sm="10">
+                                        <Form.Control 
+                                            type="text" 
+                                            placeholder="Enter event name" 
+                                            onChange={(e) => setEvent({ ...event, name: e.target.value })} 
+                                        />
+                                    </Col>
                                 </Form.Group>
-                                <Form.Group className="mb-3" controlId="formBasicPassword">
-                                    <Form.Label>Event date</Form.Label>
-                                    <Form.Control 
-                                        type="date" 
-                                        placeholder="Enter event date" 
-                                        onChange={(e) => setEvent({ ...event, date: e.target.value })} 
-                                    />
+                                <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+                                    <Form.Label column sm="2">
+                                        Event date
+                                    </Form.Label>
+                                    <Col sm="10">
+                                        <Form.Control 
+                                            type="date" 
+                                            placeholder="Enter event date" 
+                                            onChange={(e) => setEvent({ ...event, date: e.target.value })} 
+                                        />
+                                    </Col>
                                 </Form.Group>
-                                <Form.Group className="mb-3" controlId="formBasicPassword">
-                                    <Form.Label>Event description</Form.Label>
-                                    <Form.Control 
-                                        as="textarea" 
-                                        rows={3} 
-                                        placeholder="Enter event description" 
-                                        onChange={(e) => setEvent({ ...event, description: e.target.value })} 
-                                    />
+                                <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
+                                    <Form.Label column sm="2">
+                                        Event description
+                                    </Form.Label>
+                                    <Col sm="10">
+                                        <Form.Control
+                                            as="textarea"
+                                            placeholder="Enter event description"
+                                            onChange={(e) => setEvent({ ...event, description: e.target.value })}
+                                        />
+                                    </Col>
                                 </Form.Group>
-                                <Card className='mb-3'>
-                                    <Card.Header style={{backgroundColor: '#dae7f1'}}>
-                                        <h5 className='my-2'>
-                                            <FaPeopleGroup /> Members
+                                <Card className='my-3'>
+                                    <Card.Header style={{backgroundColor: '#80b1b3'}}>
+                                        <h5 className='my-1'>
+                                            <FaPeopleGroup size={25} /> Members
                                         </h5>
                                     </Card.Header>
-                                    <Card.Body style={{backgroundColor: '#f8f8f8'}}>
-                                        {event.members.length? event.members.map((member, index) => {
-                                            return (
-                                                <Form.Group className="mb-3" controlId="formBasicPassword" key={index}>
-                                                    <Form.Label>Member {index + 1}</Form.Label>
-                                                    <div className="d-flex justify-content-end">
-                                                        <Form.Control 
-                                                            type="email" 
-                                                            placeholder="Enter member email" 
-                                                            onChange={(e) => {
-                                                                const newMembers = [...event.members];
-                                                                const newItems = [...event.items];
-                                                                newMembers[index] = e.target.value;
-                                                                newItems.forEach(item => {
-                                                                    item.itemMembers[index].email = e.target.value;
+                                    <Card.Body>
+                                        <Alert variant='danger' show={memberError.length !== 0}>
+                                            {memberError}
+                                        </Alert>
+                                        {event.members.length?
+                                            event.members.map((member, index) => (
+                                                <div key={`member-${index}`} className='my-2'>
+                                                    <Form.Group as={Row} className="mb-3">
+                                                        <Form.Label column sm="2">
+                                                            Member {index + 1}
+                                                        </Form.Label>
+                                                        <Col sm="9">
+                                                            <Form.Control
+                                                                type="text"
+                                                                placeholder="Enter member email"
+                                                                onChange={(e) => handleChangeMemberEmail(e, index)}
+                                                            />
+                                                        </Col>
+                                                        <Col sm="1">
+                                                            <Button variant='danger' onClick={() => {
+                                                                let copiedMembers = [...event.members];
+                                                                copiedMembers.splice(index, 1);
+                                                                setEvent({ ...event, members: copiedMembers });
+                                                                let copiedItems = [...items];
+                                                                copiedItems.forEach(item => {
+                                                                    item.splits.splice(index, 1);
                                                                 });
-                                                                setEvent({ ...event, members: newMembers });
-                                                            }}
-                                                        />
-                                                        <Button variant="danger" className="ms-2 d-flex align-items-center" onClick={() => handleRemoveMembers(index)}>
-                                                            <MdDelete style={{ marginRight: 2 }}/> Remove
-                                                        </Button>
-                                                    </div>
-                                                </Form.Group>
-                                            )
-                                        }) : <p>No members added</p>}
+                                                                copiedItems.forEach((item, i) => {
+                                                                    updateMemberSplits(copiedMembers, copiedItems, i);
+                                                                });
+                                                                console.log(copiedItems);
+                                                                setItems(copiedItems);
+                                                            }}>
+                                                                <MdDelete />
+                                                            </Button>
+                                                        </Col>
+                                                    </Form.Group>
+                                                </div>
+                                            )):
+                                            <p>No members added</p>
+                                        }
                                     </Card.Body>
-                                    <Card.Footer style={{backgroundColor: '#dae7f1'}}>
-                                        <Button onClick={handleAddMembers} className='my-2'>
+                                    <Card.Footer style={{backgroundColor: '#80b1b3'}}>
+                                        <Button variant='primary' onClick={() => {
+                                            let copiedMembers = [...event.members];
+                                            copiedMembers.push({ email: '' });
+                                            setEvent({ ...event, members: copiedMembers });
+                                            let copiedItems = [...items];
+                                            copiedItems.forEach(item => {
+                                                item.splits.push({ email: '', amount: 0, isChecked: false});
+                                            });
+                                        }}>
                                             <BsPersonFillAdd /> Add member
                                         </Button>
                                     </Card.Footer>
                                 </Card>
                                 <Card>
-                                    <Card.Header style={{backgroundColor: '#dae7f1'}}>
-                                        <h5 className='my-2'>
-                                            <BsDatabaseFill /> Items
+                                    <Card.Header style={{backgroundColor: '#80b1b3'}}>
+                                        <h5 className='my-1'>
+                                            <BsDatabaseFill size={25} /> Items
                                         </h5>
                                     </Card.Header>
-                                    <Card.Body style={{backgroundColor: '#f8f8f8'}}>
-                                        <Accordion alwaysOpen>
-                                        {event.items.length? event.items.map((item, index) => {
-                                            return (
-                                                <Accordion.Item eventKey={index} key={index}>
-                                                    <Accordion.Header>
-                                                        <h6>Item {index + 1}</h6>
-                                                    </Accordion.Header>
-                                                    <Accordion.Body>
-                                                        <Form.Group className="mb-3" controlId="formBasicPassword" key={index}>
-                                                            <Form.Label>Item name</Form.Label>
-                                                            <Form.Control 
-                                                                type="text" 
-                                                                placeholder="Enter item" 
-                                                                onChange={(e) => {
-                                                                    const newItems = [...event.items];
-                                                                    newItems[index].itemName = e.target.value;
-                                                                    setEvent({ ...event, items: newItems });
-                                                                }}
-                                                            />
-                                                        </Form.Group>
-                                                        <Form.Group className="mb-3" controlId="formBasicPassword" key={index}>
-                                                            <Form.Label>Item quantity</Form.Label>
-                                                            <Form.Control 
-                                                                type="number" 
-                                                                placeholder="Enter item quantity" 
-                                                                onChange={(e) => {
-                                                                    const newItems = [...event.items];
-                                                                    newItems[index].itemQuantity = e.target.value;
-                                                                    setEvent({ ...event, items: newItems });
-                                                                }}
-                                                            />
-                                                        </Form.Group>
-                                                        <Form.Group className="mb-3" controlId="formBasicPassword" key={index}>
-                                                            <Form.Label>Item price</Form.Label>
-                                                            <Form.Control
-                                                                type="number" 
-                                                                placeholder="Enter item price" 
-                                                                onChange={(e) => {
-                                                                    const newItems = [...event.items];
-                                                                    newItems[index].itemPrice = e.target.value;
-                                                                    setEvent({ ...event, items: newItems });
-                                                                }}
-                                                            />
-                                                        </Form.Group>
-                                                        <Card className='mb-3'>
-                                                            <Card.Header>
-                                                                Share the blame
-                                                            </Card.Header>
-                                                            <Card.Body>
-                                                                {item.itemMembers.length? item.itemMembers.map((member, idx) => {
-                                                                    return (
-                                                                        <Form.Check
-                                                                            key={idx}
-                                                                            inline
+                                    <Card.Body>
+                                        {items.length?
+                                            <Accordion>
+                                                {items.map((item, index) => (
+                                                    <Accordion.Item eventKey={index} key={`item-${index}`}>
+                                                        <Accordion.Header>
+                                                            <h6>{item.itemName}</h6>
+                                                        </Accordion.Header>
+                                                        <Accordion.Body>
+                                                            <Form.Group as={Row} className="mb-3">
+                                                                <Form.Label column sm="2">
+                                                                    Item name
+                                                                </Form.Label>
+                                                                <Col sm="10">
+                                                                    <Form.Control 
+                                                                        type="text" 
+                                                                        placeholder="Enter item name" 
+                                                                        onChange={(e) => {
+                                                                            let copiedItems = [...items];
+                                                                            copiedItems[index].itemName = e.target.value;
+                                                                            setItems(copiedItems);
+                                                                        }}
+                                                                    />
+                                                                </Col>
+                                                            </Form.Group>
+                                                            <Form.Group as={Row} className="mb-3">
+                                                                <Form.Label column sm="2">
+                                                                    Item price
+                                                                </Form.Label>
+                                                                <Col sm="10">
+                                                                    <Form.Control 
+                                                                        type="number" 
+                                                                        placeholder="Enter item price" 
+                                                                        onChange={(e) => {
+                                                                            let copiedItems = [...items];
+                                                                            copiedItems[index].itemPrice = e.target.value;
+                                                                            console.log(copiedItems);
+                                                                            updateMemberSplits(event.members, copiedItems, index);
+                                                                            setItems(copiedItems);
+                                                                        }}
+                                                                    />
+                                                                </Col>
+                                                            </Form.Group>
+                                                            <Form.Group as={Row} className="mb-3">
+                                                                <Form.Label column sm="2">
+                                                                    Item quantity
+                                                                </Form.Label>
+                                                                <Col sm="10">
+                                                                    <Form.Control 
+                                                                        type="number" 
+                                                                        placeholder="Enter item quantity" 
+                                                                        onChange={(e) => {
+                                                                            let copiedItems = [...items];
+                                                                            copiedItems[index].itemQuantity = e.target.value;
+                                                                            updateMemberSplits(event.members, copiedItems, index);
+                                                                            setItems(copiedItems);
+                                                                        }}
+                                                                    />
+                                                                </Col>
+                                                            </Form.Group>
+                                                            <Form.Group as={Row} className="mb-3">
+                                                                <Form.Label column sm="2">
+                                                                    Transfer to
+                                                                </Form.Label>
+                                                                <Col sm="10">
+                                                                    <Form.Control 
+                                                                        type="text" 
+                                                                        placeholder="Enter transfer details of person to e-transfer to" 
+                                                                        onChange={(e) => {
+                                                                            let copiedItems = [...items];
+                                                                            copiedItems[index].transferTo = e.target.value;
+                                                                            setItems(copiedItems);
+                                                                        }}
+                                                                    />
+                                                                </Col>
+                                                            </Form.Group>
+                                                            <Form.Group as={Row} className="mb-3">
+                                                                <Form.Label column sm="2">
+                                                                    Shared among
+                                                                </Form.Label>
+                                                                <Col sm="10">
+                                                                {event.members.length?
+                                                                    event.members.map((member, i) => (
+                                                                        <Form.Check 
+                                                                            key={`item-${index}-member-${i}`}
+                                                                            type="checkbox" 
                                                                             label={member.email}
-                                                                            name="group1"
-                                                                            type='checkbox'
-                                                                            id={`member-${idx + 1}`}
-                                                                            onChange={(e) => {
-                                                                                const newItems = [...event.items];
-                                                                                newItems[index].itemMembers[idx].isSharing = e.target.checked;
-                                                                                const sharingMembers = newItems[index].itemMembers.filter(member => member.isSharing);
-                                                                                for (let i = 0; i < newItems[index].itemMembers.length; i++) {
-                                                                                    if (newItems[index].itemMembers[i].isSharing) {
-                                                                                        newItems[index].itemMembers[i].share = newItems[index].itemPrice * newItems[index].itemQuantity / sharingMembers.length;
-                                                                                    } else {
-                                                                                        newItems[index].itemMembers[i].share = 0;
-                                                                                    }
-                                                                                }
-                                                                                setEvent({ ...event, items: newItems });
-                                                                            }}
+                                                                            onChange={() => handleItemSplitChange(index, i)}
                                                                         />
-                                                                    )
-                                                                }) : <p>No members added</p>}
-                                                            </Card.Body>
-                                                        </Card>
-                                                        <Button variant="danger" onClick={() => handleRemoveItems(index)}>
-                                                            <MdDelete style={{ marginRight: 2 }}/> Remove
-                                                        </Button>
-                                                    </Accordion.Body>
-                                                </Accordion.Item>
-                                            )
-                                        }): <p>No items added</p>}
-                                        </Accordion>
+                                                                    )):
+                                                                    <p>No members added</p>
+                                                                }
+                                                                </Col>
+                                                            </Form.Group>
+                                                            <Button variant='danger' onClick={() => {
+                                                                let copiedItems = [...items];
+                                                                copiedItems.splice(index, 1);
+                                                                setItems(copiedItems);
+                                                            }}>
+                                                                <MdDelete /> Remove item
+                                                            </Button>
+                                                        </Accordion.Body>
+                                                    </Accordion.Item>
+                                                ))}
+                                            </Accordion>
+                                            : 
+                                            <p>No items added</p>
+                                        }
                                     </Card.Body>
-                                    <Card.Footer style={{backgroundColor: '#dae7f1'}}>
-                                        <Button onClick={handleAddItems} className='my-2'>
+                                    <Card.Footer style={{backgroundColor: '#80b1b3'}}>
+                                        <Button variant='primary' onClick={handleAddItems}>
                                             <BsDatabaseFillAdd /> Add item
                                         </Button>
                                     </Card.Footer>
                                 </Card>
                             </Form>
                         </Card.Body>
-                        <Card.Footer style={{backgroundColor: '#80b1b3', borderRadius: 0}}>
-                            <Button variant="primary" type="submit" className='my-2' onClick={createEvent}>
+                        <Card.Footer style={{backgroundColor: '#80b1b3'}}>
+                            <Button variant="primary" type="submit" onClick={handleCreateEvent}>
                                 <MdAddCircle /> Create event
                             </Button>
                         </Card.Footer>
@@ -339,4 +361,4 @@ const CreateEvent = () => {
     )
 }
 
-export default CreateEvent
+export default CreateEvent;
