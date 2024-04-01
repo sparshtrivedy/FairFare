@@ -19,7 +19,7 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from '../firebase-config';
 
-const CreateEvent = () => {
+const EditEvent = () => {
     const [memberError, setMemberError] = useState('');
 
     const [items, setItems] = useState([{ 
@@ -359,4 +359,4 @@ const CreateEvent = () => {
     )
 }
 
-export default CreateEvent;
+export default EditEvent;
