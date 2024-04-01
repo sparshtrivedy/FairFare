@@ -51,7 +51,7 @@ const Layout = () => {
                             <Nav.Link href="#home">Home</Nav.Link>
                             <Nav.Link href="#create-event">Create Event</Nav.Link>
                         </Nav>
-                        <Navbar.Text className='m-2'>
+                        <Navbar.Text style={{marginRight: '15px'}}>
                             {isLoggedIn ? `Hello, ${userEmail}` : 
                                 <Button variant='primary' href='#login'>Login</Button>
                             }
