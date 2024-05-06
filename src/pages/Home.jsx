@@ -1,6 +1,6 @@
 import React, {useContext, useEffect, useState} from 'react'
 import { AuthContext } from '../App'
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, getDocs, doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from '../firebase-config';
 import { 
   MdOutlineDashboard,
@@ -18,7 +18,8 @@ import {
   Spinner,
   Offcanvas,
   Form,
-  Accordion
+  Accordion,
+  Table
 } from 'react-bootstrap';
 
 const Home = () => {
@@ -60,7 +61,7 @@ const Home = () => {
           let total = 0;
           for (const split of itemSplits) {
             for (const user of split) {
-              if (user.email === userEmail) {
+              if (user.email === userEmail && !user.isSettled) {
                 total += user.amount;
               }
             }
@@ -82,43 +83,57 @@ const Home = () => {
         const item = doc.data();
         const eventRef = await getDoc(item.event);
         const event = eventRef.data();
+        const tempSplits = [];
+        for (const split of item.splits) {
+          if (split.isChecked) {
+            tempSplits.push({
+              email: split.email,
+              amount: split.amount,
+              isChecked: split.isChecked,
+              isSettled: split.isSettled
+            });
+          }
+        }
 
-        owedItems.push({
-          eventId: item.event.id,
-          eventName: event.name,
-          itemName: item.itemName,
-          itemPrice: item.itemPrice,
-          itemQuantity: item.itemQuantity,
-          youAreOwed: (parseFloat(item.itemPrice) * item.itemQuantity).toFixed(2),
-          members: item.splits.map((split) => {
-            if (split.isChecked) {
-              return {
-                email: split.email,
-                amount: split.amount
-              }
-            }
-          }),
-        });
+        const numUnSettled = tempSplits.filter((split) => !split.isSettled).length;
+        const numMembers = tempSplits.length;
+        const amount = parseFloat(item.itemPrice) * item.itemQuantity * numUnSettled / numMembers;
+
+        if (amount.toFixed(2) > 0) {
+          owedItems.push({
+            id: doc.id,
+            eventId: item.event.id,
+            eventName: event.name,
+            itemName: item.itemName,
+            itemPrice: item.itemPrice,
+            itemQuantity: item.itemQuantity,
+            youAreOwed: amount.toFixed(2),
+            members: tempSplits
+          });
+        }
       }
 
-      console.log(owedItems);
       setOwedItems(owedItems);
       
-      setUsersEvents(usersEventsTemp.map((event) => {
-        return {
-          eventId: event.eventId,
-          eventName: event.eventName,
-          eventDate: event.eventDate,
-          balance: event.balance,
-          email: userEmail
+      const tempUsersEvents = [];
+      for (const event of usersEventsTemp) {
+        if (event.balance > 0) {
+          tempUsersEvents.push({
+            eventId: event.eventId,
+            eventName: event.eventName,
+            eventDate: event.eventDate,
+            balance: event.balance,
+            email: event.email
+          });
         }
-      }));
+      }
+      setUsersEvents(tempUsersEvents);
 
       setIsLoading(false);
     }
 
     getEvents();
-  }, [userEmail]);
+  }, [userEmail, selectedEventItems]);
 
   const handleClickSettle = async (event) => {
     setSelectedEvent(event);
@@ -134,7 +149,8 @@ const Home = () => {
         transferTo: doc.data().transferTo,
         price: doc.data().itemPrice,
         quantity: doc.data().itemQuantity,
-        share: doc.data().splits.find((split) => split.email === userEmail).amount
+        share: doc.data().splits.find((split) => split.email === userEmail).amount,
+        splits: doc.data().splits
       }
     });
     setSelectedEventItems(items);
@@ -165,82 +181,98 @@ const Home = () => {
                 <Card.Header style={{backgroundColor: '#80b1b3'}} as="h4" className='d-flex align-items-center justify-content-center'>
                   <MdOutlineKeyboardDoubleArrowUp size={30} style={{marginRight: '5px'}}/> You owe
                 </Card.Header>
-                <Card.Body className='d-flex flex-wrap justify-content-center'>
+                <Card.Body className='d-flex flex-wrap justify-content-center m-0 p-0'>
                   {isLoading? 
-                    <Spinner animation="border" size='lg' /> : 
-                    <>
-                      {usersEvents.map((event, index) => (
-                        <Card key={index} className='text-align-center m-2' style={{width: '25%'}}>
-                          <Card.Body className='d-flex flex-column align-items-center'>
-                            <Card.Title as='h5'>
-                              {event.eventName}
-                            </Card.Title>
-                            <Card.Subtitle className="mb-2 text-muted">
-                              {event.eventDate}
-                            </Card.Subtitle>
-                            <Card.Text>
-                              You owe: {event.balance}
-                            </Card.Text>
-                          </Card.Body>
-                          <Card.Footer>
-                            <Button 
-                              variant='primary' 
-                              onClick={() => window.location.href = `/#view-event/${event.eventId}`}
-                              style={{marginRight: '5px'}}
-                            >
-                              <GrView /> View
-                            </Button>
-                            <Button 
-                              variant='danger' 
-                              onClick={() => handleClickSettle(event)}
-                            >
-                              <GrMoney /> Settle
-                            </Button>
-                          </Card.Footer>
-                        </Card>
-                      ))}
-                    </>}
+                    <Spinner animation="border" size='lg' className='m-3' /> : 
+                    <Table striped bordered hover className='m-3'>
+                      <thead>
+                        <tr>
+                          <th>Event name</th>
+                          <th>Event date</th>
+                          <th>To</th>
+                          <th>Balance</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {!usersEvents.length?
+                          <tr>
+                            <td colSpan='5'>No events found</td>
+                          </tr>:
+                          usersEvents.map((event, index) => (
+                            <tr key={index}>
+                              <td>{event.eventName}</td>
+                              <td>{event.eventDate}</td>
+                              <td>{event.email}</td>
+                              <td>{event.balance.toFixed(2)}</td>
+                              <td>
+                                <Button 
+                                  variant='primary' 
+                                  onClick={() => window.location.href = `/#view-event/${event.eventId}`}
+                                  style={{marginRight: '5px'}}
+                                >
+                                  <GrView /> View
+                                </Button>
+                                <Button 
+                                  variant='info'
+                                  onClick={() => handleClickSettle(event)}
+                                >
+                                  <GrMoney /> Settle
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </Table>}
                 </Card.Body>
               </Card>
               <Card className='mx-3 mb-3'>
                 <Card.Header style={{backgroundColor: '#80b1b3'}} as="h4" className='d-flex align-items-center justify-content-center'>
                   <MdOutlineKeyboardDoubleArrowDown size={30} style={{marginRight: '5px'}}/> You are owed
                 </Card.Header>
-                <Card.Body className='d-flex flex-wrap justify-content-center'>
+                <Card.Body className='d-flex flex-wrap justify-content-center p-0'>
                   {isLoading? 
-                    <Spinner animation="border" size='lg' />:
-                    <>
-                      {owedItems.map((item, index) => (
-                        <Card key={index} className='text-align-center m-2' style={{width: '25%'}}>
-                          <Card.Body className='d-flex flex-column align-items-center'>
-                            <Card.Title as='h5'>
-                              {item.itemName}
-                            </Card.Title>
-                            <Card.Subtitle className="mb-2 text-muted">
-                              {item.eventName}
-                            </Card.Subtitle>
-                            <Card.Text>
-                              Owed to you: {item.youAreOwed}
-                            </Card.Text>
-                          </Card.Body>
-                          <Card.Footer>
-                            <Button 
-                              variant='primary' 
-                              onClick={() => window.location.href = `/#view-event/${item.eventId}`}
-                              style={{marginRight: '5px'}}
-                            >
-                              <GrView /> View
-                            </Button>
-                            <Button 
-                              variant='danger' 
-                              onClick={() => handleClickBreakdown(item)}
-                            >
-                              <GrMoney /> Breakdown
-                            </Button>
-                          </Card.Footer>
-                        </Card>
-                      ))}
-                    </>}
+                    <Spinner animation="border" size='lg' className='m-3' />:
+                    <Table striped bordered hover className='m-3'>
+                      <thead>
+                        <tr>
+                          <th>Item name</th>
+                          <th>Event name</th>
+                          <th>Amount</th>
+                          <th>From</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {!owedItems.length? 
+                        <tr>
+                          <td colSpan='5'>No events found</td>
+                        </tr>:
+                        owedItems.map((item, index) => (
+                          <tr key={index}>
+                            <td>{item.itemName}</td>
+                            <td>{item.eventName}</td>
+                            <td>{item.youAreOwed}</td>
+                            <td>{item.members && item.members.filter((member) => !member.isSettled).map((member) => member.email).join(', ')}</td>
+                            <td>
+                              <Button 
+                                variant='primary' 
+                                onClick={() => window.location.href = `/#view-event/${item.eventId}`}
+                                style={{marginRight: '5px'}}
+                              >
+                                <GrView /> View
+                              </Button>
+                              <Button 
+                                variant='info' 
+                                onClick={() => handleClickBreakdown(item)}
+                              >
+                                <GrMoney /> Breakdown
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                  </Table>}
                 </Card.Body>
               </Card>
             </Card>
@@ -363,8 +395,34 @@ const Home = () => {
                         />
                       </Col>
                     </Form.Group>
-                    <Button variant='primary' className='mt-3'>
-                      Mark as settled
+                    <Button 
+                      variant={item.splits && item.splits.find((split) => split.email === userEmail).isSettled? 'danger': 'success'} 
+                      className='mt-3' 
+                      onClick={async (e) => {
+                      if (item.splits) {
+                        for (const split of item.splits) {
+                          if (split.email === userEmail) {
+                            setSelectedEventItems(selectedEventItems.map((i) => {
+                              if (i.id === item.id) {
+                                console.log(i.splits);
+                                i.splits = i.splits.map((s) => {
+                                  if (s.email === userEmail) {
+                                    s.isSettled = !s.isSettled;
+                                  }
+                                  return s;
+                                });
+                              }
+                              return i;
+                            }));
+                            const itemRef = doc(db, "items", item.id);
+                            updateDoc(itemRef, {
+                              splits: item.splits
+                            });
+                          }
+                        }
+                      }
+                    }}>
+                      {item.splits && item.splits.find((split) => split.email === userEmail).isSettled? 'Mark as unsettled': 'Mark as settled'}
                     </Button>
                   </Accordion.Body>
                 </Accordion.Item>
@@ -463,8 +521,27 @@ const Home = () => {
                         />
                       </Col>
                     </Form.Group>
-                    <Button variant='primary' className='mt-3'>
-                      Mark as settled
+                    <Button 
+                      variant={member.isSettled? 'danger': 'success'} 
+                      className='mt-3'
+                      onClick={(e) => {
+                        setSelectedOwedItem({
+                          ...selectedOwedItem,
+                          members: selectedOwedItem.members.map((m) => {
+                            if (m.email === member.email) {
+                              m.isSettled = !m.isSettled;
+                            }
+                            return m;
+                          })
+                        });
+
+                        const itemRef = doc(db, "items", selectedOwedItem.id);
+                        updateDoc(itemRef, {
+                          splits: selectedOwedItem.members
+                        });
+                      }}
+                    >
+                      {member.isSettled? 'Mark as unsettled': 'Mark as settled'}
                     </Button>
                   </Accordion.Body>
                 </Accordion.Item>

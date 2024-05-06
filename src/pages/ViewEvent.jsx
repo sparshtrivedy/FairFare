@@ -105,7 +105,7 @@ const ViewEvent = () => {
                                     <Card.Body>
                                         {event?.members.map((member, index) => (
                                             <Form.Group key={`member-${index}`} as={Row}>
-                                                <Form.Label column sm="2">
+                                                <Form.Label column sm="2" className='mb-3'>
                                                     Member {index + 1}
                                                 </Form.Label>
                                                 <Col sm="10">

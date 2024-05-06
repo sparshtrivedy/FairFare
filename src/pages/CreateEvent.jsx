@@ -45,7 +45,8 @@ const CreateEvent = () => {
             splits: event.members.map(member => ({
                 email: member.email,
                 amount: 0,
-                isChecked: false
+                isChecked: false,
+                isSettled: false
             }))
         }]);
     }
@@ -218,7 +219,12 @@ const CreateEvent = () => {
                                             setEvent({ ...event, members: copiedMembers });
                                             let copiedItems = [...items];
                                             copiedItems.forEach(item => {
-                                                item.splits.push({ email: '', amount: 0, isChecked: false});
+                                                item.splits.push({ 
+                                                    email: '', 
+                                                    amount: 0, 
+                                                    isChecked: false,
+                                                    isSettled: false
+                                                });
                                             });
                                         }}>
                                             <BsPersonFillAdd /> Add member
