@@ -14,6 +14,7 @@ import Login from './Login'
 import Register from './Register'
 import CreateEvent from './CreateEvent'
 import EditEvent from './EditEvent'
+import History from './History'
 import { MdOutlineBalance, MdLogout } from "react-icons/md";
 import ViewEvent from './ViewEvent';
 import { useNavigate } from 'react-router-dom';
@@ -50,6 +51,7 @@ const Layout = () => {
                         <Nav className="me-auto">
                             <Nav.Link href="#home">Home</Nav.Link>
                             <Nav.Link href="#create-event">Create Event</Nav.Link>
+                            <Nav.Link href="#history">History</Nav.Link>
                         </Nav>
                         <Navbar.Text style={{marginRight: '15px'}}>
                             {isLoggedIn ? `Hello, ${userEmail}` : 
@@ -71,9 +73,10 @@ const Layout = () => {
                         <Route path="/create-event" element={<CreateEvent />} />
                         <Route path="/view-event/:eventId" element={<ViewEvent />} />
                         <Route path="/edit-event/:eventId" element={<EditEvent />} />
+                        <Route path="/history" element={<History />} />
                     </>
                 }
-                </Routes>
+            </Routes>
         </div>
     )
 }
