@@ -19,6 +19,14 @@ import { MdOutlineBalance, MdLogout } from "react-icons/md";
 import ViewEvent from './ViewEvent';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
+import { 
+    GoLaw, 
+    GoSignOut,
+    GoHome,
+    GoPlusCircle,
+    GoHistory
+} from "react-icons/go";
+
 
 const Layout = () => {
     const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail } = useContext(AuthContext);
@@ -45,13 +53,35 @@ const Layout = () => {
             {isLoggedIn &&
                 <Navbar bg="dark" data-bs-theme="dark">
                     <Container>
-                        <Navbar.Brand href="#home">
-                            <MdOutlineBalance size={25} /> FairFare
+                        <Navbar.Brand style={{ display: 'flex', alignItems: 'center' }}>
+                            <GoLaw size={25} /> 
+                            <span style={{ marginLeft: "10px" }}>FairFare</span>
                         </Navbar.Brand>
                         <Nav className="me-auto">
-                            <Nav.Link href="#home">Home</Nav.Link>
-                            <Nav.Link href="#create-event">Create Event</Nav.Link>
-                            <Nav.Link href="#history">History</Nav.Link>
+                            <Nav.Link className='d-flex align-items-center' disabled>
+                                <span style={{ marginLeft: "5px" }}>|</span>
+                            </Nav.Link>
+                            <Nav.Link href="#home" className='d-flex align-items-center'>
+                                <GoHome size={20} />
+                                <span style={{ marginLeft: "5px" }}>Home</span>
+                            </Nav.Link>
+                            <Nav.Link className='d-flex align-items-center' disabled>
+                                <span style={{ marginLeft: "5px" }}>|</span>
+                            </Nav.Link>
+                            <Nav.Link href="#create-event" className='d-flex align-items-center'>
+                                <GoPlusCircle size={20} />
+                                <span style={{ marginLeft: "5px" }}>Create</span>
+                            </Nav.Link>
+                            <Nav.Link className='d-flex align-items-center' disabled>
+                                <span style={{ marginLeft: "5px" }}>|</span>
+                            </Nav.Link>
+                            <Nav.Link href="#history" className='d-flex align-items-center'>
+                                <GoHistory size={20} />
+                                <span style={{ marginLeft: "5px" }}>History</span>
+                            </Nav.Link>
+                            <Nav.Link className='d-flex align-items-center' disabled>
+                                <span style={{ marginLeft: "5px" }}>|</span>
+                            </Nav.Link>
                         </Nav>
                         <Navbar.Text style={{marginRight: '15px'}}>
                             {isLoggedIn ? `Hello, ${userEmail}` : 
@@ -59,7 +89,7 @@ const Layout = () => {
                             }
                         </Navbar.Text>
                         <Button variant='danger' onClick={handleLogout}>
-                            <MdLogout size={20} /> Logout
+                            <GoSignOut size={20} /> Logout
                         </Button>
                     </Container>
                 </Navbar>

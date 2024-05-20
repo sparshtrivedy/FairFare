@@ -7,23 +7,13 @@ import {
     getDocs,
     doc,
     getDoc,
-    updateDoc,
 } from "firebase/firestore";
 import { db } from "../../firebase-config";
-import {
-    MdOutlineDashboard,
-} from "react-icons/md";
-import { GrMoney } from "react-icons/gr";
-import { PiTreeStructureBold } from "react-icons/pi";
 import {
     Container,
     Row,
     Col,
     Card,
-    Button,
-    Offcanvas,
-    Form,
-    Accordion,
 } from "react-bootstrap";
 import {
     itemsWithTransferToMemberQuery,
@@ -31,6 +21,12 @@ import {
     itemsInEventQuery,
 } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
+import ViewSummary from "./Components/ViewSummary";
+import { 
+    GoTable,
+    GoFoldDown,
+    GoFoldUp
+} from "react-icons/go";
 
 const Home = () => {
     const { userEmail } = useContext(AuthContext);
@@ -104,7 +100,7 @@ const Home = () => {
                                 as="h4"
                                 className="d-flex align-items-center justify-content-center"
                             >
-                                <MdOutlineDashboard size={30} style={{ marginRight: "5px" }} />{" "}
+                                <GoTable size={30} style={{ marginRight: "10px" }} />
                                 Dashboard
                             </Card.Header>
                             <Card.Body>
@@ -120,6 +116,7 @@ const Home = () => {
                                     values={["eventName", "eventDate", "email", "balance"]}
                                     isLoading={isLoading}
                                     settleHandler={handleClickSettle}
+                                    icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}
                                 />
                                 <br />
                                 <DashboardCard
@@ -129,469 +126,74 @@ const Home = () => {
                                     values={["itemName", "eventName", "youAreOwed", "unsettledMembers"]}
                                     isLoading={isLoading}
                                     settleHandler={handleClickBreakdown}
+                                    icon={<GoFoldDown size={30} style={{ marginRight: "10px" }} />}
                                 />
-                                {/* <Card className="mb-3">
-                                    <Card.Header
-                                        style={{ backgroundColor: "#80b1b3" }}
-                                        as="h4"
-                                        className="d-flex align-items-center justify-content-center"
-                                    >
-                                        <MdOutlineKeyboardDoubleArrowUp size={30} style={{ marginRight: "5px" }} />{" "}
-                                        You owe
-                                    </Card.Header>
-                                    <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-0">
-                                        {isLoading ? (
-                                            <Spinner animation="border" size="lg" className="m-3" />
-                                        ) : (
-                                            <Table striped bordered hover className="m-3">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Event name</th>
-                                                        <th>Event date</th>
-                                                        <th>To</th>
-                                                        <th>Balance</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {!eventsLentToUser.length ? (
-                                                        <tr>
-                                                            <td colSpan="5">No events found</td>
-                                                        </tr>
-                                                    ) : (
-                                                        eventsLentToUser.map((event, index) => (
-                                                            <tr key={index}>
-                                                                <td>{event.eventName}</td>
-                                                                <td>{event.eventDate}</td>
-                                                                <td>{event.email}</td>
-                                                                <td>{event.balance}</td>
-                                                                <td>
-                                                                    <Button
-                                                                        variant="primary"
-                                                                        onClick={() =>
-                                                                            (window.location.href = `/#view-event/${event.eventId}`)
-                                                                        }
-                                                                        style={{ marginRight: "5px" }}
-                                                                    >
-                                                                        <GrView /> View
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="info"
-                                                                        onClick={() => handleClickSettle(event)}
-                                                                    >
-                                                                        <GrMoney /> Settle
-                                                                    </Button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                    )}
-                                                </tbody>
-                                            </Table>
-                                        )}
-                                    </Card.Body>
-                                </Card>
-                                <Card>
-                                    <Card.Header
-                                        style={{ backgroundColor: "#80b1b3" }}
-                                        as="h4"
-                                        className="d-flex align-items-center justify-content-center"
-                                    >
-                                        <MdOutlineKeyboardDoubleArrowDown size={30} style={{ marginRight: "5px" }} />{" "}
-                                        You are owed
-                                    </Card.Header>
-                                    <Card.Body className="d-flex flex-wrap justify-content-center p-0">
-                                        {isLoading ? (
-                                            <Spinner animation="border" size="lg" className="m-3" />
-                                        ) : (
-                                            <Table striped bordered hover className="m-3">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Item name</th>
-                                                        <th>Event name</th>
-                                                        <th>Amount</th>
-                                                        <th>From</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {!itemsOwedToUser.length ? (
-                                                        <tr>
-                                                            <td colSpan="5">No events found</td>
-                                                        </tr>
-                                                    ) : (
-                                                        itemsOwedToUser.map((item, index) => (
-                                                            <tr key={index}>
-                                                                <td>{item.itemName}</td>
-                                                                <td>{item.eventName}</td>
-                                                                <td>{item.youAreOwed}</td>
-                                                                <td>{}
-                                                                </td>
-                                                                <td>
-                                                                    <Button
-                                                                        variant="primary"
-                                                                        onClick={() =>
-                                                                            window.location.href = `/#view-event/${item.eventId}`
-                                                                        }
-                                                                        style={{ marginRight: "5px" }}
-                                                                    >
-                                                                        <GrView /> View
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="info"
-                                                                        onClick={() => handleClickBreakdown(item)}
-                                                                    >
-                                                                        <GrMoney /> Breakdown
-                                                                    </Button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                    )}
-                                                </tbody>
-                                            </Table>
-                                        )}
-                                    </Card.Body>
-                                </Card> */}
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
             </Container>
-            <Offcanvas
-                show={showSettlementSummary}
-                placement="end"
-                onHide={() => setShowSettlementSummary(false)}
-            >
-                <Offcanvas.Header style={{ backgroundColor: "#80b1b3" }} closeButton>
-                    <Offcanvas.Title as="h5">
-                        <GrMoney size={25} style={{ marginRight: "5px" }} /> Settlement
-                        Summary
-                    </Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body className="p-0">
-                    <div className="p-3">
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Event name
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedEvent?.eventName}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Event date
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="date"
-                                    disabled={true}
-                                    value={selectedEvent?.eventDate}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group
-                            as={Row}
-                            className="mb-0"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Your balance
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedEvent?.balance}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </div>
-                    <Card style={{ border: 0 }} className="my-3">
-                        <Card.Header
-                            style={{ backgroundColor: "#80b1b3", border: 0, borderRadius: 0 }}
-                            as="h5"
-                            className="d-flex align-items-center justify-content-center"
-                        >
-                            <PiTreeStructureBold size={25} style={{ marginRight: "5px" }} />{" "}
-                            Detailed breakdown
-                        </Card.Header>
-                        <Accordion>
-                            {selectedEventItems.map((item, index) => (
-                                <Accordion.Item eventKey={index} key={index}>
-                                    <Accordion.Header>
-                                        {item.name}
-                                    </Accordion.Header>
-                                    <Accordion.Body>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4">
-                                                Item name
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                    type="text"
-                                                    disabled={true}
-                                                    value={item.name}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4">
-                                                Price
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                type="number"
-                                                disabled={true}
-                                                value={item.price}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4">
-                                                Quantity
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                type="number"
-                                                disabled={true}
-                                                value={item.quantity}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4">
-                                                Your share
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                type="number"
-                                                disabled={true}
-                                                value={item.share}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Form.Group as={Row} className="mb-3">
-                                            <Form.Label column sm="4">
-                                                Transfer to
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                type="text"
-                                                disabled={true}
-                                                value={item.transferTo}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Button
-                                            variant={
-                                                item.splits &&
-                                                item.splits.find((split) => split.email === userEmail)
-                                                .isSettled
-                                                ? "danger"
-                                                : "success"
-                                            }
-                                            className="mt-3"
-                                            onClick={async (e) => {
-                                                if (item.splits) {
-                                                    for (const split of item.splits) {
-                                                        if (split.email === userEmail) {
-                                                            setSelectedEventItems(
-                                                                selectedEventItems.map((i) => {
-                                                                    if (i.id === item.id) {
-                                                                        i.splits = i.splits.map((s) => {
-                                                                            if (s.email === userEmail) {
-                                                                                s.isSettled = !s.isSettled;
-                                                                            }
-                                                                            return s;
-                                                                        });
-                                                                    }
-                                                                    return i;
-                                                                })
-                                                            );
-                                                            const itemRef = doc(db, "items", item.id);
-                                                            updateDoc(itemRef, {
-                                                                splits: item.splits,
-                                                            });
-                                                        }
-                                                    }
-                                                }
-                                            }}
-                                        >
-                                            {item.splits &&
-                                            item.splits.find((split) => split.email === userEmail)
-                                                .isSettled
-                                                ? "Mark as unsettled"
-                                                : "Mark as settled"}
-                                        </Button>
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            ))}
-                        </Accordion>
-                    </Card>
-                </Offcanvas.Body>
-            </Offcanvas>
-            <Offcanvas
-                show={showOwingBreakdown}
-                placement="end"
-                onHide={() => setShowOwingBreakdown(false)}
-            >
-                <Offcanvas.Header closeButton style={{ backgroundColor: "#80b1b3" }}>
-                    <Offcanvas.Title as="h5">Breakdown of owing</Offcanvas.Title>
-                </Offcanvas.Header>
-                <Offcanvas.Body className="p-0">
-                    <div className="p-3">
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Event name
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedOwedItem?.eventName}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Item name
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedOwedItem?.itemName}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Price
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedOwedItem?.itemPrice}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                Quantity
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedOwedItem?.itemQuantity}
-                                />
-                            </Col>
-                        </Form.Group>
-                        <Form.Group 
-                            as={Row} 
-                            controlId="formPlaintextEmail"
-                        >
-                            <Form.Label column sm="4">
-                                You are owed
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={selectedOwedItem?.youAreOwed}
-                                />
-                            </Col>
-                        </Form.Group>
-                    </div>
-                    <Card style={{ border: 0 }} className="my-3">
-                        <Card.Header
-                            style={{ backgroundColor: "#80b1b3", border: 0, borderRadius: 0 }}
-                            as="h5"
-                            className="d-flex align-items-center justify-content-center"
-                        >
-                            <PiTreeStructureBold size={25} style={{ marginRight: "5px" }} />{" "}
-                            Who owes you?
-                        </Card.Header>
-                        <Accordion>
-                            {selectedOwedItem?.members.map((member, index) => (
-                                <Accordion.Item eventKey={index} key={index}>
-                                    <Accordion.Header>{member.email}</Accordion.Header>
-                                    <Accordion.Body>
-                                        <Form.Group as={Row}>
-                                            <Form.Label column sm="4">
-                                                Amount owed
-                                            </Form.Label>
-                                            <Col sm="8">
-                                                <Form.Control
-                                                    type="text"
-                                                    disabled={true}
-                                                    value={member.amount}
-                                                />
-                                            </Col>
-                                        </Form.Group>
-                                        <Button
-                                            variant={member.isSettled ? "danger" : "success"}
-                                            className="mt-3"
-                                            onClick={(e) => {
-                                                setSelectedOwedItem({
-                                                    ...selectedOwedItem,
-                                                    members: selectedOwedItem?.members.map((m) => {
-                                                        if (m.email === member.email) {
-                                                            m.isSettled = !m.isSettled;
-                                                        }
-                                                        return m;
-                                                    })
-                                                });
-
-                                                const itemRef = doc(db, "items", selectedOwedItem.id);
-                                                updateDoc(itemRef, {
-                                                    splits: selectedOwedItem?.members,
-                                                });
-                                            }}
-                                        >
-                                            {member.isSettled? "Mark as unsettled" : "Mark as settled"}
-                                        </Button>
-                                    </Accordion.Body>
-                                </Accordion.Item>
-                            ))}
-                        </Accordion>
-                    </Card>
-                </Offcanvas.Body>
-            </Offcanvas>
+            <ViewSummary
+                userEmail={userEmail}
+                showSummary={showSettlementSummary}
+                setShowSummary={setShowSettlementSummary}
+                itemList={{
+                    title: "name",
+                    items: selectedEventItems,
+                    labels: ["Item name", "Price", "Quantity", "Your share", "Transfer to"],
+                    values: ["name", "price", "quantity", "share", "transferTo"],
+                }}
+                labels={["Event name", "Event date", "Your balance"]}
+                values={[
+                    selectedEvent?.eventName,
+                    selectedEvent?.eventDate,
+                    selectedEvent?.balance,
+                ]}
+                isSettled={isSettledYouOwe}
+                settleUnsettle="youOwe"
+                setSelectedOwedItem={setSelectedOwedItem}
+                selectedOwedItem={selectedOwedItem}
+                setSelectedEventItems={setSelectedEventItems}
+                selectedEventItems={selectedEventItems}
+            />
+            <ViewSummary
+                userEmail={userEmail}
+                showSummary={showOwingBreakdown}
+                setShowSummary={setShowOwingBreakdown}
+                itemList={{
+                    title: "email",
+                    items: selectedOwedItem?.members,
+                    labels: ["Amount owed"],
+                    values: ["amount"],
+                }}
+                labels={["Event name", "Item name", "Price", "Quantity", "You are owed"]}
+                values={[
+                    selectedOwedItem?.eventName,
+                    selectedOwedItem?.itemName,
+                    selectedOwedItem?.itemPrice,
+                    selectedOwedItem?.itemQuantity,
+                    selectedOwedItem?.youAreOwed,
+                ]}
+                isSettled={isSettledOwedToYou}
+                settleUnsettle="owedToYou"
+                setSelectedOwedItem={setSelectedOwedItem}
+                selectedOwedItem={selectedOwedItem}
+                setSelectedEventItems={setSelectedEventItems}
+                selectedEventItems={selectedEventItems}
+            />
         </>
     );
 };
 
 export default Home;
+
+const isSettledOwedToYou = (item, userEmail) => {
+    return item.isSettled;
+}
+
+const isSettledYouOwe = (item, userEmail) => {
+    return item.splits.find(split => split.email === userEmail).isSettled
+}
 
 async function fetchItemsOwedToMember(userEmail) {
     const itemsOwedToMemberQuery = itemsWithTransferToMemberQuery(userEmail);

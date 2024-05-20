@@ -1,9 +1,9 @@
 import React from 'react';
 import { Card, Table, Button, Spinner } from 'react-bootstrap';
-import { MdOutlineKeyboardDoubleArrowUp } from "react-icons/md";
-import { GrView, GrMoney } from "react-icons/gr";
+import { GoEye, GoCodeOfConduct } from "react-icons/go";
 
-const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHandler }) => {
+
+const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHandler, icon }) => {
 
     return (
         <Card>
@@ -12,8 +12,10 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                 as="h4"
                 className="d-flex align-items-center justify-content-center"
             >
-                <MdOutlineKeyboardDoubleArrowUp size={30} style={{ marginRight: "5px" }} />{" "}
-                {title}
+                <div style={{ display: "flex", alignItems: "center" }}>
+                    {icon}
+                    <span>{title}</span>
+                </div>
             </Card.Header>
             <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-0">
                 {isLoading ? (
@@ -46,13 +48,19 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                                                 }
                                                 style={{ marginRight: "5px" }}
                                             >
-                                                <GrView /> View
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoEye size={20} />
+                                                    <span style={{marginLeft: "10px"}}>View</span>
+                                                </div>
                                             </Button>
                                             <Button
                                                 variant="info"
                                                 onClick={() => settleHandler(item)}
                                             >
-                                                <GrMoney /> Settle
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoCodeOfConduct size={20} />
+                                                    <span style={{marginLeft: "10px"}}>Settle</span>
+                                                </div>
                                             </Button>
                                         </td>
                                     </tr>

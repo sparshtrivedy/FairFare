@@ -9,15 +9,17 @@ import {
     Accordion,
     Alert
 } from 'react-bootstrap'
-import { 
-    BsPersonFillAdd,
-    BsDatabaseFillAdd,
-    BsDatabaseFill
-} from "react-icons/bs";
-import { MdOutlineSafetyDivider, MdDelete, MdAddCircle } from "react-icons/md";
-import { FaPeopleGroup } from "react-icons/fa6";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import { db } from '../firebase-config';
+import { 
+    GoPeople,
+    GoRows,
+    GoPlusCircle,
+    GoPersonAdd,
+    GoWorkflow,
+    GoProjectSymlink,
+    GoTrash
+} from "react-icons/go";
 
 const CreateEvent = () => {
     const [memberError, setMemberError] = useState('');
@@ -124,8 +126,13 @@ const CreateEvent = () => {
             <Row className='justify-content-center'>
                 <Col xs={10}>
                     <Card style={{border: 0}} className='my-3'>
-                        <Card.Header style={{backgroundColor: '#80b1b3'}} as="h4">
-                            <MdOutlineSafetyDivider size={30} /> Create new event
+                        <Card.Header
+                            style={{ backgroundColor: "#80b1b3" }}
+                            as="h4"
+                            className="d-flex align-items-center"
+                        >
+                            <GoPlusCircle size={30} style={{ marginRight: "10px" }} />
+                            Create new event
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
                             <Form>
@@ -166,10 +173,9 @@ const CreateEvent = () => {
                                     </Col>
                                 </Form.Group>
                                 <Card className='my-3'>
-                                    <Card.Header style={{backgroundColor: '#80b1b3'}}>
-                                        <h5 className='my-1'>
-                                            <FaPeopleGroup size={25} /> Members
-                                        </h5>
+                                    <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
+                                        <GoPeople size={25} />
+                                        <span style={{marginLeft: '10px'}}>Members</span>
                                     </Card.Header>
                                     <Card.Body>
                                         <Alert variant='danger' show={memberError.length !== 0}>
@@ -203,7 +209,7 @@ const CreateEvent = () => {
                                                                 });
                                                                 setItems(copiedItems);
                                                             }}>
-                                                                <MdDelete />
+                                                                <GoTrash />
                                                             </Button>
                                                         </Col>
                                                     </Form.Group>
@@ -227,15 +233,17 @@ const CreateEvent = () => {
                                                 });
                                             });
                                         }}>
-                                            <BsPersonFillAdd /> Add member
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoPersonAdd size={20} />
+                                                <span style={{marginLeft: "10px"}}>Add member</span>
+                                            </div>
                                         </Button>
                                     </Card.Footer>
                                 </Card>
                                 <Card>
-                                    <Card.Header style={{backgroundColor: '#80b1b3'}}>
-                                        <h5 className='my-1'>
-                                            <BsDatabaseFill size={25} /> Items
-                                        </h5>
+                                    <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
+                                        <GoRows size={25} />
+                                        <span style={{marginLeft: '10px'}}>Items</span>
                                     </Card.Header>
                                     <Card.Body>
                                         {items.length?
@@ -245,7 +253,8 @@ const CreateEvent = () => {
                                                         <Accordion.Header>
                                                             <h6>{item.itemName}</h6>
                                                         </Accordion.Header>
-                                                        <Accordion.Body>
+                                                        <Accordion.Body className='p-0'>
+                                                            <div style={{ padding: "15px", paddingBottom: "0px" }}>
                                                             <Form.Group as={Row} className="mb-3">
                                                                 <Form.Label column sm="2">
                                                                     Item name
@@ -330,13 +339,19 @@ const CreateEvent = () => {
                                                                 }
                                                                 </Col>
                                                             </Form.Group>
-                                                            <Button variant='danger' onClick={() => {
-                                                                let copiedItems = [...items];
-                                                                copiedItems.splice(index, 1);
-                                                                setItems(copiedItems);
-                                                            }}>
-                                                                <MdDelete /> Remove item
-                                                            </Button>
+                                                            </div>
+                                                            <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
+                                                                <Button variant='danger' onClick={() => {
+                                                                    let copiedItems = [...items];
+                                                                    copiedItems.splice(index, 1);
+                                                                    setItems(copiedItems);
+                                                                }}>
+                                                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                                                        <GoTrash size={20} />
+                                                                        <span style={{marginLeft: "10px"}}>Remove item</span>
+                                                                    </div>
+                                                                </Button>
+                                                            </div>
                                                         </Accordion.Body>
                                                     </Accordion.Item>
                                                 ))}
@@ -346,8 +361,11 @@ const CreateEvent = () => {
                                         }
                                     </Card.Body>
                                     <Card.Footer style={{backgroundColor: '#80b1b3'}}>
-                                        <Button variant='primary' onClick={handleAddItems}>
-                                            <BsDatabaseFillAdd /> Add item
+                                        <Button variant='primary' onClick={handleAddItems}>   
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoWorkflow size={20} />
+                                                <span style={{marginLeft: "10px"}}>Add item</span>
+                                            </div>
                                         </Button>
                                     </Card.Footer>
                                 </Card>
@@ -355,7 +373,10 @@ const CreateEvent = () => {
                         </Card.Body>
                         <Card.Footer style={{backgroundColor: '#80b1b3'}}>
                             <Button variant="primary" type="submit" onClick={handleCreateEvent}>
-                                <MdAddCircle /> Create event
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <GoProjectSymlink size={20} />
+                                    <span style={{marginLeft: "10px"}}>Create event</span>
+                                </div>
                             </Button>
                         </Card.Footer>
                     </Card>
