@@ -17,8 +17,7 @@ import {
 } from "react-bootstrap";
 import {
     itemsWithTransferToMemberQuery,
-    eventsContainingMemberQuery,
-    itemsInEventQuery,
+    fetchEventsWithMember,
 } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
 import ViewSummary from "./Components/ViewSummary";
@@ -46,7 +45,7 @@ const Home = () => {
             setIsLoading(true);
 
             setEventsLentToUser([]);
-            const eventsLentToMember = await fetchEventsWithMember(userEmail);
+            const eventsLentToMember = await fetchEventsWithMember(userEmail, false);
             setEventsLentToUser(eventsLentToMember);
 
             const itemsOwedToMember = await fetchItemsOwedToMember(userEmail);
@@ -56,7 +55,7 @@ const Home = () => {
         };
 
         fetchOwedAndLent();
-    }, [userEmail, selectedEventItems]);
+    }, [userEmail]);
 
     const handleClickSettle = async (event) => {
         setSelectedEvent(event);
@@ -67,7 +66,9 @@ const Home = () => {
             collection(db, "items"),
             where("event", "==", eventRef)
         );
+
         const itemsSnapshot = await getDocs(itemsQuery);
+        
         const items = itemsSnapshot.docs.map((doc) => {
             return {
                 id: doc.id,
@@ -79,12 +80,12 @@ const Home = () => {
                 splits: doc.data().splits,
             };
         });
+        
         setSelectedEventItems(items);
         setShowSettlementSummary(true);
     };
 
     const handleClickBreakdown = async (item) => {
-        console.log(item);
         setSelectedOwedItem(item);
         setShowOwingBreakdown(true);
     };
@@ -247,56 +248,4 @@ function calculateUnsettledTotal(itemSplits, itemOwedToMember) {
     const unsettledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numUnSettled) / numMembers;
     
     return unsettledTotal;
-}
-
-async function fetchEventsWithMember(userEmail) {
-    const memberEventsQuery = eventsContainingMemberQuery(userEmail);
-    const memberEventsSnapshot = await getDocs(memberEventsQuery);
-    const memberEventsDocs = memberEventsSnapshot.docs;
-
-    const memberEvents = [];
-
-    for (const memberEventDoc of memberEventsDocs) {
-        const memberEventRef = memberEventDoc.ref;
-
-        const itemsForMemberEventQuery = itemsInEventQuery(memberEventRef);
-        const itemsForMemberEventSnapshot = await getDocs(itemsForMemberEventQuery);
-
-        const itemSplits = [];
-
-        itemsForMemberEventSnapshot.forEach((doc) => {
-            itemSplits.push(doc.data().splits);
-        });
-
-        const unsettledItemTotal = calculateUnsettledItemTotal(
-            itemSplits,
-            userEmail
-        );
-
-        if (unsettledItemTotal > 0) {
-            memberEvents.push({
-                eventId: memberEventDoc.id,
-                eventName: memberEventDoc.data().name,
-                eventDate: memberEventDoc.data().date,
-                balance: unsettledItemTotal.toFixed(2),
-                email: userEmail
-            });
-        }
-    }
-
-    return memberEvents;
-}
-
-function calculateUnsettledItemTotal(itemSplits, userEmail) {
-    let unsettledItemTotal = 0;
-
-    for (const split of itemSplits) {
-        for (const user of split) {
-            if (user.email === userEmail && !user.isSettled) {
-                unsettledItemTotal += user.amount;
-            }
-        }
-    }
-
-    return unsettledItemTotal;
 }
