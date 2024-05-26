@@ -4,6 +4,7 @@ import {
     query, 
     where,
     getDocs,
+    addDoc,
 } from "firebase/firestore";
 
 export const eventsContainingMemberQuery = (userEmail) => {
@@ -28,6 +29,50 @@ export const itemsInEventQuery = (eventRef) => {
         where("event", "==", eventRef)
     );
 };
+
+export const userWithEmailQuery = (email) => {
+    return query(
+        collection(db, 'users'), 
+        where('email', '==', email)
+    );
+}
+
+export const updateMemberSplits = (members, copiedItems, index) => {
+    const totalChecked = copiedItems[index].splits.reduce((acc, split) => {
+        if (split.isChecked) {
+            return acc + 1;
+        }
+        return acc;
+    }, 0);
+
+    for (let j = 0; j < members.length; j++) {
+        if (copiedItems[index].splits[j].isChecked) {
+            copiedItems[index].splits[j].amount = (copiedItems[index].itemPrice * copiedItems[index].itemQuantity) / totalChecked;
+        } else {
+            copiedItems[index].splits[j].amount = 0;
+        }
+    }
+}
+
+export const addEvent = async (event) => {
+    return await addDoc(collection(db, 'events'), {
+        name: event.name,
+        date: event.date,
+        description: event.description,
+        members: event.members,
+    });
+}
+
+export const addItem = async (item, eventRef) => {
+    return await addDoc(collection(db, 'items'), {
+        event: eventRef,
+        itemName: item.itemName,
+        itemPrice: item.itemPrice,
+        itemQuantity: item.itemQuantity,
+        transferTo: item.transferTo,
+        splits: item.splits
+    });
+}
 
 export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
     const memberEventsQuery = eventsContainingMemberQuery(userEmail);

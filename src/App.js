@@ -10,9 +10,9 @@ function App() {
 
   return (
     <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn, userEmail, setUserEmail }}>
-        <Router>
-          <Layout />
-        </Router>
+      <Router>
+        <Layout />
+      </Router>
     </AuthContext.Provider>
   );
 }

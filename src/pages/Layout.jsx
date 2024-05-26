@@ -12,10 +12,10 @@ import {
 import Home from './Home/Home'
 import Login from './Login'
 import Register from './Register'
-import CreateEvent from './CreateEvent'
 import EditEvent from './EditEvent'
 import ViewEvent from './ViewEvent';
 import History from './History/History'
+import CreateEvent from './FormEvents/CreateEvent';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { 
