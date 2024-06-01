@@ -10,8 +10,8 @@ import {
     GoPlusCircle,
     GoProjectSymlink,
 } from "react-icons/go";
-import EventForm from "./Components/EventForm";
 import { addEvent, addItem } from "../../Utils";
+import CreateEventForm from "./Components/CreateEventForm";
 
 const CreateEvent = () => {
     const [memberError, setMemberError] = useState('');
@@ -54,8 +54,8 @@ const CreateEvent = () => {
                             <GoPlusCircle size={30} style={{ marginRight: "10px" }} />
                             Create new event
                         </Card.Header>
-                        <Card.Body style={{backgroundColor: '#f7fafa'}}>
-                            <EventForm
+                        <Card.Body style={{backgroundColor: '#f7fafa', paddingBottom: 0}}>
+                            <CreateEventForm
                                 memberError={memberError}
                                 setMemberError={setMemberError}
                                 items={items}

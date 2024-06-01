@@ -3,8 +3,11 @@ import {
     collection, 
     query, 
     where,
+    getDoc,
     getDocs,
     addDoc,
+    doc,
+    updateDoc,
 } from "firebase/firestore";
 
 export const eventsContainingMemberQuery = (userEmail) => {
@@ -72,6 +75,50 @@ export const addItem = async (item, eventRef) => {
         transferTo: item.transferTo,
         splits: item.splits
     });
+}
+
+export const getEventById = async (eventId) => {
+    const eventRef = await getDoc(doc(db, 'events', eventId));
+    return eventRef.data();
+}
+
+export const getItemsByEventId = async (eventId) => {
+    const eventRef = await getDoc(doc(db, 'events', eventId));
+    const itemsQuery = query(collection(db, 'items'), where('event', '==', eventRef.ref));
+    const itemsSnapshot = await getDocs(itemsQuery);
+    return itemsSnapshot.docs.map((doc) => {
+        return {
+            id: doc.id,
+            ...doc.data()
+        };
+    });
+}
+
+export const updateEvent = async (eventRef, event) => {
+    return await updateDoc(eventRef, {
+        name: event.name,
+        date: event.date,
+        description: event.description,
+        members: event.members,
+    });
+}
+
+export const updateItem = async (itemRef, item) => {
+    return await updateDoc(itemRef, {
+        itemName: item.itemName,
+        itemPrice: item.itemPrice,
+        itemQuantity: item.itemQuantity,
+        transferTo: item.transferTo,
+        splits: item.splits,
+    });
+}
+
+export const getEventRef = (eventId) => {
+    return doc(db, 'events', eventId);
+}
+
+export const getItemRef = (itemId) => {
+    return doc(db, 'items', itemId);
 }
 
 export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {

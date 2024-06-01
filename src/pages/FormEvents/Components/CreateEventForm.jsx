@@ -6,8 +6,7 @@ import FairFareControl from "./FairFareControl";
 import MembersCard from "./MembersCard";
 import ItemsCard from "./ItemsCard";
 
-const EventForm = ({ memberError, setMemberError, items, setItems, event, setEvent }) => {
-
+const CreateEventForm = ({ memberError, setMemberError, items, setItems, event, setEvent }) => {
     return (
         <Form>
             <FairFareControl
@@ -46,4 +45,4 @@ const EventForm = ({ memberError, setMemberError, items, setItems, event, setEve
     )
 }
 
-export default EventForm;
+export default CreateEventForm;

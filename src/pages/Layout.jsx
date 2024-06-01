@@ -12,8 +12,8 @@ import {
 import Home from './Home/Home'
 import Login from './Login'
 import Register from './Register'
-import EditEvent from './EditEvent'
-import ViewEvent from './ViewEvent';
+import EditEvent from './FormEvents/EditEvent'
+import ViewEvent from './FormEvents/ViewEvent';
 import History from './History/History'
 import CreateEvent from './FormEvents/CreateEvent';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,6 @@ import {
     GoPlusCircle,
     GoHistory
 } from "react-icons/go";
-
 
 const Layout = () => {
     const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail } = useContext(AuthContext);

@@ -11,7 +11,7 @@ import { GoRows, GoWorkflow, GoTrash } from 'react-icons/go';
 import FairFareControl from './FairFareControl';
 import { updateMemberSplits } from '../../../Utils';
 
-const ItemsCard = ({ event, items, setItems }) => {
+const ItemsCard = ({ event, items, setItems, disabled=false }) => {
     const handleAddItems = () => {
         setItems([...items, {
             itemName: '',
@@ -59,6 +59,8 @@ const ItemsCard = ({ event, items, setItems }) => {
                                             copiedItems[index].itemName = e.target.value;
                                             setItems(copiedItems);
                                         }}
+                                        value={item.itemName}
+                                        disabled={disabled}
                                     />
                                     <FairFareControl
                                         label="Item price"
@@ -69,6 +71,8 @@ const ItemsCard = ({ event, items, setItems }) => {
                                             copiedItems[index].itemPrice = e.target.value;
                                             setItems(copiedItems);
                                         }}
+                                        value={item.itemPrice}
+                                        disabled={disabled}
                                     />
                                     <FairFareControl
                                         label="Item quantity"
@@ -79,6 +83,8 @@ const ItemsCard = ({ event, items, setItems }) => {
                                             copiedItems[index].itemQuantity = e.target.value;
                                             setItems(copiedItems);
                                         }}
+                                        value={item.itemQuantity}
+                                        disabled={disabled}
                                     />
                                     <FairFareControl
                                         label="Transfer to"
@@ -89,6 +95,8 @@ const ItemsCard = ({ event, items, setItems }) => {
                                             copiedItems[index].transferTo = e.target.value;
                                             setItems(copiedItems);
                                         }}
+                                        value={item.transferTo}
+                                        disabled={disabled}
                                     />
                                     <Form.Group as={Row} className="mb-3">
                                         <Form.Label column sm="2">
@@ -102,6 +110,8 @@ const ItemsCard = ({ event, items, setItems }) => {
                                                     type="checkbox" 
                                                     label={member.email}
                                                     onChange={() => handleItemSplitChange(index, i)}
+                                                    checked={item?.splits[i]?.isChecked}
+                                                    disabled={disabled}
                                                 />
                                             )):
                                             <p>No members added</p>
@@ -109,6 +119,7 @@ const ItemsCard = ({ event, items, setItems }) => {
                                         </Col>
                                     </Form.Group>
                                 </div>
+                                {!disabled &&
                                 <div className="d-flex p-2" style={{ backgroundColor: "#CFE2FF" }} >
                                     <Button variant='danger' onClick={() => {
                                         let copiedItems = [...items];
@@ -120,7 +131,7 @@ const ItemsCard = ({ event, items, setItems }) => {
                                             <span style={{marginLeft: "10px"}}>Remove item</span>
                                         </div>
                                     </Button>
-                                </div>
+                                </div>}
                             </Accordion.Body>
                         </Accordion.Item>
                     ))}
@@ -128,6 +139,7 @@ const ItemsCard = ({ event, items, setItems }) => {
                 <p>No items added</p>
             }
             </Card.Body>
+            {!disabled &&
             <Card.Footer style={{backgroundColor: '#80b1b3'}}>
                 <Button variant='primary' onClick={handleAddItems}>   
                     <div style={{ display: "flex", alignItems: "center" }}>
@@ -135,7 +147,7 @@ const ItemsCard = ({ event, items, setItems }) => {
                         <span style={{marginLeft: "10px"}}>Add item</span>
                     </div>
                 </Button>
-            </Card.Footer>
+            </Card.Footer>}
         </Card>
     )
 }
