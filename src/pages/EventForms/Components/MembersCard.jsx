@@ -48,7 +48,7 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
         const memberQuerySnapshot = await getDocs(memberQuery);
 
         if (memberQuerySnapshot.empty) {
-            setMemberError('Member not found. Please make sure this user is registered.');
+            setMemberError('Member not found. Please make sure this user has signed-up.');
         } else {
             setMemberError('');
             for (let i = 0; i < items.length; i++) {

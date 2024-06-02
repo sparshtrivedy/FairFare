@@ -10,12 +10,12 @@ import {
     Route
 } from 'react-router-dom'
 import Home from './Home/Home'
-import Login from './Login'
-import Register from './Register'
-import EditEvent from './FormEvents/EditEvent'
-import ViewEvent from './FormEvents/ViewEvent';
+import SignIn from './Authentication/SignIn'
+import SignUp from './Authentication/SignUp'
+import EditEvent from './EventForms/EditEvent'
+import ViewEvent from './EventForms/ViewEvent';
 import History from './History/History'
-import CreateEvent from './FormEvents/CreateEvent';
+import CreateEvent from './EventForms/CreateEvent';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { 
@@ -43,7 +43,7 @@ const Layout = () => {
         setUserEmail('');
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userEmail');
-        navigate('/login');
+        navigate('/sign-in');
     }
 
     return (
@@ -83,7 +83,7 @@ const Layout = () => {
                         </Nav>
                         <Navbar.Text style={{marginRight: '15px'}}>
                             {isLoggedIn ? `Hello, ${userEmail}` : 
-                                <Button variant='primary' href='#login'>Login</Button>
+                                <Button variant='primary' href='#sign-in'>Sign-in</Button>
                             }
                         </Navbar.Text>
                         <Button variant='danger' onClick={handleLogout}>
@@ -93,8 +93,8 @@ const Layout = () => {
                 </Navbar>
             }
             <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+                <Route path="/sign-in" element={<SignIn />} />
+                <Route path="/sign-up" element={<SignUp />} />
                 {isLoggedIn &&
                     <>
                         <Route path="/home" element={<Home />} />

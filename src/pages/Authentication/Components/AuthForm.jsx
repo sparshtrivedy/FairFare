@@ -9,13 +9,13 @@ import {
     Card,
     Spinner
 } from 'react-bootstrap';
-import { auth } from '../firebase-config';
-import { BsFillLockFill } from "react-icons/bs";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from '../../../firebase-config';
+import { GoLaw } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../App';
+import { AuthContext } from '../../../App';
 
-const Login = () => {
+const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
     const navigate = useNavigate();
     const { setIsLoggedIn, setUserEmail } = useContext(AuthContext);
 
@@ -49,15 +49,39 @@ const Login = () => {
         }
     }
 
+    const handleSignUp = async () => {
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+
+            await db.collection('users').add({
+                email
+            });
+            setSuccess('User signed-up successfully. Redirecting to sign-in page...');
+
+            setTimeout(() => {
+                setSuccess('');
+                navigate('/sign-in');
+            }, 3000);
+        } catch (error) {
+            setError('An error occurred');
+
+            setTimeout(() => {
+                setError('');
+            }, 3000);
+
+            console.error(error);
+        }
+    }
+
     return (
         <Container className='py-3'>
             <Row className='justify-content-center'>
-                <Col xs={6}>
+                <Col xs={4}>
                     <Card className='border-0'>
                         <Card.Header className='d-flex align-items-center justify-content-center p-3 flex-column' style={{backgroundColor: '#80b1b3'}}>
-                            <BsFillLockFill size={50} className='my-2 rounded-circle p-2' style={{backgroundColor: '#f7fafa'}} />
+                            <GoLaw size={50} className='my-2 rounded-circle p-2' style={{backgroundColor: '#f7fafa'}} />
                             <h4>
-                                Login
+                                {title}
                             </h4>
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
@@ -79,40 +103,43 @@ const Login = () => {
                                 </Alert>
                             }
                             <Form>
-                                <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
-                                    <Form.Label column sm="2">
+                                <Form.Group className="mb-3" controlId="formPlaintextEmail">
+                                    <Form.Label>
                                         Email
                                     </Form.Label>
-                                    <Col sm="10">
-                                        <Form.Control 
-                                            type="text" 
-                                            placeholder="Enter your email here"
-                                            onChange={(e) => setEmail(e.target.value)} 
-                                        />
-                                    </Col>
+                                    <Form.Control 
+                                        type="text" 
+                                        placeholder="Enter your email here"
+                                        onChange={(e) => setEmail(e.target.value)} 
+                                    />
                                 </Form.Group>
-                                <Form.Group as={Row} className="mb-3" controlId="formPlaintextPassword">
-                                    <Form.Label column sm="2">
+                                <Form.Group className="mb-3" controlId="formPlaintextPassword">
+                                    <Form.Label>
                                         Password
                                     </Form.Label>
-                                    <Col sm="10">
-                                        <Form.Control 
-                                            type="password" 
-                                            placeholder="Enter your password here" 
-                                            onChange={(e) => setPassword(e.target.value)}
-                                        />
-                                    </Col>
+                                    <Form.Control 
+                                        type="password" 
+                                        placeholder="Enter your password here" 
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
                                 </Form.Group>
                             </Form>
                         </Card.Body>
                         <Card.Footer className='d-flex align-items-center justify-content-center flex-column' style={{backgroundColor: '#80b1b3'}}>
-                            <div className='mb-2'>
-                                <Button onClick={handleSignIn}>
-                                    Login
+                            <div className='m-2 w-100'>
+                                <Button onClick={buttonText === "Sign-in"? handleSignIn: handleSignUp} className='w-100' variant='success'>
+                                    {buttonText}
                                 </Button>
                             </div>
-                            <div>
-                                Don't have an account? <Button variant='link' onClick={() => navigate('/register')} className='p-0'>Register</Button>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <span>{footerText}</span> 
+                                <Button 
+                                    variant='link' 
+                                    onClick={() => navigate(footerButtonText === "Sign-in"? '/sign-in': '/sign-up')}
+                                    style={{ paddingLeft: '5px' }}
+                                >
+                                    {footerButtonText}
+                                </Button>
                             </div>
                         </Card.Footer>
                     </Card>
@@ -122,4 +149,4 @@ const Login = () => {
     )
 }
 
-export default Login;
+export default SignIn;
