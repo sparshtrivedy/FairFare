@@ -7,7 +7,8 @@ import {
 } from 'react-bootstrap'
 import {
     Routes, 
-    Route
+    Route,
+    Navigate
 } from 'react-router-dom'
 import Home from './Home/Home'
 import SignIn from './Authentication/SignIn'
@@ -95,15 +96,16 @@ const Layout = () => {
             <Routes>
                 <Route path="/sign-in" element={<SignIn />} />
                 <Route path="/sign-up" element={<SignUp />} />
-                {isLoggedIn &&
+                {isLoggedIn && (
                     <>
                         <Route path="/home" element={<Home />} />
                         <Route path="/create-event" element={<CreateEvent />} />
                         <Route path="/view-event/:eventId" element={<ViewEvent />} />
                         <Route path="/edit-event/:eventId" element={<EditEvent />} />
                         <Route path="/history" element={<History />} />
+                        <Route path="*" element={<Navigate to="/home" />} />
                     </>
-                }
+                )}
             </Routes>
         </div>
     )
