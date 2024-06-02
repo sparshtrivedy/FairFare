@@ -114,7 +114,7 @@ const Home = () => {
                                     title="You owe"
                                     itemList={eventsLentToUser}
                                     headers={["Event name", "Event date", "To", "Balance", "Actions"]}
-                                    values={["eventName", "eventDate", "email", "balance"]}
+                                    values={["eventName", "eventDate", "unsettledMembers", "balance"]}
                                     isLoading={isLoading}
                                     settleHandler={handleClickSettle}
                                     icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}

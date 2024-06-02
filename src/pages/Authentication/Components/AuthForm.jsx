@@ -14,6 +14,7 @@ import { auth, db } from '../../../firebase-config';
 import { GoLaw } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../App';
+import { addDoc, collection } from 'firebase/firestore';
 
 const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
     const navigate = useNavigate();
@@ -51,11 +52,13 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
 
     const handleSignUp = async () => {
         try {
-            await createUserWithEmailAndPassword(auth, email, password);
-
-            await db.collection('users').add({
-                email
+            console.log('signing up')
+            await addDoc(collection(db, 'users'), {
+                email: email
             });
+            console.log('user added')
+            await createUserWithEmailAndPassword(auth, email, password);
+            console.log('user signed up')
             setSuccess('User signed-up successfully. Redirecting to sign-in page...');
 
             setTimeout(() => {

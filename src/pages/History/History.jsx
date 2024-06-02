@@ -71,7 +71,7 @@ const History = () => {
                                         <HistoryTable 
                                             isLoading={isLoading} 
                                             headers={['Event name', 'Event date', 'Amount', "To", "Actions"]} 
-                                            values={['eventName', 'eventDate', 'balance', 'email']} 
+                                            values={['eventName', 'eventDate', 'balance', 'settledMembers']} 
                                             items={owedItems} 
                                         />
                                     </Tab>

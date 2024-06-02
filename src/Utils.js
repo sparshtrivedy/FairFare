@@ -134,22 +134,35 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
         const itemsForMemberEventQuery = itemsInEventQuery(memberEventRef);
         const itemsForMemberEventSnapshot = await getDocs(itemsForMemberEventQuery);
 
-        const itemSplits = [];
-
-        itemsForMemberEventSnapshot.forEach((doc) => {
-            itemSplits.push(doc.data().splits);
+        const itemsData = itemsForMemberEventSnapshot.docs.map((doc) => {
+            return doc.data();
         });
 
+        const itemsSplits = itemsData.map((doc) => {
+            return doc.splits;
+        });
+
+        const unsettledMembers = itemsData
+            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && !user.isSettled))
+            .map(item => item.transferTo)
+            .join(', ');
+        
+        const settledMembers = itemsData
+            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled))
+            .map(item => item.transferTo)
+            .join(', ');
+            
         const total = isCalculateSettled? 
-            calculateSettledItemTotal(itemSplits, userEmail):
-            calculateUnsettledItemTotal(itemSplits, userEmail);
+            calculateSettledItemTotal(itemsSplits, userEmail):
+            calculateUnsettledItemTotal(itemsSplits, userEmail);
 
         total && memberEvents.push({
             eventId: memberEventDoc.id,
             eventName: memberEventDoc.data().name,
             eventDate: memberEventDoc.data().date,
             balance: total.toFixed(2),
-            email: userEmail
+            unsettledMembers: unsettledMembers,
+            settledMembers: settledMembers
         });
     }
 
