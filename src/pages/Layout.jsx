@@ -94,9 +94,7 @@ const Layout = () => {
                 </Navbar>
             }
             <Routes>
-                <Route path="/sign-in" element={<SignIn />} />
-                <Route path="/sign-up" element={<SignUp />} />
-                {isLoggedIn && (
+                {isLoggedIn ? (
                     <>
                         <Route path="/home" element={<Home />} />
                         <Route path="/create-event" element={<CreateEvent />} />
@@ -104,6 +102,12 @@ const Layout = () => {
                         <Route path="/edit-event/:eventId" element={<EditEvent />} />
                         <Route path="/history" element={<History />} />
                         <Route path="*" element={<Navigate to="/home" />} />
+                    </>
+                ) : (
+                    <>
+                        <Route path="/sign-in" element={<SignIn />} />
+                        <Route path="/sign-up" element={<SignUp />} />
+                        <Route path="*" element={<Navigate to="/sign-in" />} />
                     </>
                 )}
             </Routes>
