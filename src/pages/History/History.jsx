@@ -17,7 +17,7 @@ import {
 import HistoryTable from './Components/HistoryTable';
 import {
     itemsWithTransferToMemberQuery,
-    fetchEventsWithMember
+    fetchItemsSettledByMember
 } from '../../Utils';
 
 const History = () => {
@@ -28,9 +28,10 @@ const History = () => {
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
+            await fetchItemsSettledByMember(userEmail);
             setIsLoading(true);
 
-            const eventsLentToMember = await fetchEventsWithMember(userEmail, true);
+            const eventsLentToMember = await fetchItemsSettledByMember(userEmail);
             setOwedItems(eventsLentToMember);
 
             const settledOwedItems = await fetchItemsOwedToMember(userEmail);
@@ -70,8 +71,8 @@ const History = () => {
                                     }>
                                         <HistoryTable 
                                             isLoading={isLoading} 
-                                            headers={['Event name', 'Event date', 'Amount', "To", "Actions"]} 
-                                            values={['eventName', 'eventDate', 'balance', 'settledMembers']} 
+                                            headers={['Event name', 'Item name', 'To', 'Amount', "Actions"]} 
+                                            values={['eventName', 'itemName', 'transferTo', 'youPaid']} 
                                             items={owedItems} 
                                         />
                                     </Tab>

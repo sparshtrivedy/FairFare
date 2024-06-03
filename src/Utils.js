@@ -169,6 +169,42 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
     return memberEvents;
 }
 
+export const fetchItemsSettledByMember = async (userEmail) => {
+    const itemsWithMemberQuery = eventsContainingMemberQuery(userEmail);
+    const itemsWithMemberSnapshot = await getDocs(itemsWithMemberQuery);
+    const itemsWithMemberDocs = itemsWithMemberSnapshot.docs;
+
+    const settledItems = [];
+    itemsWithMemberDocs.forEach(async (doc) => {
+        const itemsForEventQuery = itemsInEventQuery(doc.ref);
+        const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
+        const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
+            return doc.data();
+        });
+        itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
+        for (const item of itemsForEventData) {
+            const splits = item.splits;
+            const numChecked = splits.filter(split => split.isChecked).length;
+            for (const split of splits) {
+                if (split.email === userEmail && split.isChecked && split.isSettled) {
+                    settledItems.push({
+                        id: doc.id,
+                        eventId: item.event.id,
+                        eventName: doc.data().name,
+                        eventDate: doc.data().date,
+                        itemName: item.itemName,
+                        itemPrice: item.itemPrice,
+                        itemQuantity: item.itemQuantity,
+                        youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                        transferTo: item.transferTo
+                    });
+                }
+            }
+        }
+    });
+    return settledItems;
+}
+
 export const calculateUnsettledItemTotal = (itemSplits, userEmail) => {
     let unsettledItemTotal = 0;
 

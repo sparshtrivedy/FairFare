@@ -10,7 +10,7 @@ import { GoEye } from "react-icons/go";
 const HistoryTable = ({isLoading, headers, values, items}) => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
-
+    console.log(items);
     // Calculate the indices of the first and last items on the current page
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
