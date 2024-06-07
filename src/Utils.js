@@ -138,12 +138,12 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
             return doc.data();
         });
 
-        const itemsSplits = itemsData.map((doc) => {
-            return doc.splits;
-        });
+        const itemsSplits = itemsData
+            .filter(item => item.transferTo !== userEmail)
+            .map(item => item.splits);
 
         const unsettledMembers = itemsData
-            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && !user.isSettled))
+            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && !user.isSettled && item.transferTo !== userEmail))
             .map(item => item.transferTo)
             .join(', ');
         
@@ -186,7 +186,7 @@ export const fetchItemsSettledByMember = async (userEmail) => {
             const splits = item.splits;
             const numChecked = splits.filter(split => split.isChecked).length;
             for (const split of splits) {
-                if (split.email === userEmail && split.isChecked && split.isSettled) {
+                if (split.email === userEmail && split.isChecked && split.isSettled && item.transferTo !== userEmail) {
                     settledItems.push({
                         id: doc.id,
                         eventId: item.event.id,
@@ -209,9 +209,12 @@ export const calculateUnsettledItemTotal = (itemSplits, userEmail) => {
     let unsettledItemTotal = 0;
 
     for (const split of itemSplits) {
-        for (const user of split) {
-            if (user.email === userEmail && !user.isSettled) {
-                unsettledItemTotal += user.amount;
+        console.log(split);
+        if (split.transferTo !== userEmail) {
+            for (const user of split) {
+                if (user.email === userEmail && !user.isSettled) {
+                    unsettledItemTotal += user.amount;
+                }
             }
         }
     }
@@ -223,9 +226,11 @@ export const calculateSettledItemTotal = (itemSplits, userEmail) => {
     let settledItemTotal = 0;
 
     for (const split of itemSplits) {
-        for (const user of split) {
-            if (user.email === userEmail && user.isSettled) {
-                settledItemTotal += user.amount;
+        if (split.transferTo !== userEmail) {
+            for (const user of split) {
+                if (user.email === userEmail && user.isSettled) {
+                    settledItemTotal += user.amount;
+                }
             }
         }
     }

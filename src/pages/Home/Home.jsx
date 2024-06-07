@@ -215,15 +215,16 @@ async function fetchItemsOwedToMember(userEmail) {
 
         const unsettledItemTotal = calculateUnsettledTotal(
             itemSplits,
-            itemOwedToMember
+            itemOwedToMember,
+            userEmail
         );
 
         const unsettledMembers = itemSplits
-            .filter(member => !member.isSettled)
+            .filter(member => !member.isSettled && member.email !== userEmail)
             .map(member => member.email)
             .join(", ");
 
-        if (unsettledItemTotal > 0) {
+        if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
             owedItems.push({
                 id: doc.id,
                 eventId: itemOwedToMember.event.id,
@@ -241,8 +242,8 @@ async function fetchItemsOwedToMember(userEmail) {
     return owedItems;
 }
 
-function calculateUnsettledTotal(itemSplits, itemOwedToMember) {
-    const numUnSettled = itemSplits.filter((split) => !split.isSettled).length;
+function calculateUnsettledTotal(itemSplits, itemOwedToMember, userEmail) {
+    const numUnSettled = itemSplits.filter((split) => !split.isSettled && split.email !== userEmail).length;
     const numMembers = itemSplits.length;
 
     const unsettledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numUnSettled) / numMembers;

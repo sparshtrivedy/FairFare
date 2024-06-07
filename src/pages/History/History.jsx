@@ -28,7 +28,6 @@ const History = () => {
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
-            await fetchItemsSettledByMember(userEmail);
             setIsLoading(true);
 
             const eventsLentToMember = await fetchItemsSettledByMember(userEmail);
@@ -120,11 +119,12 @@ async function fetchItemsOwedToMember(userEmail) {
 
         const settledItemTotal = calculateSettledTotal(
             itemSplits,
-            itemOwedToMember
+            itemOwedToMember,
+            userEmail
         );
 
         const settledMembers = itemSplits
-            .filter(member => member.isSettled)
+            .filter(member => member.isSettled && member.email !== userEmail)
             .map(member => member.email)
             .join(", ");
 
@@ -143,8 +143,8 @@ async function fetchItemsOwedToMember(userEmail) {
     return owedItems;
 }
 
-function calculateSettledTotal(itemSplits, itemOwedToMember) {
-    const numSettled = itemSplits.filter((split) => split.isSettled).length;
+function calculateSettledTotal(itemSplits, itemOwedToMember, userEmail) {
+    const numSettled = itemSplits.filter((split) => split.isSettled && split.email !== userEmail).length;
     const numMembers = itemSplits.length;
 
     const settledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numSettled) / numMembers;

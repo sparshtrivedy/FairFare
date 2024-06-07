@@ -96,26 +96,31 @@ const ViewSummary = ({
                                         ))}
                                     </div>
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        <Button
-                                            variant={
-                                                isSettled(item, userEmail)? "danger": "success"
-                                            }
-                                            onClick={() => 
-                                                settleUnsettle === "youOwe"?
-                                                settleUnsettleYouOwe(item, userEmail, setSelectedEventItems, selectedEventItems):
-                                                settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, item)
-                                            }
-                                        >
-                                            {isSettled(item, userEmail)? 
-                                                <div style={{ display: "flex", alignItems: "center" }}>
-                                                    <GoReply size={20} />
-                                                    <span style={{marginLeft: "10px"}}>Unsettle</span>
-                                                </div>:
-                                                <div>
-                                                    <GoCheckCircle size={20} />
-                                                    <span style={{marginLeft: "10px"}}>Settle</span>
-                                                </div>}
-                                        </Button>
+                                        {item.transferTo === userEmail || item[itemList.title] === userEmail?
+                                            <Button variant="secondary" disabled>
+                                                No action required
+                                            </Button>:
+                                            <Button
+                                                variant={
+                                                    isSettled(item, userEmail)? "danger": "success"
+                                                }
+                                                onClick={() => 
+                                                    settleUnsettle === "youOwe"?
+                                                    settleUnsettleYouOwe(item, userEmail, setSelectedEventItems, selectedEventItems):
+                                                    settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, item)
+                                                }
+                                            >
+                                                {isSettled(item, userEmail)? 
+                                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                                        <GoReply size={20} />
+                                                        <span style={{marginLeft: "10px"}}>Unsettle</span>
+                                                    </div>:
+                                                    <div>
+                                                        <GoCheckCircle size={20} />
+                                                        <span style={{marginLeft: "10px"}}>Settle</span>
+                                                    </div>}
+                                            </Button>
+                                        }
                                     </div>
                                 </Accordion.Body>
                             </Accordion.Item>
