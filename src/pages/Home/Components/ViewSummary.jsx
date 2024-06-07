@@ -97,7 +97,7 @@ const ViewSummary = ({
                                         ))}
                                     </div>
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        {item.transferTo === userEmail || item[itemList.title] === userEmail || !item.share?
+                                        {item.transferTo === userEmail || item[itemList.title] === userEmail || item.share === 0?
                                             <Button variant="secondary" disabled>
                                                 <div style={{ display: "flex", alignItems: "center" }}>
                                                     <GoCircleSlash size={20} />
