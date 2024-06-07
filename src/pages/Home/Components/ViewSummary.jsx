@@ -4,7 +4,8 @@ import {
     GoReply, 
     GoCheckCircle,
     GoTasklist,
-    GoBook
+    GoBook,
+    GoCircleSlash,
 } from "react-icons/go";
 import {
     doc,
@@ -98,7 +99,10 @@ const ViewSummary = ({
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
                                         {item.transferTo === userEmail || item[itemList.title] === userEmail?
                                             <Button variant="secondary" disabled>
-                                                No action required
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoCircleSlash size={20} />
+                                                    <span style={{marginLeft: "10px"}}>No action required</span>
+                                                </div>
                                             </Button>:
                                             <Button
                                                 variant={
@@ -115,7 +119,7 @@ const ViewSummary = ({
                                                         <GoReply size={20} />
                                                         <span style={{marginLeft: "10px"}}>Unsettle</span>
                                                     </div>:
-                                                    <div>
+                                                    <div style={{ display: "flex", alignItems: "center" }}>
                                                         <GoCheckCircle size={20} />
                                                         <span style={{marginLeft: "10px"}}>Settle</span>
                                                     </div>}
