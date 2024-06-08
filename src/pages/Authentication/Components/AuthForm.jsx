@@ -79,7 +79,7 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
     return (
         <Container className='py-3'>
             <Row className='justify-content-center'>
-                <Col xs={4}>
+                <Col xs={12} sm={4}>
                     <Card className='border-0'>
                         <Card.Header className='d-flex align-items-center justify-content-center p-3 flex-column' style={{backgroundColor: '#80b1b3'}}>
                             <GoLaw size={50} className='my-2 rounded-circle p-2' style={{backgroundColor: '#f7fafa'}} />
