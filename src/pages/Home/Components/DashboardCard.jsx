@@ -6,7 +6,7 @@ import { GoEye, GoCodeOfConduct } from "react-icons/go";
 const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHandler, icon }) => {
 
     return (
-        <Card>
+        <Card className='m-0 p-0'>
             <Card.Header
                 style={{ backgroundColor: "#80b1b3" }}
                 as="h4"
@@ -17,11 +17,11 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                     <span>{title}</span>
                 </div>
             </Card.Header>
-            <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-0" style={{ overflowX: "scroll" }}>
+            <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-3" style={{ overflowX: "auto" }}>
                 {isLoading ? (
                     <Spinner animation="border" size="lg" className="m-3" />
                 ) : (
-                    <Table striped bordered hover className="m-3">
+                    <Table striped bordered hover className='p-0 m-0'>
                         <thead>
                             <tr>
                                 {headers.map((header, index) => (
@@ -46,7 +46,7 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                                                 onClick={() =>
                                                     window.location.href = `/#view-event/${item.eventId}`
                                                 }
-                                                style={{ marginRight: "5px" }}
+                                                className='m-1'
                                             >
                                                 <div style={{ display: "flex", alignItems: "center" }}>
                                                     <GoEye size={20} />
@@ -56,6 +56,7 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                                             <Button
                                                 variant="info"
                                                 onClick={() => settleHandler(item)}
+                                                className='m-1'
                                             >
                                                 <div style={{ display: "flex", alignItems: "center" }}>
                                                     <GoCodeOfConduct size={20} />

@@ -90,7 +90,7 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                             <Form.Label column sm="2">
                                 Member {index + 1}
                             </Form.Label>
-                            <Col sm={disabled? "10": "9"}>
+                            <Col xs={disabled? "10": "9"}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter member email"
@@ -100,7 +100,7 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                                 />
                             </Col>
                             {!disabled &&
-                            <Col sm="1">
+                            <Col xs="1">
                                 <Button variant='danger' onClick={() => handleDeleteMember(index)}>
                                     <GoTrash />
                                 </Button>

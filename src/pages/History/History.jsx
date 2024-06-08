@@ -46,7 +46,7 @@ const History = () => {
         <>
             <Container style={{ height: "100%" }}>
                 <Row className="justify-content-center">
-                    <Col xs={10}>
+                    <Col sm={10} xs={12}>
                         <Card style={{ border: 0 }} className="my-3">
                             <Card.Header
                                 style={{ backgroundColor: "#80b1b3" }}
@@ -62,12 +62,14 @@ const History = () => {
                                     id="uncontrolled-tab-example"
                                     className="mb-3"
                                 >
-                                    <Tab eventKey="paid-by-you" title={
-                                        <>
-                                            <GoFoldUp size={30} style={{ marginRight: "10px" }} /> 
-                                            Paid by you
-                                        </>
-                                    }>
+                                    <Tab 
+                                        eventKey="paid-by-you" 
+                                        title={
+                                            <>
+                                                <GoFoldUp size={30} style={{ marginRight: "10px" }} /> 
+                                                Paid by you
+                                            </>}
+                                    >
                                         <HistoryTable 
                                             isLoading={isLoading} 
                                             headers={['Event name', 'Item name', 'To', 'Amount', "Actions"]} 
@@ -75,12 +77,14 @@ const History = () => {
                                             items={owedItems} 
                                         />
                                     </Tab>
-                                    <Tab eventKey="paid-to-you" title={
+                                    <Tab 
+                                        eventKey="paid-to-you" 
+                                        title={
                                         <>
                                             <GoFoldDown size={30} style={{ marginRight: "10px" }} /> 
                                             Paid to you
-                                        </>
-                                    }>
+                                        </>}
+                                    >
                                         <HistoryTable 
                                             isLoading={isLoading} 
                                             headers={['Event name', 'Item name', 'From', 'Amount', "Actions"]} 

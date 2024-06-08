@@ -39,7 +39,6 @@ const EditEventForm = ({ memberError, setMemberError, items, setItems, event, se
                 items={items}
                 setItems={setItems}
             />
-            
             <ItemsCard
                 event={event}
                 items={items}

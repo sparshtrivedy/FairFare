@@ -38,7 +38,7 @@ const ViewEvent = () => {
     return (
         <Container style={{height: '100%'}}>
             <Row className='justify-content-center'>
-                <Col xs={10}>
+                <Col sm={10} xs={12}>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header
                             style={{ backgroundColor: "#80b1b3" }}

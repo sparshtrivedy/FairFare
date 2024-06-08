@@ -31,40 +31,42 @@ const HistoryTable = ({isLoading, headers, values, items}) => {
                 <Spinner animation="border" size='lg' className='m-3' />
             </div>:
             <div>
-                <Table striped bordered hover className='mb-0'>
-                    <thead>
-                        <tr>
-                            {headers.map((header, index) => (
-                                <th key={index}>{header}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {currentItems.map((item) => (
-                            <tr key={item.eventId}>
-                                {values.map((value, index) => (
-                                    <td key={index}>{item[value]}</td>
+                <div style={{ overflowX: "auto" }}>
+                    <Table striped bordered hover className='p-0 m-0'>
+                        <thead>
+                            <tr>
+                                {headers.map((header, index) => (
+                                    <th key={index}>{header}</th>
                                 ))}
-                                <td>
-                                    <Button
-                                        variant="primary"
-                                        onClick={() =>
-                                            window.location.href = `/#view-event/${item.eventId}`
-                                        }
-                                        style={{ marginRight: "5px" }}
-                                    >
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <GoEye size={20} />
-                                            <span style={{marginLeft: "10px"}}>View</span>
-                                        </div>
-                                    </Button>
-                                </td>
                             </tr>
-                        ))}
-                    </tbody>
-                </Table>
+                        </thead>
+                        <tbody>
+                            {currentItems.map((item) => (
+                                <tr key={item.eventId}>
+                                    {values.map((value, index) => (
+                                        <td key={index}>{item[value]}</td>
+                                    ))}
+                                    <td>
+                                        <Button
+                                            variant="primary"
+                                            onClick={() =>
+                                                window.location.href = `/#view-event/${item.eventId}`
+                                            }
+                                            style={{ marginRight: "5px" }}
+                                        >
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoEye size={20} />
+                                                <span style={{marginLeft: "10px"}}>View</span>
+                                            </div>
+                                        </Button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </div>
                 <div className='d-flex justify-content-center'>
-                    <Pagination className="mt-3">
+                    <Pagination className="mt-3 mb-0">
                         <Pagination.First onClick={() => handlePageChange(1)} disabled={currentPage === 1} />
                         <Pagination.Prev onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1} />
                         {Array.from({ length: totalPages }, (_, index) => (
