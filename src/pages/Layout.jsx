@@ -48,69 +48,58 @@ const Layout = () => {
     }
 
     return (
-        <div style={{ backgroundColor: '#2F4F4F', minHeight: '100vh' }}>
+        <div style={{ backgroundColor: '#2F4F4F', minHeight: '100vh', width: '100%' }}>
             {isLoggedIn &&
-                <Navbar bg="dark" data-bs-theme="dark">
-                    <Container>
-                        <Navbar.Brand style={{ display: 'flex', alignItems: 'center' }}>
-                            <GoLaw size={25} /> 
-                            <span style={{ marginLeft: "10px" }}>FairFare</span>
-                        </Navbar.Brand>
+            <Navbar collapseOnSelect expand="lg" bg="dark" data-bs-theme="dark">
+                <Container>
+                    <Navbar.Brand style={{ display: 'flex', alignItems: 'center' }}>
+                        <GoLaw size={25} /> 
+                        <span style={{ marginLeft: "10px" }}>FairFare</span>
+                    </Navbar.Brand>
+                    <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                    <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link className='d-flex align-items-center' disabled>
-                                <span style={{ marginLeft: "5px" }}>|</span>
-                            </Nav.Link>
                             <Nav.Link href="#home" className='d-flex align-items-center'>
                                 <GoHome size={20} />
                                 <span style={{ marginLeft: "5px" }}>Home</span>
-                            </Nav.Link>
-                            <Nav.Link className='d-flex align-items-center' disabled>
-                                <span style={{ marginLeft: "5px" }}>|</span>
                             </Nav.Link>
                             <Nav.Link href="#create-event" className='d-flex align-items-center'>
                                 <GoPlusCircle size={20} />
                                 <span style={{ marginLeft: "5px" }}>Create</span>
                             </Nav.Link>
-                            <Nav.Link className='d-flex align-items-center' disabled>
-                                <span style={{ marginLeft: "5px" }}>|</span>
-                            </Nav.Link>
                             <Nav.Link href="#history" className='d-flex align-items-center'>
                                 <GoHistory size={20} />
                                 <span style={{ marginLeft: "5px" }}>History</span>
                             </Nav.Link>
-                            <Nav.Link className='d-flex align-items-center' disabled>
-                                <span style={{ marginLeft: "5px" }}>|</span>
-                            </Nav.Link>
                         </Nav>
-                        <Navbar.Text style={{marginRight: '15px'}}>
-                            {isLoggedIn ? `Hello, ${userEmail}` : 
-                                <Button variant='primary' href='#sign-in'>Sign-in</Button>
-                            }
-                        </Navbar.Text>
-                        <Button variant='danger' onClick={handleLogout}>
-                            <GoSignOut size={20} /> Logout
-                        </Button>
-                    </Container>
-                </Navbar>
-            }
-            <Routes>
-                {isLoggedIn ? (
-                    <>
-                        <Route path="/home" element={<Home />} />
-                        <Route path="/create-event" element={<CreateEvent />} />
-                        <Route path="/view-event/:eventId" element={<ViewEvent />} />
-                        <Route path="/edit-event/:eventId" element={<EditEvent />} />
-                        <Route path="/history" element={<History />} />
-                        <Route path="*" element={<Navigate to="/home" />} />
-                    </>
-                ) : (
-                    <>
-                        <Route path="/sign-in" element={<SignIn />} />
-                        <Route path="/sign-up" element={<SignUp />} />
-                        <Route path="*" element={<Navigate to="/sign-in" />} />
-                    </>
-                )}
-            </Routes>
+                        <Nav>
+                            <Navbar.Text style={{marginRight: '15px'}}>
+                                {isLoggedIn ? `Hello, ${userEmail}` : 
+                                    <Button variant='primary' href='#sign-in'>Sign-in</Button>
+                                }
+                            </Navbar.Text>
+                            <Button variant='danger' onClick={handleLogout}>
+                                <GoSignOut size={20} /> Logout
+                            </Button>
+                        </Nav>
+                    </Navbar.Collapse>
+                </Container>
+            </Navbar>}
+            {isLoggedIn ? (
+                <Routes>
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/create-event" element={<CreateEvent />} />
+                    <Route path="/view-event/:eventId" element={<ViewEvent />} />
+                    <Route path="/edit-event/:eventId" element={<EditEvent />} />
+                    <Route path="/history" element={<History />} />
+                    <Route path="*" element={<Navigate to="/home" />} />
+                </Routes>
+            ) : (
+                <Routes>
+                    <Route path="/sign-in" element={<SignIn />} />
+                    <Route path="/sign-up" element={<SignUp />} />
+                    <Route path="*" element={<Navigate to="/sign-in" />} />
+                </Routes>)}
         </div>
     )
 }

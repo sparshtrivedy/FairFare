@@ -17,7 +17,7 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                     <span>{title}</span>
                 </div>
             </Card.Header>
-            <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-0">
+            <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-0" style={{ overflowX: "scroll" }}>
                 {isLoading ? (
                     <Spinner animation="border" size="lg" className="m-3" />
                 ) : (
