@@ -15,6 +15,7 @@ const EditEventForm = ({ memberError, setMemberError, items, setItems, event, se
                 placeholder="Enter event name"
                 onChange={(e) => setEvent({ ...event, name: e.target.value })}
                 value={event.name}
+                required={true}
             />
             <FairFareControl
                 label="Event date"
@@ -22,6 +23,7 @@ const EditEventForm = ({ memberError, setMemberError, items, setItems, event, se
                 placeholder="Enter event date"
                 onChange={(e) => setEvent({ ...event, date: e.target.value })}
                 value={event.date}
+                required={true}
             />
             <FairFareControl
                 label="Event description"

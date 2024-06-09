@@ -61,6 +61,7 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                         }}
                                         value={item.itemName}
                                         disabled={disabled}
+                                        required={true}
                                     />
                                     <FairFareControl
                                         label="Item price"
@@ -73,6 +74,7 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                         }}
                                         value={item.itemPrice}
                                         disabled={disabled}
+                                        required={true}
                                     />
                                     <FairFareControl
                                         label="Item quantity"
@@ -85,6 +87,7 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                         }}
                                         value={item.itemQuantity}
                                         disabled={disabled}
+                                        required={true}
                                     />
                                     <FairFareControl
                                         label="Transfer to"
@@ -97,10 +100,14 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                         }}
                                         value={item.transferTo}
                                         disabled={disabled}
+                                        required={true}
                                     />
                                     <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="2">
+                                        <Form.Label column sm="2" className='d-flex align-items-center'>
                                             Shared among
+                                            <span style={{ color: 'red', marginLeft: '5px' }}>
+                                                *
+                                            </span>
                                         </Form.Label>
                                         <Col sm="10">
                                         {event.members.length?

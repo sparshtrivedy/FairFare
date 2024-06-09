@@ -11,6 +11,7 @@ import {
     GoPeople,
     GoTrash,
     GoPersonAdd,
+    GoAlert
 } from "react-icons/go";
 import { userWithEmailQuery } from "../../../Utils";
 import { getDocs } from "firebase/firestore";
@@ -81,14 +82,18 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
             </Card.Header>
             <Card.Body>
                 {!disabled &&
-                <Alert variant='danger' show={memberError.length !== 0}>
+                <Alert variant='danger' className="d-flex align-items-center" show={memberError.length !== 0}>
+                    <GoAlert size={20} style={{ marginRight: '10px' }} />
                     {memberError}
                 </Alert>}
                 {members?.length? members.map((member, index) => (
                     <div key={`member-${index}`} className='my-2'>
                         <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="2">
+                            <Form.Label column sm="2" className='d-flex align-items-center'>
                                 Member {index + 1}
+                                <span style={{ color: 'red', marginLeft: '5px' }}>
+                                    *
+                                </span>
                             </Form.Label>
                             <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
                                 <Form.Control

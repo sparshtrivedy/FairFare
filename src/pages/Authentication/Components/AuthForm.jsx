@@ -9,6 +9,7 @@ import {
     Card,
     Spinner
 } from 'react-bootstrap';
+import { GoAlert } from 'react-icons/go';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from '../../../firebase-config';
 import { GoLaw } from "react-icons/go";
@@ -88,8 +89,9 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                             </h4>
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
-                            {error && 
-                                <Alert variant='danger'>
+                            {error &&
+                                <Alert variant='danger' className="d-flex align-items-center">
+                                    <GoAlert size={20} style={{ marginRight: '10px' }} />
                                     {error}
                                 </Alert>
                             }
@@ -100,7 +102,7 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                                         animation="border"
                                         size="sm"
                                         role="status"
-                                        style={{marginRight: '5px'}}
+                                        style={{ marginRight: '10px' }}
                                     />
                                     {success}
                                 </Alert>
