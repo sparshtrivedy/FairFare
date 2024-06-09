@@ -90,7 +90,7 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                             <Form.Label column sm="2">
                                 Member {index + 1}
                             </Form.Label>
-                            <Col xs={disabled? "10": "9"}>
+                            <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
                                 <Form.Control
                                     type="text"
                                     placeholder="Enter member email"

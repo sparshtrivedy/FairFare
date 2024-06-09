@@ -10,6 +10,7 @@ const CreateEventForm = ({ memberError, setMemberError, items, setItems, event, 
     return (
         <Form>
             <FairFareControl
+            requ
                 label="Event name"
                 type="text"
                 placeholder="Enter event name"
