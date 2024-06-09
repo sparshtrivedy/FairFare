@@ -7,6 +7,7 @@ import {
     Spinner,
     Button,
     Alert,
+    Breadcrumb,
 } from "react-bootstrap";
 import { GoPencil, GoFileDirectory, GoAlert } from "react-icons/go";
 import EditEventForm from "./Components/EditEventForm";
@@ -20,6 +21,7 @@ import {
     updateItem,
 } from "../../Utils";
 import { useParams } from "react-router-dom";
+import '../pages.css';
 
 const EditEvent = () => {
     const eventId = useParams().eventId;
@@ -61,7 +63,7 @@ const EditEvent = () => {
                 await updateItem(itemRef, item);
             }
 
-            window.location.href = `/#view-event/${eventId}`;
+            window.location.href = `/#/view-event/${eventId}`;
         }
     }
 
@@ -126,6 +128,11 @@ const EditEvent = () => {
         <Container style={{height: '100%'}}>
             <Row className='justify-content-center'>
                 <Col sm={10} xs={12}>
+                    <Breadcrumb className="my-2">
+                        <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item href={`/#/view-event/${eventId}`}>View</Breadcrumb.Item>
+                        <Breadcrumb.Item active className="text-white">Edit</Breadcrumb.Item>
+                    </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header
                             style={{ backgroundColor: "#80b1b3" }}

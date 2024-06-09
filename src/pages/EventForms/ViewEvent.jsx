@@ -5,12 +5,14 @@ import {
     Col, 
     Card,
     Button,
-    Spinner
+    Spinner,
+    Breadcrumb,
 } from "react-bootstrap";
 import { GoEye, GoPencil } from "react-icons/go";
 import { useParams } from "react-router-dom";
 import { getEventById, getItemsByEventId } from "../../Utils";
 import ViewEventForm from "./Components/ViewEventForm";
+import '../pages.css';
 
 const ViewEvent = () => {
     const eventId = useParams().eventId;
@@ -39,6 +41,10 @@ const ViewEvent = () => {
         <Container style={{height: '100%'}}>
             <Row className='justify-content-center'>
                 <Col sm={10} xs={12}>
+                    <Breadcrumb className="my-2">
+                        <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item active>View</Breadcrumb.Item>
+                    </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header
                             style={{ backgroundColor: "#80b1b3" }}
@@ -68,7 +74,7 @@ const ViewEvent = () => {
                                 variant="primary" 
                                 type="submit"
                                 onClick={() =>
-                                    window.location.href = `/#edit-event/${eventId}`
+                                    window.location.href = `/#/edit-event/${eventId}`
                                 }
                             >
                                 <div style={{ display: "flex", alignItems: "center" }}>

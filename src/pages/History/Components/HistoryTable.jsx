@@ -50,7 +50,7 @@ const HistoryTable = ({isLoading, headers, values, items}) => {
                                         <Button
                                             variant="primary"
                                             onClick={() =>
-                                                window.location.href = `/#view-event/${item.eventId}`
+                                                window.location.href = `/#/view-event/${item.eventId}`
                                             }
                                             style={{ marginRight: "5px" }}
                                         >

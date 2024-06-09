@@ -8,6 +8,7 @@ import {
     Row,
     Col,
     Card,
+    Breadcrumb,
 } from 'react-bootstrap';
 import { 
     GoHistory,
@@ -19,6 +20,7 @@ import {
     itemsWithTransferToMemberQuery,
     fetchItemsSettledByMember
 } from '../../Utils';
+import '../pages.css';
 
 const History = () => {
     const {userEmail} = useContext(AuthContext);
@@ -47,6 +49,10 @@ const History = () => {
             <Container style={{ height: "100%" }}>
                 <Row className="justify-content-center">
                     <Col sm={10} xs={12}>
+                        <Breadcrumb className="my-2">
+                            <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
+                            <Breadcrumb.Item active>History</Breadcrumb.Item>
+                        </Breadcrumb>
                         <Card style={{ border: 0 }} className="my-3">
                             <Card.Header
                                 style={{ backgroundColor: "#80b1b3" }}

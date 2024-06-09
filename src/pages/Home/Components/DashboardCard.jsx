@@ -44,7 +44,7 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                                             <Button
                                                 variant="primary"
                                                 onClick={() =>
-                                                    window.location.href = `/#view-event/${item.eventId}`
+                                                    window.location.href = `/#/view-event/${item.eventId}`
                                                 }
                                                 className='m-1'
                                             >

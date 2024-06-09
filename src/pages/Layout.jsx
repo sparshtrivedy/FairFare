@@ -59,15 +59,15 @@ const Layout = () => {
                     <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                     <Navbar.Collapse id="responsive-navbar-nav">
                         <Nav className="me-auto">
-                            <Nav.Link href="#home" className='d-flex align-items-center'>
+                            <Nav.Link href="/#/home" className='d-flex align-items-center'>
                                 <GoHome size={20} />
                                 <span style={{ marginLeft: "5px" }}>Home</span>
                             </Nav.Link>
-                            <Nav.Link href="#create-event" className='d-flex align-items-center'>
+                            <Nav.Link href="/#/create-event" className='d-flex align-items-center'>
                                 <GoPlusCircle size={20} />
                                 <span style={{ marginLeft: "5px" }}>Create</span>
                             </Nav.Link>
-                            <Nav.Link href="#history" className='d-flex align-items-center'>
+                            <Nav.Link href="/#/history" className='d-flex align-items-center'>
                                 <GoHistory size={20} />
                                 <span style={{ marginLeft: "5px" }}>History</span>
                             </Nav.Link>

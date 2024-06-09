@@ -1,0 +1,14 @@
+/* custom-breadcrumbs.css */
+.breadcrumb-item a {
+    color: #adb5bd; /* Change breadcrumb link color */
+}
+
+.breadcrumb-item.active {
+    color: #FBFBFB /* Change active breadcrumb item color */
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: "/";
+    color: #adb5bd; /* Change breadcrumb divider color */
+    padding: 0 1rem;
+  }

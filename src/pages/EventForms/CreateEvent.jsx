@@ -6,6 +6,7 @@ import {
     Card,
     Button,
     Alert,
+    Breadcrumb,
 } from "react-bootstrap";
 import { 
     GoPlusCircle,
@@ -14,6 +15,7 @@ import {
 } from "react-icons/go";
 import { addEvent, addItem } from "../../Utils";
 import CreateEventForm from "./Components/CreateEventForm";
+import '../pages.css';
 
 const CreateEvent = () => {
     const [memberError, setMemberError] = useState('');
@@ -86,13 +88,17 @@ const CreateEvent = () => {
             await addItem(item, eventRef);
         }
 
-        window.location.href = `/#view-event/${eventRef.id}`;
+        window.location.href = `/#/view-event/${eventRef.id}`;
     }
 
     return (
         <Container style={{height: '100%'}}>
             <Row className='justify-content-center'>
                 <Col sm={10} xs={12}>
+                    <Breadcrumb className="my-2">
+                        <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item active>Create</Breadcrumb.Item>
+                    </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header
                             style={{ backgroundColor: "#80b1b3" }}

@@ -14,6 +14,7 @@ import {
     Row,
     Col,
     Card,
+    Breadcrumb,
 } from "react-bootstrap";
 import {
     itemsWithTransferToMemberQuery,
@@ -26,6 +27,7 @@ import {
     GoFoldDown,
     GoFoldUp
 } from "react-icons/go";
+import '../pages.css';
 
 const Home = () => {
     const { userEmail } = useContext(AuthContext);
@@ -95,6 +97,9 @@ const Home = () => {
             <Container style={{ height: "100%" }}>
                 <Row className="justify-content-center">
                     <Col sm={10} xs={12}>
+                        <Breadcrumb className="my-2">
+                            <Breadcrumb.Item active>Home</Breadcrumb.Item>
+                        </Breadcrumb>
                         <Card style={{ border: 0 }} className="my-3">
                             <Card.Header
                                 style={{ backgroundColor: "#80b1b3" }}
