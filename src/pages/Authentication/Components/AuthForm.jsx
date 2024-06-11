@@ -53,13 +53,26 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
 
     const handleSignUp = async () => {
         try {
-            console.log('signing up')
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            setEmail(email.trim().toLowerCase());
+            if (!emailRegex.test(email)) {
+                setError('Invalid email');
+                setTimeout(() => {
+                    setError('');
+                }, 3000);
+                return;
+            }
+            if (password.length < 8) {
+                setError('Password must be at least 6 characters long');
+                setTimeout(() => {
+                    setError('');
+                }, 3000);
+                return;
+            }
+            await createUserWithEmailAndPassword(auth, email, password);
             await addDoc(collection(db, 'users'), {
                 email: email
             });
-            console.log('user added')
-            await createUserWithEmailAndPassword(auth, email, password);
-            console.log('user signed up')
             setSuccess('User signed-up successfully. Redirecting to sign-in page...');
 
             setTimeout(() => {
@@ -67,7 +80,7 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                 navigate('/sign-in');
             }, 3000);
         } catch (error) {
-            setError('An error occurred');
+            setError('An error occurred. This email might already be in use.');
 
             setTimeout(() => {
                 setError('');
