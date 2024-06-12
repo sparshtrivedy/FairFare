@@ -7,9 +7,13 @@ import {
     Alert, 
     Container,
     Card,
-    Spinner
+    Spinner,
+    InputGroup
 } from 'react-bootstrap';
-import { GoAlert } from 'react-icons/go';
+import { 
+    GoAlert,
+    GoIssueClosed,
+} from 'react-icons/go';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from '../../../firebase-config';
 import { GoLaw } from "react-icons/go";
@@ -23,8 +27,10 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [isPasswordConfirmed, setIsPasswordConfirmed] = useState(false);
 
     const handleSignIn = async () => {
         try {
@@ -64,6 +70,13 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
             }
             if (password.length < 8) {
                 setError('Password must be at least 6 characters long');
+                setTimeout(() => {
+                    setError('');
+                }, 3000);
+                return;
+            }
+            if (password !== confirmPassword) {
+                setError('Passwords do not match');
                 setTimeout(() => {
                     setError('');
                 }, 3000);
@@ -141,6 +154,33 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                                         onChange={(e) => setPassword(e.target.value)}
                                     />
                                 </Form.Group>
+                                {buttonText === "Sign-up" &&
+                                <Form.Group className="mb-3" controlId="formPlaintextConfirmPassword">
+                                    <Form.Label>
+                                        Confirm Password
+                                    </Form.Label>
+                                    <InputGroup>
+                                        <Form.Control 
+                                            type="password" 
+                                            placeholder="Re-enter your password here"
+                                            onChange={(e) => {
+                                                setConfirmPassword(e.target.value);
+                                                if (e.target.value !== password) {
+                                                    setError('Passwords do not match');
+                                                    setIsPasswordConfirmed(false);
+                                                } else if (e.target.value === password
+                                                    && e.target.value.length > 0) {
+                                                    setError('');
+                                                    setIsPasswordConfirmed(true);
+                                                }
+                                            }}
+                                        />
+                                        {isPasswordConfirmed && 
+                                        <InputGroup.Text className='bg-success'>
+                                            <GoIssueClosed size={20} className='text-light'/>
+                                        </InputGroup.Text>}
+                                    </InputGroup>
+                                </Form.Group>}
                             </Form>
                         </Card.Body>
                         <Card.Footer className='d-flex align-items-center justify-content-center flex-column' style={{backgroundColor: '#80b1b3'}}>
