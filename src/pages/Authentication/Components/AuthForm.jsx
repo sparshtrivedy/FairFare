@@ -69,7 +69,7 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                 return;
             }
             if (password.length < 8) {
-                setError('Password must be at least 6 characters long');
+                setError('Password must be at least 8 characters long');
                 setTimeout(() => {
                     setError('');
                 }, 3000);
