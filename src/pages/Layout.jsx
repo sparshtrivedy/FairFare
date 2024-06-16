@@ -17,6 +17,7 @@ import EditEvent from './EventForms/EditEvent'
 import ViewEvent from './EventForms/ViewEvent';
 import History from './History/History'
 import CreateEvent from './EventForms/CreateEvent';
+import Contacts from './Contacts/Contacts'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { 
@@ -24,7 +25,8 @@ import {
     GoSignOut,
     GoHome,
     GoPlusCircle,
-    GoHistory
+    GoHistory,
+    GoPerson
 } from "react-icons/go";
 
 const Layout = () => {
@@ -71,6 +73,10 @@ const Layout = () => {
                                 <GoHistory size={20} />
                                 <span style={{ marginLeft: "5px" }}>History</span>
                             </Nav.Link>
+                            <Nav.Link href="/#/contacts" className='d-flex align-items-center'>
+                                <GoPerson size={20} />
+                                <span style={{ marginLeft: "5px" }}>Contacts</span>
+                            </Nav.Link>
                         </Nav>
                         <Nav>
                             <Navbar.Text style={{marginRight: '15px'}}>
@@ -92,6 +98,7 @@ const Layout = () => {
                     <Route path="/view-event/:eventId" element={<ViewEvent />} />
                     <Route path="/edit-event/:eventId" element={<EditEvent />} />
                     <Route path="/history" element={<History />} />
+                    <Route path="/contacts" element={<Contacts />} />
                     <Route path="*" element={<Navigate to="/home" />} />
                 </Routes>
             ) : (

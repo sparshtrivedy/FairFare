@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useContext, useState } from "react";
+import { AuthContext } from "../../../App";
 import { 
     Card,
     Alert,
@@ -18,6 +19,9 @@ import { getDocs } from "firebase/firestore";
 import { updateMemberSplits } from "../../../Utils";
 
 const MembersCard = ({ members, memberError, setMemberError, event, setEvent, items, setItems, disabled=false }) => {
+    const { userEmail } = useContext(AuthContext);
+    const [contacts, setContacts] = useState([]);
+
     const handleAddMember = () => {
         setEvent({ ...event, 
             members: [...event.members, {
@@ -45,18 +49,10 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
         copiedMembers[index].email = e.target.value;
         setEvent({ ...event, members: copiedMembers });
 
-        const memberQuery = userWithEmailQuery(e.target.value);
-        const memberQuerySnapshot = await getDocs(memberQuery);
-
-        if (memberQuerySnapshot.empty) {
-            setMemberError('Member not found. Please make sure this user has signed-up.');
-        } else {
-            setMemberError('');
-            for (let i = 0; i < items.length; i++) {
-                let copiedItems = [...items];
-                copiedItems[i].splits[index].email = e.target.value;
-                setItems(copiedItems);
-            }
+        for (let i = 0; i < items.length; i++) {
+            let copiedItems = [...items];
+            copiedItems[i].splits[index].email = e.target.value;
+            setItems(copiedItems);
         }
     }
 
@@ -73,6 +69,19 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
 
         setItems(copiedItems);
     }
+
+    useEffect(() => {
+        const fetchContacts = async () => {
+            const memberQuery = userWithEmailQuery(userEmail);
+            const memberQuerySnapshot = await getDocs(memberQuery);
+
+            if (!memberQuerySnapshot.empty) {
+                const memberData = memberQuerySnapshot.docs[0].data().contacts.sort();
+                if (memberData.length > 0) setContacts(memberData);
+            }
+        }
+        fetchContacts();
+    }, [userEmail]);
 
     return (
         <Card className='my-3'>
@@ -96,13 +105,17 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                                 </span>
                             </Form.Label>
                             <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="Enter member email"
+                                <Form.Select
                                     onChange={(e) => handleUpdateMember(e, index)}
                                     value={member.email}
                                     disabled={disabled}
-                                />
+                                    required={true}
+                                >
+                                    <option>Select a member</option>
+                                    {contacts.map((member, i) => (
+                                        <option key={`item-${index}-member-${i}`} value={member}>{member}</option>
+                                    ))}
+                                </Form.Select>
                             </Col>
                             {!disabled &&
                             <Col xs="1">
