@@ -12,7 +12,8 @@ import {
     GoPeople,
     GoTrash,
     GoPersonAdd,
-    GoAlert
+    GoAlert,
+    GoInfo,
 } from "react-icons/go";
 import { userWithEmailQuery } from "../../../Utils";
 import { getDocs } from "firebase/firestore";
@@ -90,43 +91,58 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                 <span style={{marginLeft: '10px'}}>Members</span>
             </Card.Header>
             <Card.Body>
+                <Card.Subtitle className="mb-2 text-muted d-flex align-items-center">
+                    Don't see a member? Add them to your 
+                    <Button 
+                        variant="link" 
+                        className="px-1" 
+                        onClick={() => {
+                            window.location.href = '/#/contacts';
+                        }}
+                    >
+                        contacts
+                    </Button>
+                </Card.Subtitle>
                 {!disabled &&
                 <Alert variant='danger' className="d-flex align-items-center" show={memberError.length !== 0}>
                     <GoAlert size={20} style={{ marginRight: '10px' }} />
                     {memberError}
                 </Alert>}
                 {members?.length? members.map((member, index) => (
-                    <div key={`member-${index}`} className='my-2'>
-                        <Form.Group as={Row} className="mb-3">
-                            <Form.Label column sm="2" className='d-flex align-items-center'>
-                                Member {index + 1}
-                                <span style={{ color: 'red', marginLeft: '5px' }}>
-                                    *
-                                </span>
-                            </Form.Label>
-                            <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
-                                <Form.Select
-                                    onChange={(e) => handleUpdateMember(e, index)}
-                                    value={member.email}
-                                    disabled={disabled}
-                                    required={true}
-                                >
-                                    <option>Select a member</option>
-                                    {contacts.map((member, i) => (
-                                        <option key={`item-${index}-member-${i}`} value={member}>{member}</option>
-                                    ))}
-                                </Form.Select>
-                            </Col>
-                            {!disabled &&
-                            <Col xs="1">
-                                <Button variant='danger' onClick={() => handleDeleteMember(index)}>
-                                    <GoTrash />
-                                </Button>
-                            </Col>}
-                        </Form.Group>
-                    </div>
+                    <Form.Group key={`member-${index}`} as={Row} className={index === members.length-1? "mb-1": "mb-3"}>
+                        <Form.Label column sm="2" className='d-flex align-items-center'>
+                            Member {index + 1}
+                            <span style={{ color: 'red', marginLeft: '5px' }}>
+                                *
+                            </span>
+                        </Form.Label>
+                        <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
+                            <Form.Select
+                                onChange={(e) => handleUpdateMember(e, index)}
+                                value={member.email}
+                                disabled={disabled}
+                                required={true}
+                            >
+                                <option>Select a member</option>
+                                {contacts.map((member, i) => (
+                                    <option key={`item-${index}-member-${i}`} value={member}>{member}</option>
+                                ))}
+                            </Form.Select>
+                        </Col>
+                        {!disabled &&
+                        <Col xs="1">
+                            <Button variant='danger' onClick={() => handleDeleteMember(index)}>
+                                <GoTrash />
+                            </Button>
+                        </Col>}
+                    </Form.Group>
                 )):
-                    <div>No members found</div>
+                    <Card.Text className='d-flex align-items-center text-muted'>
+                        <GoInfo size={20} />
+                        <span style={{marginLeft: "10px"}}>
+                            No members to display. Add members to split the expenses.
+                        </span>
+                    </Card.Text>
                 }
             </Card.Body>
             {!disabled &&

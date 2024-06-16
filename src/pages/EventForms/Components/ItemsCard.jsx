@@ -7,7 +7,7 @@ import {
     Form,
     Accordion
 } from 'react-bootstrap';
-import { GoRows, GoWorkflow, GoTrash } from 'react-icons/go';
+import { GoRows, GoWorkflow, GoTrash, GoInfo } from 'react-icons/go';
 import FairFareControl from './FairFareControl';
 import { updateMemberSplits } from '../../../Utils';
 
@@ -133,7 +133,12 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                                     disabled={disabled}
                                                 />
                                             )):
-                                            <p>No members added</p>
+                                            <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
+                                                <GoInfo size={20} />
+                                                <span style={{marginLeft: "10px"}}>
+                                                    No members to display. Add members to split the expenses.
+                                                </span>
+                                            </div>
                                         }
                                         </Col>
                                     </Form.Group>
