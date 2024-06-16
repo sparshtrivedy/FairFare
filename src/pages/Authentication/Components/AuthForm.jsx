@@ -84,7 +84,8 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
             }
             await createUserWithEmailAndPassword(auth, email, password);
             await addDoc(collection(db, 'users'), {
-                email: email
+                email: email,
+                contacts: [ email ],
             });
             setSuccess('User signed-up successfully. Redirecting to sign-in page...');
 
