@@ -82,7 +82,7 @@ const Contacts = () => {
             <Row className="justify-content-center">
                 <Col sm={10} xs={12}>
                     <Breadcrumb className="my-2">
-                        <Breadcrumb.Item>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
                         <Breadcrumb.Item active>Contacts</Breadcrumb.Item>
                     </Breadcrumb>
                     <Card style={{ border: 0 }} className="my-3">
