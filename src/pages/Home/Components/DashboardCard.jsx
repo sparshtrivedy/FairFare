@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, Table, Button, Spinner } from 'react-bootstrap';
-import { GoEye, GoCodeOfConduct } from "react-icons/go";
+import { GoEye, GoCodeOfConduct, GoCheckCircle } from "react-icons/go";
 
 
 const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHandler, icon }) => {
@@ -32,7 +32,14 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                         <tbody>
                             {!itemList.length ? (
                                 <tr>
-                                    <td colSpan="5">No events found</td>
+                                    <td colSpan={5}>
+                                        <div style={{ display: "flex", alignItems: "center", justifyContent: 'center' }} className='text-muted'>
+                                            <GoCheckCircle size={20} />
+                                            <span style={{marginLeft: "10px"}}>
+                                                You are all caught up!
+                                            </span>
+                                        </div>
+                                    </td>
                                 </tr>
                             ) : (
                                 itemList.map((item, index) => (

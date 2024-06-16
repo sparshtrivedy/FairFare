@@ -5,7 +5,7 @@ import {
     Spinner,
     Pagination,
 } from "react-bootstrap";
-import { GoEye } from "react-icons/go";
+import { GoEye, GoInfo } from "react-icons/go";
 
 const HistoryTable = ({isLoading, headers, values, items}) => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -41,27 +41,40 @@ const HistoryTable = ({isLoading, headers, values, items}) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentItems.map((item) => (
-                                <tr key={item.eventId}>
-                                    {values.map((value, index) => (
-                                        <td key={index}>{item[value]}</td>
-                                    ))}
-                                    <td>
-                                        <Button
-                                            variant="primary"
-                                            onClick={() =>
-                                                window.location.href = `/#/view-event/${item.eventId}`
-                                            }
-                                            style={{ marginRight: "5px" }}
-                                        >
-                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                <GoEye size={20} />
-                                                <span style={{marginLeft: "10px"}}>View</span>
-                                            </div>
-                                        </Button>
-                                    </td>
-                                </tr>
-                            ))}
+                            {!currentItems.length ? (
+                                <tr>
+                                <td colSpan={5}>
+                                    <div style={{ display: "flex", alignItems: "center", justifyContent: 'center' }} className='text-muted'>
+                                        <GoInfo size={20} />
+                                        <span style={{marginLeft: "10px"}}>
+                                            No items to display. Your settled items will appear here.
+                                        </span>
+                                    </div>
+                                </td>
+                            </tr>
+                            ) : (
+                                currentItems.map((item) => (
+                                    <tr key={item.eventId}>
+                                        {values.map((value, index) => (
+                                            <td key={index}>{item[value]}</td>
+                                        ))}
+                                        <td>
+                                            <Button
+                                                variant="primary"
+                                                onClick={() =>
+                                                    window.location.href = `/#/view-event/${item.eventId}`
+                                                }
+                                                style={{ marginRight: "5px" }}
+                                            >
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoEye size={20} />
+                                                    <span style={{marginLeft: "10px"}}>View</span>
+                                                </div>
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </Table>
                 </div>
