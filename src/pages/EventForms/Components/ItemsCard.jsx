@@ -89,19 +89,31 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                         disabled={disabled}
                                         required={true}
                                     />
-                                    <FairFareControl
-                                        label="Transfer to"
-                                        type="text"
-                                        placeholder="Enter transfer details of person to e-transfer to"
-                                        onChange={(e) => {
-                                            let copiedItems = [...items];
-                                            copiedItems[index].transferTo = e.target.value;
-                                            setItems(copiedItems);
-                                        }}
-                                        value={item.transferTo}
-                                        disabled={disabled}
-                                        required={true}
-                                    />
+                                    <Form.Group as={Row} className="mb-3">
+                                        <Form.Label column sm="2" className='d-flex align-items-center'>
+                                            Transfer to
+                                            <span style={{ color: 'red', marginLeft: '5px' }}>
+                                                *
+                                            </span>
+                                        </Form.Label>
+                                        <Col sm="10">
+                                            <Form.Select
+                                                onChange={(e) => {
+                                                    let copiedItems = [...items];
+                                                    copiedItems[index].transferTo = e.target.value;
+                                                    setItems(copiedItems);
+                                                }}
+                                                value={item.transferTo}
+                                                disabled={disabled}
+                                                required={true}
+                                            >
+                                                <option>Select a member</option>
+                                                {event.members.map((member, i) => (
+                                                    <option key={`item-${index}-member-${i}`} value={member.email}>{member.email}</option>
+                                                ))}
+                                            </Form.Select>
+                                        </Col>
+                                    </Form.Group>
                                     <Form.Group as={Row} className="mb-3">
                                         <Form.Label column sm="2" className='d-flex align-items-center'>
                                             Shared among
