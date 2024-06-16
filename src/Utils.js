@@ -209,7 +209,6 @@ export const calculateUnsettledItemTotal = (itemSplits, userEmail) => {
     let unsettledItemTotal = 0;
 
     for (const split of itemSplits) {
-        console.log(split);
         if (split.transferTo !== userEmail) {
             for (const user of split) {
                 if (user.email === userEmail && !user.isSettled) {
