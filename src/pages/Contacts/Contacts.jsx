@@ -61,6 +61,15 @@ const Contacts = () => {
         await updateDoc(memberRef, {
             contacts: [...contacts, newContact]
         });
+
+        const newContactQuery = userWithEmailQuery(newContact);
+        const newContactQuerySnapshot = await getDocs(newContactQuery);
+        const newContactDoc = newContactQuerySnapshot.docs[0];
+        const newContactRef = doc(db, 'users', newContactDoc.id);
+        await updateDoc(newContactRef, {
+            contacts: [...newContactDoc.data().contacts, userEmail]
+        });
+        
         setNewContact('');
         setSuccess('Contact added successfully.');
         setTimeout(() => {
