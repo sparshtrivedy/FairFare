@@ -14,7 +14,11 @@ import {
     GoAlert,
     GoIssueClosed,
 } from 'react-icons/go';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { 
+    signInWithEmailAndPassword, 
+    createUserWithEmailAndPassword, 
+    sendPasswordResetEmail,
+} from "firebase/auth";
 import { auth, db } from '../../../firebase-config';
 import { GoLaw } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
@@ -47,8 +51,14 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
         } catch (error) {
             if (error.code === 'auth/invalid-credential') {
                 setError('Invalid email or password');
+                setTimeout(() => {
+                    setError('');
+                }, 3000);
             } else {
                 setError('An error occurred');
+                setTimeout(() => {
+                    setError('');
+                }, 3000);
             }
             setTimeout(() => {
                 setError('');
@@ -84,8 +94,8 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
             }
             await createUserWithEmailAndPassword(auth, email, password);
             await addDoc(collection(db, 'users'), {
-                email: email,
-                contacts: [ email ],
+                email: email.toLowerCase(),
+                contacts: [ email.toLowerCase() ],
             });
             setSuccess('User signed-up successfully. Redirecting to sign-in page...');
 
@@ -95,11 +105,26 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
             }, 3000);
         } catch (error) {
             setError('An error occurred. This email might already be in use.');
-
             setTimeout(() => {
                 setError('');
             }, 3000);
 
+            console.error(error);
+        }
+    }
+
+    const handleForgotPassword = async () => {
+        try {
+            await sendPasswordResetEmail(auth, email);
+            setSuccess('Password reset email sent successfully.');
+            setTimeout(() => {
+                setSuccess('');
+            }, 3000);
+        } catch (error) {
+            setError('An error occurred. This email might not be registered.');
+            setTimeout(() => {
+                setError('');
+            }, 3000);
             console.error(error);
         }
     }
@@ -146,8 +171,16 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                                     />
                                 </Form.Group>
                                 <Form.Group className="mb-3" controlId="formPlaintextPassword">
-                                    <Form.Label>
-                                        Password
+                                    <Form.Label className='d-flex justify-content-between align-items-center'>
+                                        <span>Password</span>
+                                        {buttonText === "Sign-in" &&
+                                            <Button 
+                                                variant='link' 
+                                                onClick={handleForgotPassword}
+                                                className='p-0'
+                                            >
+                                                Forgot password?
+                                            </Button>}
                                     </Form.Label>
                                     <Form.Control 
                                         type="password" 
@@ -168,10 +201,12 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                                                 setConfirmPassword(e.target.value);
                                                 if (e.target.value !== password) {
                                                     setError('Passwords do not match');
+                                                    setTimeout(() => {
+                                                        setError('');
+                                                    }, 3000);
                                                     setIsPasswordConfirmed(false);
                                                 } else if (e.target.value === password
                                                     && e.target.value.length > 0) {
-                                                    setError('');
                                                     setIsPasswordConfirmed(true);
                                                 }
                                             }}
