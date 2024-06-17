@@ -55,12 +55,20 @@ const EditEvent = () => {
         const eventRef = getEventRef(eventId);
         await updateEvent(eventRef, event);
         for (const item of items) {
+            const shareOfItem = (item.itemPrice * item.itemQuantity) / item.splits.filter(split => split.isChecked && !split.isSettled).length;
+            let copiedItem = { ...item };
+            copiedItem.splits = copiedItem.splits.map((split) => {
+                return {
+                    ...split,
+                    amount: shareOfItem.toFixed(2)
+                }
+            });
             if (!item.id) {
-                const itemRef = await addItem(item, eventRef);
+                const itemRef = await addItem(copiedItem, eventRef);
                 item.id = itemRef.id;
             } else {
                 const itemRef = getItemRef(item.id);
-                await updateItem(itemRef, item);
+                await updateItem(itemRef, copiedItem);
             }
 
             window.location.href = `/#/view-event/${eventId}`;
@@ -130,8 +138,8 @@ const EditEvent = () => {
                 <Col sm={10} xs={12}>
                     <Breadcrumb className="my-2">
                         <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
-                        <Breadcrumb.Item href={`/#/view-event/${eventId}`}>View</Breadcrumb.Item>
-                        <Breadcrumb.Item active className="text-white">Edit</Breadcrumb.Item>
+                        <Breadcrumb.Item href={`/#/view-event/${eventId}`}>View Event</Breadcrumb.Item>
+                        <Breadcrumb.Item active className="text-white">Edit Event</Breadcrumb.Item>
                     </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header

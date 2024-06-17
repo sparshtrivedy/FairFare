@@ -43,7 +43,7 @@ const ViewEvent = () => {
                 <Col sm={10} xs={12}>
                     <Breadcrumb className="my-2">
                         <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
-                        <Breadcrumb.Item active>View</Breadcrumb.Item>
+                        <Breadcrumb.Item active>View Event</Breadcrumb.Item>
                     </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         <Card.Header

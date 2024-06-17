@@ -33,6 +33,13 @@ export const itemsInEventQuery = (eventRef) => {
     );
 };
 
+export const itemsWithoutEventQuery = () => {
+    return query(
+        collection(db, "items"), 
+        where("event", "==", null),
+    );
+}
+
 export const userWithEmailQuery = (email) => {
     return query(
         collection(db, 'users'), 
@@ -82,6 +89,11 @@ export const getEventById = async (eventId) => {
     return eventRef.data();
 }
 
+export const getItemById = async (itemId) => {
+    const itemRef = await getDoc(doc(db, 'items', itemId));
+    return itemRef.data();
+}
+
 export const getItemsByEventId = async (eventId) => {
     const eventRef = await getDoc(doc(db, 'events', eventId));
     const itemsQuery = query(collection(db, 'items'), where('event', '==', eventRef.ref));
@@ -122,57 +134,76 @@ export const getItemRef = (itemId) => {
 }
 
 export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
-    const memberEventsQuery = eventsContainingMemberQuery(userEmail);
-    const memberEventsSnapshot = await getDocs(memberEventsQuery);
-    const memberEventsDocs = memberEventsSnapshot.docs;
+    const itemsWithMemberQuery = eventsContainingMemberQuery(userEmail);
+    const itemsWithMemberSnapshot = await getDocs(itemsWithMemberQuery);
+    const itemsWithMemberDocs = itemsWithMemberSnapshot.docs;
 
-    const memberEvents = [];
+    const isolatedItemsQuery = itemsWithoutEventQuery();
+    const isolatedItemsSnapshot = await getDocs(isolatedItemsQuery);
+    const isolatedItemsDocs = isolatedItemsSnapshot.docs;
 
-    for (const memberEventDoc of memberEventsDocs) {
-        const memberEventRef = memberEventDoc.ref;
-
-        const itemsForMemberEventQuery = itemsInEventQuery(memberEventRef);
-        const itemsForMemberEventSnapshot = await getDocs(itemsForMemberEventQuery);
-
-        const itemsData = itemsForMemberEventSnapshot.docs.map((doc) => {
+    const unSettledItems = [];
+    itemsWithMemberDocs.forEach(async (doc) => {
+        const itemsForEventQuery = itemsInEventQuery(doc.ref);
+        const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
+        const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
             return doc.data();
         });
+        itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
+        for (const item of itemsForEventData) {
+            const splits = item.splits;
+            const numChecked = splits.filter(split => split.isChecked).length;
+            for (const split of splits) {
+                if (split.email === userEmail && split.isChecked && !split.isSettled && item.transferTo !== userEmail) {
+                    unSettledItems.push({
+                        id: doc.id,
+                        eventId: item.event.id,
+                        eventName: doc.data().name,
+                        eventDate: doc.data().date,
+                        itemName: item.itemName,
+                        itemPrice: item.itemPrice,
+                        itemQuantity: item.itemQuantity,
+                        youOwe: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                        members: item.splits.filter(member => member.isChecked),
+                        transferTo: item.transferTo
+                    });
+                }
+            }
+        }
+    });
 
-        const itemsSplits = itemsData
-            .filter(item => item.transferTo !== userEmail)
-            .map(item => item.splits);
+    isolatedItemsDocs.forEach(async (doc) => {
+        const item = doc.data();
+        const numChecked = item.splits.filter(split => split.isChecked).length;
+        for (const split of item.splits) {
+            if (split.email === userEmail && split.isChecked && !split.isSettled && item.transferTo !== userEmail) {
+                unSettledItems.push({
+                    id: doc.id,
+                    eventId: '',
+                    eventName: 'N/A',
+                    eventDate: 'N/A',
+                    itemName: item.itemName,
+                    itemPrice: item.itemPrice,
+                    itemQuantity: item.itemQuantity,
+                    youOwe: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                    members: item.splits.filter(member => member.isChecked),
+                    transferTo: item.transferTo
+                });
+            }
+        }
+    });
 
-        const unsettledMembers = itemsData
-            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && !user.isSettled && item.transferTo !== userEmail))
-            .map(item => item.transferTo)
-            .join(', ');
-        
-        const settledMembers = itemsData
-            .filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled))
-            .map(item => item.transferTo)
-            .join(', ');
-            
-        const total = isCalculateSettled? 
-            calculateSettledItemTotal(itemsSplits, userEmail):
-            calculateUnsettledItemTotal(itemsSplits, userEmail);
-
-        total && memberEvents.push({
-            eventId: memberEventDoc.id,
-            eventName: memberEventDoc.data().name,
-            eventDate: memberEventDoc.data().date,
-            balance: total.toFixed(2),
-            unsettledMembers: unsettledMembers,
-            settledMembers: settledMembers
-        });
-    }
-
-    return memberEvents;
+    return unSettledItems;
 }
 
 export const fetchItemsSettledByMember = async (userEmail) => {
     const itemsWithMemberQuery = eventsContainingMemberQuery(userEmail);
     const itemsWithMemberSnapshot = await getDocs(itemsWithMemberQuery);
     const itemsWithMemberDocs = itemsWithMemberSnapshot.docs;
+
+    const isolatedItemsQuery = itemsWithoutEventQuery();
+    const isolatedItemsSnapshot = await getDocs(isolatedItemsQuery);
+    const isolatedItemsDocs = isolatedItemsSnapshot.docs;
 
     const settledItems = [];
     itemsWithMemberDocs.forEach(async (doc) => {
@@ -202,6 +233,27 @@ export const fetchItemsSettledByMember = async (userEmail) => {
             }
         }
     });
+
+    isolatedItemsDocs.forEach(async (doc) => {
+        const item = doc.data();
+        const numChecked = item.splits.filter(split => split.isChecked).length;
+        for (const split of item.splits) {
+            if (split.email === userEmail && split.isChecked && split.isSettled && item.transferTo !== userEmail) {
+                settledItems.push({
+                    id: doc.id,
+                    eventId: '',
+                    eventName: 'N/A',
+                    eventDate: 'N/A',
+                    itemName: item.itemName,
+                    itemPrice: item.itemPrice,
+                    itemQuantity: item.itemQuantity,
+                    youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                    transferTo: item.transferTo
+                });
+            }
+        }
+    });
+
     return settledItems;
 }
 

@@ -20,10 +20,10 @@ const ViewSummary = ({
     itemList, 
     labels, 
     values, 
-    isSettled, 
+    isSettled,
     settleUnsettle,
-    setSelectedEventItems,
-    selectedEventItems,
+    setSelectedOweItem,
+    selectedOweItem,
     setSelectedOwedItem,
     selectedOwedItem
 }) => {
@@ -97,7 +97,11 @@ const ViewSummary = ({
                                         ))}
                                     </div>
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        {item.transferTo === userEmail || item[itemList.title] === userEmail || item.share === 0?
+                                        {
+                                        // itemList.transferTo === userEmail || 
+                                        (settleUnsettle !== "youOwe" && item[itemList.title] === userEmail) || 
+                                        item.share === 0 ||
+                                        itemList.transferTo === item[itemList.title]?
                                             <Button variant="secondary" disabled>
                                                 <div style={{ display: "flex", alignItems: "center" }}>
                                                     <GoCircleSlash size={20} />
@@ -108,9 +112,9 @@ const ViewSummary = ({
                                                 variant={
                                                     isSettled(item, userEmail)? "danger": "success"
                                                 }
-                                                onClick={() => 
+                                                onClick={() =>
                                                     settleUnsettle === "youOwe"?
-                                                    settleUnsettleYouOwe(item, userEmail, setSelectedEventItems, selectedEventItems):
+                                                    settleUnsettleYouOwe(setSelectedOweItem, selectedOweItem, item):
                                                     settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, item)
                                                 }
                                             >
@@ -153,30 +157,21 @@ function settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, member) 
     });
 }
 
-function settleUnsettleYouOwe(item, userEmail, setSelectedEventItems, selectedEventItems) {
-    if (item.splits) {
-        for (const split of item.splits) {
-            if (split.email === userEmail) {
-                setSelectedEventItems(
-                    selectedEventItems.map((i) => {
-                        if (i.id === item.id) {
-                            i.splits = i.splits.map((s) => {
-                                if (s.email === userEmail) {
-                                    s.isSettled = !s.isSettled;
-                                }
-                                return s;
-                            });
-                        }
-                        return i;
-                    })
-                );
-                const itemRef = doc(db, "items", item.id);
-                updateDoc(itemRef, {
-                    splits: item.splits,
-                });
+function settleUnsettleYouOwe(setSelectedOweItem, selectedOweItem, member) {
+    setSelectedOweItem({
+        ...selectedOweItem,
+        members: selectedOweItem?.members.map((m) => {
+            if (m.email === member.email) {
+                m.isSettled = !m.isSettled;
             }
-        }
-    }
+            return m;
+        })
+    });
+
+    const itemRef = doc(db, "items", selectedOweItem.id);
+    updateDoc(itemRef, {
+        splits: selectedOweItem?.members,
+    });
 }
 
 export default ViewSummary;

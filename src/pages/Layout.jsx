@@ -17,6 +17,7 @@ import EditEvent from './EventForms/EditEvent'
 import ViewEvent from './EventForms/ViewEvent';
 import History from './History/History'
 import CreateEvent from './EventForms/CreateEvent';
+import CreateItem from './EventForms/ItemForms/CreateItem'
 import Contacts from './Contacts/Contacts'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
@@ -67,7 +68,11 @@ const Layout = () => {
                             </Nav.Link>
                             <Nav.Link href="/#/create-event" className='d-flex align-items-center'>
                                 <GoPlusCircle size={20} />
-                                <span style={{ marginLeft: "5px" }}>Create</span>
+                                <span style={{ marginLeft: "5px" }}>Create Event</span>
+                            </Nav.Link>
+                            <Nav.Link href="/#/create-item" className='d-flex align-items-center'>
+                                <GoPlusCircle size={20} />
+                                <span style={{ marginLeft: "5px" }}>Create Item</span>
                             </Nav.Link>
                             <Nav.Link href="/#/history" className='d-flex align-items-center'>
                                 <GoHistory size={20} />
@@ -95,8 +100,11 @@ const Layout = () => {
                 <Routes>
                     <Route path="/home" element={<Home />} />
                     <Route path="/create-event" element={<CreateEvent />} />
+                    <Route path="/create-item" element={<CreateItem />} />
                     <Route path="/view-event/:eventId" element={<ViewEvent />} />
+                    <Route path="/view-item/:itemId" element={<CreateItem disabled={true} />} />
                     <Route path="/edit-event/:eventId" element={<EditEvent />} />
+                    <Route path="/edit-item/:itemId" element={<CreateItem mode={'edit'} />} />
                     <Route path="/history" element={<History />} />
                     <Route path="/contacts" element={<Contacts />} />
                     <Route path="*" element={<Navigate to="/home" />} />

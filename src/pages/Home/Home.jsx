@@ -1,14 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../App";
 import {
-    collection,
-    query,
-    where,
     getDocs,
-    doc,
     getDoc,
 } from "firebase/firestore";
-import { db } from "../../firebase-config";
 import {
     Container,
     Row,
@@ -38,8 +33,7 @@ const Home = () => {
     const [showSettlementSummary, setShowSettlementSummary] = useState(false);
     const [showOwingBreakdown, setShowOwingBreakdown] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState(null);
-    const [selectedEventItems, setSelectedEventItems] = useState([]);
+    const [selectedOweItem, setSelectedOweItem] = useState(null);
     const [selectedOwedItem, setSelectedOwedItem] = useState(null);
 
     useEffect(() => {
@@ -59,31 +53,8 @@ const Home = () => {
         fetchOwedAndLent();
     }, [userEmail]);
 
-    const handleClickSettle = async (event) => {
-        setSelectedEvent(event);
-
-        const eventRef = doc(db, "events", event.eventId);
-
-        const itemsQuery = query(
-            collection(db, "items"),
-            where("event", "==", eventRef)
-        );
-
-        const itemsSnapshot = await getDocs(itemsQuery);
-        
-        const items = itemsSnapshot.docs.map((doc) => {
-            return {
-                id: doc.id,
-                name: doc.data().itemName,
-                transferTo: doc.data().transferTo,
-                price: doc.data().itemPrice,
-                quantity: doc.data().itemQuantity,
-                share: doc.data().splits.find((split) => split.email === userEmail).amount,
-                splits: doc.data().splits,
-            };
-        });
-        
-        setSelectedEventItems(items);
+    const handleClickSettle = async (item) => {
+        setSelectedOweItem(item);
         setShowSettlementSummary(true);
     };
 
@@ -118,8 +89,8 @@ const Home = () => {
                                 <DashboardCard 
                                     title="You owe"
                                     itemList={eventsLentToUser}
-                                    headers={["Event name", "Event date", "To", "Balance", "Actions"]}
-                                    values={["eventName", "eventDate", "unsettledMembers", "balance"]}
+                                    headers={["Item name", "Event name", "Amount", "To", "Actions"]}
+                                    values={["itemName", "eventName", "youOwe", "transferTo"]}
                                     isLoading={isLoading}
                                     settleHandler={handleClickSettle}
                                     icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}
@@ -144,23 +115,26 @@ const Home = () => {
                 showSummary={showSettlementSummary}
                 setShowSummary={setShowSettlementSummary}
                 itemList={{
-                    title: "name",
-                    items: selectedEventItems,
-                    labels: ["Item name", "Price", "Quantity", "Your share", "Transfer to"],
-                    values: ["name", "price", "quantity", "share", "transferTo"],
+                    title: "email",
+                    items: selectedOweItem?.members,
+                    labels: ["Owes"],
+                    values: ["amount"],
+                    transferTo: selectedOweItem?.transferTo,
                 }}
-                labels={["Event name", "Event date", "Your balance"]}
+                labels={["Event name", "Item name", "Price", "Quantity", "You owe"]}
                 values={[
-                    selectedEvent?.eventName,
-                    selectedEvent?.eventDate,
-                    selectedEvent?.balance,
+                    selectedOweItem?.eventName,
+                    selectedOweItem?.itemName,
+                    selectedOweItem?.itemPrice,
+                    selectedOweItem?.itemQuantity,
+                    selectedOweItem?.youOwe,
                 ]}
-                isSettled={isSettledYouOwe}
+                isSettled={isSettled}
                 settleUnsettle="youOwe"
                 setSelectedOwedItem={setSelectedOwedItem}
                 selectedOwedItem={selectedOwedItem}
-                setSelectedEventItems={setSelectedEventItems}
-                selectedEventItems={selectedEventItems}
+                setSelectedOweItem={setSelectedOweItem}
+                selectedOweItem={selectedOweItem}
             />
             <ViewSummary
                 userEmail={userEmail}
@@ -169,8 +143,9 @@ const Home = () => {
                 itemList={{
                     title: "email",
                     items: selectedOwedItem?.members,
-                    labels: ["Amount owed"],
+                    labels: ["Owes"],
                     values: ["amount"],
+                    transferTo: selectedOwedItem?.transferTo,
                 }}
                 labels={["Event name", "Item name", "Price", "Quantity", "You are owed"]}
                 values={[
@@ -180,12 +155,12 @@ const Home = () => {
                     selectedOwedItem?.itemQuantity,
                     selectedOwedItem?.youAreOwed,
                 ]}
-                isSettled={isSettledOwedToYou}
+                isSettled={isSettled}
                 settleUnsettle="owedToYou"
                 setSelectedOwedItem={setSelectedOwedItem}
                 selectedOwedItem={selectedOwedItem}
-                setSelectedEventItems={setSelectedEventItems}
-                selectedEventItems={selectedEventItems}
+                setSelectedOweItem={setSelectedOweItem}
+                selectedOweItem={selectedOweItem}
             />
         </>
     );
@@ -193,12 +168,8 @@ const Home = () => {
 
 export default Home;
 
-const isSettledOwedToYou = (item, userEmail) => {
+const isSettled = (item) => {
     return item.isSettled;
-}
-
-const isSettledYouOwe = (item, userEmail) => {
-    return item.splits.find(split => split.email === userEmail).isSettled
 }
 
 async function fetchItemsOwedToMember(userEmail) {
@@ -210,9 +181,12 @@ async function fetchItemsOwedToMember(userEmail) {
 
     for (const doc of itemsOwedToMemberDocs) {
         const itemOwedToMember = doc.data();
+        let event = '';
 
-        const eventRef = await getDoc(itemOwedToMember.event);
-        const event = eventRef.data();
+        if (itemOwedToMember.event !== null) {
+            const eventRef = await getDoc(itemOwedToMember.event);
+            event = eventRef.data();
+        }
 
         const itemSplits = itemOwedToMember.splits.filter(
             split => split.isChecked
@@ -232,8 +206,8 @@ async function fetchItemsOwedToMember(userEmail) {
         if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
             owedItems.push({
                 id: doc.id,
-                eventId: itemOwedToMember.event.id,
-                eventName: event.name,
+                eventId: itemOwedToMember.event?.id || '',
+                eventName: event?.name || 'N/A',
                 itemName: itemOwedToMember.itemName,
                 itemPrice: itemOwedToMember.itemPrice,
                 itemQuantity: itemOwedToMember.itemQuantity,

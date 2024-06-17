@@ -119,9 +119,12 @@ async function fetchItemsOwedToMember(userEmail) {
 
     for (const doc of itemsOwedToMemberDocs) {
         const itemOwedToMember = doc.data();
+        let event = '';
 
-        const eventRef = await getDoc(itemOwedToMember.event);
-        const event = eventRef.data();
+        if (itemOwedToMember.event !== null) {
+            const eventRef = await getDoc(itemOwedToMember.event);
+            event = eventRef.data();
+        }
 
         const itemSplits = itemOwedToMember.splits.filter(
             split => split.isChecked
@@ -140,8 +143,8 @@ async function fetchItemsOwedToMember(userEmail) {
 
         settledItemTotal && owedItems.push({
             id: doc.id,
-            eventId: itemOwedToMember.event.id,
-            eventName: event.name,
+            eventId: itemOwedToMember.event?.id || '',
+            eventName: event?.name || 'N/A',
             itemName: itemOwedToMember.itemName,
             itemPrice: itemOwedToMember.itemPrice,
             itemQuantity: itemOwedToMember.itemQuantity,
