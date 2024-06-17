@@ -13,6 +13,7 @@ import {
     Form,
     Button,
     Alert,
+    Spinner,
 } from "react-bootstrap";
 import {
     GoPerson,
@@ -33,9 +34,11 @@ const Contacts = () => {
     const [newContact, setNewContact] = useState('');
     const [showConfirmation, setShowConfirmation] = useState(false);
     const [removeContact, setRemoveContact] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchContacts = async () => {
+            setIsLoading(true);
             const memberQuery = userWithEmailQuery(userEmail);
             const memberQuerySnapshot = await getDocs(memberQuery);
 
@@ -43,6 +46,7 @@ const Contacts = () => {
                 const memberData = memberQuerySnapshot.docs[0].data().contacts;
                 if (memberData.length > 0) setContacts(memberData);
             }
+            setIsLoading(false);
         }
         fetchContacts();
     }, [userEmail, success]);
@@ -186,6 +190,11 @@ const Contacts = () => {
                                         </div>
                                     </Card.Header>
                                     <Card.Body>
+                                        {isLoading ? (
+                                        <div className='d-flex justify-content-center'>
+                                            <Spinner animation="border" size='lg' className='m-3' />
+                                        </div>
+                                        ) : (
                                         <div style={{ overflowX: "auto" }}>
                                             <Table striped bordered hover className='p-0 m-0'>
                                                 <thead>
@@ -228,7 +237,7 @@ const Contacts = () => {
                                                     )}
                                                 </tbody>
                                             </Table>
-                                        </div>
+                                        </div>)}
                                     </Card.Body>
                                 </Card>
                             </Card.Body>

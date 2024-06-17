@@ -8,6 +8,7 @@ import {
     Button,
     Form,
     Alert,
+    Spinner,
 } from "react-bootstrap";
 import { 
     GoPlusCircle, 
@@ -32,6 +33,7 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
     const { userEmail } = useContext(AuthContext);
     const [contacts, setContacts] = useState([]);
     const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const [item, setItem] = useState({
         event: null,
         itemName: '',
@@ -44,6 +46,7 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
 
     useEffect(() => {
         const fetchContacts = async () => {
+            setIsLoading(true);
             const memberQuery = userWithEmailQuery(userEmail);
             const memberQuerySnapshot = await getDocs(memberQuery);
 
@@ -51,17 +54,15 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                 const memberData = memberQuerySnapshot.docs[0].data().contacts.sort();
                 if (memberData.length > 0) setContacts(memberData);
             }
-        }
 
-        const fetchItem = async () => {
-            const itemWithId = await getItemById(itemId);
-            setItem(itemWithId);
+            if (itemId) {
+                const itemWithId = await getItemById(itemId);
+                setItem(itemWithId);
+            }
+            setIsLoading(false);
         }
         
         fetchContacts();
-        if (itemId) {
-            fetchItem();
-        }
     }, [itemId, userEmail]);
 
     const isValidated = () => {
@@ -174,122 +175,69 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                     <Alert.Link href="/#/create-event" style={{ marginLeft: '5px' }}>create an event</Alert.Link>.
                                 </Alert>
                             }
-                            <Card.Subtitle className="mb-2 text-muted">
-                                
-                            </Card.Subtitle>
-                            <FairFareControl
-                                label="Item name"
-                                type="text"
-                                placeholder="Enter item name"
-                                value={item.itemName}
-                                required={true}
-                                onChange={(e) => {
-                                    setItem({
-                                        ...item,
-                                        itemName: e.target.value
-                                    });
-                                }}
-                                disabled={disabled}
-                            />
-                            <FairFareControl
-                                label="Item price"
-                                type="number"
-                                placeholder="Enter item price"
-                                value={item.itemPrice}
-                                required={true}
-                                onChange={(e) => {
-                                    setItem({
-                                        ...item,
-                                        itemPrice: e.target.value
-                                    });
-                                }}
-                                disabled={disabled}
-                            />
-                            <FairFareControl
-                                label="Item quantity"
-                                type="number"
-                                placeholder="Enter item quantity"
-                                value={item.itemQuantity}
-                                required={true}
-                                onChange={(e) => {
-                                    setItem({
-                                        ...item,
-                                        itemQuantity: e.target.value
-                                    });
-                                }}
-                                disabled={disabled}
-                            />
-                            <Form.Group as={Row} className="mb-3">
-                                <Form.Label column sm="2" className='d-flex align-items-center'>
-                                    Transfer to
-                                    <span style={{ color: 'red', marginLeft: '5px' }}>
-                                        *
-                                    </span>
-                                </Form.Label>
-                                <Col sm="10">
-                                    <Form.Select
-                                        value={item.transferTo}
+                            {isLoading? (
+                            <div className='d-flex justify-content-center my-3'>
+                                <Spinner animation="border" size='lg' />
+                            </div>
+                            ) : (
+                                <>
+                                    <FairFareControl
+                                        label="Item name"
+                                        type="text"
+                                        placeholder="Enter item name"
+                                        value={item.itemName}
                                         required={true}
                                         onChange={(e) => {
                                             setItem({
                                                 ...item,
-                                                transferTo: e.target.value
+                                                itemName: e.target.value
                                             });
                                         }}
                                         disabled={disabled}
-                                    >
-                                        <option>Select a member</option>
-                                        {contacts.map((member, i) => (
-                                            <option key={`member-${i}`} value={member}>{member}</option>
-                                        ))}
-                                    </Form.Select>
-                                </Col>
-                            </Form.Group>
-                            <Card className='my-3'>
-                                <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
-                                    <GoPeople size={25} />
-                                    <span style={{marginLeft: '10px'}}>
-                                        Share among
-                                    </span>
-                                </Card.Header>
-                                <Card.Body>
-                                    <Card.Subtitle className="mb-2 text-muted d-flex align-items-center">
-                                        Don't see a member? Add them to your 
-                                        <Button 
-                                            variant="link" 
-                                            className="px-1" 
-                                            onClick={() => {
-                                                window.location.href = '/#/contacts';
-                                            }}
-                                        >
-                                            contacts
-                                        </Button>
-                                    </Card.Subtitle>
-                                    {item.splits.length === 0 &&
-                                    <Card.Text className='d-flex align-items-center text-muted'>
-                                        <GoInfo size={20} />
-                                        <span style={{marginLeft: "10px"}}>
-                                            No members to display. Add members to split the expenses.
-                                        </span>
-                                    </Card.Text>}
-                                    {item.splits.map((split, index) => (
-                                    <Form.Group key={`split-${index}`} as={Row} className={index === item.splits.length-1? "mb-1": "mb-3"}>
+                                    />
+                                    <FairFareControl
+                                        label="Item price"
+                                        type="number"
+                                        placeholder="Enter item price"
+                                        value={item.itemPrice}
+                                        required={true}
+                                        onChange={(e) => {
+                                            setItem({
+                                                ...item,
+                                                itemPrice: e.target.value
+                                            });
+                                        }}
+                                        disabled={disabled}
+                                    />
+                                    <FairFareControl
+                                        label="Item quantity"
+                                        type="number"
+                                        placeholder="Enter item quantity"
+                                        value={item.itemQuantity}
+                                        required={true}
+                                        onChange={(e) => {
+                                            setItem({
+                                                ...item,
+                                                itemQuantity: e.target.value
+                                            });
+                                        }}
+                                        disabled={disabled}
+                                    />
+                                    <Form.Group as={Row} className="mb-3">
                                         <Form.Label column sm="2" className='d-flex align-items-center'>
-                                            Member {index + 1}
+                                            Transfer to
                                             <span style={{ color: 'red', marginLeft: '5px' }}>
                                                 *
                                             </span>
                                         </Form.Label>
-                                        <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
+                                        <Col sm="10">
                                             <Form.Select
-                                                value={split.email}
+                                                value={item.transferTo}
                                                 required={true}
                                                 onChange={(e) => {
-                                                    let copiedSplits = [...item.splits];
-                                                    copiedSplits[index].email = e.target.value;
                                                     setItem({
                                                         ...item,
-                                                        splits: copiedSplits
+                                                        transferTo: e.target.value
                                                     });
                                                 }}
                                                 disabled={disabled}
@@ -300,48 +248,106 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                                 ))}
                                             </Form.Select>
                                         </Col>
-                                        {!disabled &&
-                                        <Col xs="1">
-                                            <Button 
-                                                variant='danger'
-                                                onClick={() => {
-                                                    let copiedSplits = [...item.splits];
-                                                    copiedSplits.splice(index, 1);
-                                                    setItem({
-                                                        ...item,
-                                                        splits: copiedSplits
-                                                    });
-                                                }}
-                                            >
-                                                <GoTrash />
-                                            </Button>
-                                        </Col>}
                                     </Form.Group>
-                                    ))}
-                                </Card.Body>
-                                {!disabled &&
-                                <Card.Footer style={{backgroundColor: '#80b1b3'}}>
-                                    <Button variant='primary' onClick={() => {
-                                        setItem({
-                                            ...item,
-                                            splits: [
-                                                ...item.splits,
-                                                {
-                                                    email: '',
-                                                    amount: 0,
-                                                    isChecked: true,
-                                                    isSettled: false
-                                                }
-                                            ]
-                                        });
-                                    }}>
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <GoPersonAdd size={20} />
-                                            <span style={{marginLeft: "10px"}}>Add member</span>
-                                        </div>
-                                    </Button>
-                                </Card.Footer>}
-                            </Card>
+                                    <Card className='my-3'>
+                                        <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
+                                            <GoPeople size={25} />
+                                            <span style={{marginLeft: '10px'}}>
+                                                Share among
+                                            </span>
+                                        </Card.Header>
+                                        <Card.Body>
+                                            <Card.Subtitle className="mb-2 text-muted d-flex align-items-center">
+                                                Don't see a member? Add them to your 
+                                                <Button 
+                                                    variant="link" 
+                                                    className="px-1" 
+                                                    onClick={() => {
+                                                        window.location.href = '/#/contacts';
+                                                    }}
+                                                >
+                                                    contacts
+                                                </Button>
+                                            </Card.Subtitle>
+                                            {item.splits.length === 0 &&
+                                            <Card.Text className='d-flex align-items-center text-muted'>
+                                                <GoInfo size={20} />
+                                                <span style={{marginLeft: "10px"}}>
+                                                    No members to display. Add members to split the expenses.
+                                                </span>
+                                            </Card.Text>}
+                                            {item.splits.map((split, index) => (
+                                            <Form.Group key={`split-${index}`} as={Row} className={index === item.splits.length-1? "mb-1": "mb-3"}>
+                                                <Form.Label column sm="2" className='d-flex align-items-center'>
+                                                    Member {index + 1}
+                                                    <span style={{ color: 'red', marginLeft: '5px' }}>
+                                                        *
+                                                    </span>
+                                                </Form.Label>
+                                                <Col xs={disabled? "12": "9"} sm={disabled? "10": "9"}>
+                                                    <Form.Select
+                                                        value={split.email}
+                                                        required={true}
+                                                        onChange={(e) => {
+                                                            let copiedSplits = [...item.splits];
+                                                            copiedSplits[index].email = e.target.value;
+                                                            setItem({
+                                                                ...item,
+                                                                splits: copiedSplits
+                                                            });
+                                                        }}
+                                                        disabled={disabled}
+                                                    >
+                                                        <option>Select a member</option>
+                                                        {contacts.map((member, i) => (
+                                                            <option key={`member-${i}`} value={member}>{member}</option>
+                                                        ))}
+                                                    </Form.Select>
+                                                </Col>
+                                                {!disabled &&
+                                                <Col xs="1">
+                                                    <Button 
+                                                        variant='danger'
+                                                        onClick={() => {
+                                                            let copiedSplits = [...item.splits];
+                                                            copiedSplits.splice(index, 1);
+                                                            setItem({
+                                                                ...item,
+                                                                splits: copiedSplits
+                                                            });
+                                                        }}
+                                                    >
+                                                        <GoTrash />
+                                                    </Button>
+                                                </Col>}
+                                            </Form.Group>
+                                            ))}
+                                        </Card.Body>
+                                        {!disabled &&
+                                        <Card.Footer style={{backgroundColor: '#80b1b3'}}>
+                                            <Button variant='primary' onClick={() => {
+                                                setItem({
+                                                    ...item,
+                                                    splits: [
+                                                        ...item.splits,
+                                                        {
+                                                            email: '',
+                                                            amount: 0,
+                                                            isChecked: true,
+                                                            isSettled: false
+                                                        }
+                                                    ]
+                                                });
+                                            }}>
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoPersonAdd size={20} />
+                                                    <span style={{marginLeft: "10px"}}>Add member</span>
+                                                </div>
+                                            </Button>
+                                        </Card.Footer>}
+                                    </Card>
+                            </>
+                        )}
                         </Card.Body>
                         <Card.Footer style={{backgroundColor: '#80b1b3'}}>
                         {mode === 'edit' ?
