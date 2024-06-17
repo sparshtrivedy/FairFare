@@ -9,7 +9,18 @@ import {
     Form,
     Alert,
 } from "react-bootstrap";
-import { GoPlusCircle, GoProjectSymlink, GoPeople, GoPersonAdd, GoTrash, GoEye, GoPencil, GoFileDirectory, GoAlert } from "react-icons/go";
+import { 
+    GoPlusCircle, 
+    GoProjectSymlink, 
+    GoPeople, 
+    GoPersonAdd, 
+    GoTrash, 
+    GoEye, 
+    GoPencil, 
+    GoFileDirectory, 
+    GoAlert, 
+    GoInfo
+} from "react-icons/go";
 import FairFareControl from "../Components/FairFareControl";
 import { AuthContext } from "../../../App";
 import { getItemById, userWithEmailQuery, getItemRef, updateItem } from "../../../Utils";
@@ -27,12 +38,7 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
         itemPrice: 0,
         itemQuantity: 0,
         transferTo: '',
-        splits: [{
-            email: '',
-            amount: 0,
-            isChecked: true,
-            isSettled: false
-        }]
+        splits: []
     });
     const { itemId } = useParams();
 
@@ -160,6 +166,17 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                     {error}
                                 </Alert>
                             }
+                            {
+                                mode !== 'edit' && !disabled &&
+                                <Alert variant={'primary'} className="d-flex align-items-center">
+                                    <GoInfo size={30} style={{ marginRight: '10px' }} />
+                                    Recommended for stand-alone items that are not part of an event. If this item is part of an event,{' '}
+                                    <Alert.Link href="/#/create-event" style={{ marginLeft: '5px' }}>create an event</Alert.Link>.
+                                </Alert>
+                            }
+                            <Card.Subtitle className="mb-2 text-muted">
+                                
+                            </Card.Subtitle>
                             <FairFareControl
                                 label="Item name"
                                 type="text"
@@ -248,6 +265,13 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                             contacts
                                         </Button>
                                     </Card.Subtitle>
+                                    {item.splits.length === 0 &&
+                                    <Card.Text className='d-flex align-items-center text-muted'>
+                                        <GoInfo size={20} />
+                                        <span style={{marginLeft: "10px"}}>
+                                            No members to display. Add members to split the expenses.
+                                        </span>
+                                    </Card.Text>}
                                     {item.splits.map((split, index) => (
                                     <Form.Group key={`split-${index}`} as={Row} className={index === item.splits.length-1? "mb-1": "mb-3"}>
                                         <Form.Label column sm="2" className='d-flex align-items-center'>

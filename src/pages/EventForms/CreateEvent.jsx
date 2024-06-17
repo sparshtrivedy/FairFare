@@ -11,7 +11,8 @@ import {
 import { 
     GoPlusCircle,
     GoProjectSymlink,
-    GoAlert
+    GoAlert,
+    GoInfo
 } from "react-icons/go";
 import { addEvent, addItem } from "../../Utils";
 import CreateEventForm from "./Components/CreateEventForm";
@@ -115,6 +116,11 @@ const CreateEvent = () => {
                                     {error}
                                 </Alert>
                             }
+                            <Alert variant={'primary'} className="d-flex align-items-center">
+                                <GoInfo size={30} style={{ marginRight: '10px' }} />
+                                Recommended for events with multiple items. If this is a stand-alone item,{' '}
+                                <Alert.Link href="/#/create-item" style={{ marginLeft: '5px' }}>create an item</Alert.Link>.
+                            </Alert>
                             <CreateEventForm
                                 memberError={memberError}
                                 setMemberError={setMemberError}
