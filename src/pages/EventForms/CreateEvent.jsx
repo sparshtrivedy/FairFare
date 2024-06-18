@@ -79,17 +79,21 @@ const CreateEvent = () => {
     }
 
     const handleCreateEvent = async (e) => {
-        if (!isValidated()) {
-            return;
-        }
-        setError('');
-        const eventRef = await addEvent(event);
+        try {
+            if (!isValidated()) {
+                return;
+            }
+            setError('');
+            const eventRef = await addEvent(event);
 
-        for (const item of items) {
-            await addItem(item, eventRef);
-        }
+            for (const item of items) {
+                await addItem(item, eventRef);
+            }
 
-        window.location.href = `/#/view-event/${eventRef.id}`;
+            window.location.href = `/#/view-event/${eventRef.id}`;
+        } catch (error) {
+            setError(error.message);
+        }
     }
 
     return (

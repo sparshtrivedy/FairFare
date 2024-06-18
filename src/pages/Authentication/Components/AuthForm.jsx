@@ -18,6 +18,7 @@ import {
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword, 
     sendPasswordResetEmail,
+    sendEmailVerification,
 } from "firebase/auth";
 import { auth, db } from '../../../firebase-config';
 import { GoLaw } from "react-icons/go";
@@ -92,12 +93,16 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                 }, 3000);
                 return;
             }
-            await createUserWithEmailAndPassword(auth, email, password);
+            const userCredentials = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredentials.user;
             await addDoc(collection(db, 'users'), {
-                email: email.toLowerCase(),
-                contacts: [ email.toLowerCase() ],
+                uid: user.uid,
+                email: user.email,
+                contacts: [ user.email ],
+                isVerified: user.emailVerified,
             });
-            setSuccess('User signed-up successfully. Redirecting to sign-in page...');
+            await sendEmailVerification(user);
+            setSuccess('Sign-up successful. Verification email sent. Redirecting...');
 
             setTimeout(() => {
                 setSuccess('');
@@ -108,7 +113,6 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
             setTimeout(() => {
                 setError('');
             }, 3000);
-
             console.error(error);
         }
     }

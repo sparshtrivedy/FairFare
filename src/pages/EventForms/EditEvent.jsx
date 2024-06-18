@@ -47,31 +47,35 @@ const EditEvent = () => {
     });
 
     const handleUpdateEvent = async (e) => {
-        if (!isValidated()) {
-            return;
-        }
-        setError('');
-        
-        const eventRef = getEventRef(eventId);
-        await updateEvent(eventRef, event);
-        for (const item of items) {
-            const shareOfItem = (item.itemPrice * item.itemQuantity) / item.splits.filter(split => split.isChecked && !split.isSettled).length;
-            let copiedItem = { ...item };
-            copiedItem.splits = copiedItem.splits.map((split) => {
-                return {
-                    ...split,
-                    amount: shareOfItem.toFixed(2)
-                }
-            });
-            if (!item.id) {
-                const itemRef = await addItem(copiedItem, eventRef);
-                item.id = itemRef.id;
-            } else {
-                const itemRef = getItemRef(item.id);
-                await updateItem(itemRef, copiedItem);
+        try {
+            if (!isValidated()) {
+                return;
             }
+            setError('');
+            
+            const eventRef = getEventRef(eventId);
+            await updateEvent(eventRef, event);
+            for (const item of items) {
+                const shareOfItem = (item.itemPrice * item.itemQuantity) / item.splits.filter(split => split.isChecked && !split.isSettled).length;
+                let copiedItem = { ...item };
+                copiedItem.splits = copiedItem.splits.map((split) => {
+                    return {
+                        ...split,
+                        amount: shareOfItem.toFixed(2)
+                    }
+                });
+                if (!item.id) {
+                    const itemRef = await addItem(copiedItem, eventRef);
+                    item.id = itemRef.id;
+                } else {
+                    const itemRef = getItemRef(item.id);
+                    await updateItem(itemRef, copiedItem);
+                }
 
-            window.location.href = `/#/view-event/${eventId}`;
+                window.location.href = `/#/view-event/${eventId}`;
+            }
+        } catch (error) {
+            setError(error.message);
         }
     }
 

@@ -3,6 +3,7 @@ import { AuthContext } from "../../App";
 import {
     getDocs,
     getDoc,
+    updateDoc,
 } from "firebase/firestore";
 import {
     Container,
@@ -10,19 +11,25 @@ import {
     Col,
     Card,
     Breadcrumb,
+    Alert,
+    Button,
 } from "react-bootstrap";
 import {
     itemsWithTransferToMemberQuery,
     fetchEventsWithMember,
+    userWithEmailQuery,
 } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
 import ViewSummary from "./Components/ViewSummary";
 import { 
     GoTable,
     GoFoldDown,
-    GoFoldUp
+    GoFoldUp,
+    GoStop,
 } from "react-icons/go";
 import '../pages.css';
+import { auth } from "../../firebase-config";
+import { sendEmailVerification } from "firebase/auth";
 
 const Home = () => {
     const { userEmail } = useContext(AuthContext);
@@ -35,6 +42,8 @@ const Home = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [selectedOweItem, setSelectedOweItem] = useState(null);
     const [selectedOwedItem, setSelectedOwedItem] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [disable, setDisable] = useState(false);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
@@ -46,6 +55,24 @@ const Home = () => {
 
             const itemsOwedToMember = await fetchItemsOwedToMember(userEmail);
             setItemsOwedToUser(itemsOwedToMember);
+
+            const user = auth.currentUser;
+            setCurrentUser(user);
+
+            const memberQuery = userWithEmailQuery(userEmail);
+            const memberQuerySnapshot = await getDocs(memberQuery);
+            const memberDoc = memberQuerySnapshot.docs[0];
+            const memberData = memberDoc.data();
+            if (memberData && !memberData.isVerified) {
+                await updateDoc(memberDoc.ref, {
+                    isVerified: user.emailVerified
+                });
+            }
+            if (memberData && !memberData.uid) {
+                await updateDoc(memberDoc.ref, {
+                    uid: user.uid
+                });
+            }
 
             setIsLoading(false);
         };
@@ -63,11 +90,33 @@ const Home = () => {
         setShowOwingBreakdown(true);
     };
 
+    const handleClickSendEmailVerification = async () => {
+        await sendEmailVerification(currentUser);
+        setDisable(true);
+        setTimeout(() => {
+            setDisable(false);
+        }, 5000);
+    }
+
     return (
         <>
             <Container style={{ height: "100%" }}>
                 <Row className="justify-content-center">
                     <Col sm={10} xs={12}>
+                        <Alert variant={'danger'} className="my-3" show={currentUser && !currentUser.emailVerified}>
+                            <Alert.Heading className="d-flex align-items-center">
+                                <GoStop size={30} style={{ marginRight: '10px' }} />
+                                Email verification required
+                            </Alert.Heading>
+                            Please verify your email address to start using FairFare. You are currently using the app in read-only mode.
+                            <hr />
+                            <div className="d-flex align-items-center">
+                                <div style={{ marginRight: '5px'}}>Didn't receive an email?</div>
+                                <Button variant="link" className="p-0" onClick={handleClickSendEmailVerification} disabled={disable}>
+                                    Resend verification email
+                                </Button>
+                            </div>
+                        </Alert>
                         <Breadcrumb className="my-2">
                             <Breadcrumb.Item active>Home</Breadcrumb.Item>
                         </Breadcrumb>

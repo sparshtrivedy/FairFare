@@ -91,37 +91,45 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
     }
 
     const handleCreateItem = async () => {
-        if (!isValidated()) {
-            return;
-        }
-        const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
-        let copiedItem = { ...item };
-        copiedItem.splits = copiedItem.splits.map((split) => {
-            return {
-                ...split,
-                amount: shareOfItem
+        try {
+            if (!isValidated()) {
+                return;
             }
-        });
-        setItem(copiedItem);
-        const itemRef = await addDoc(collection(db, 'items'), copiedItem);
-        window.location.href = `/#/view-item/${itemRef.id}`;
+            const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
+            let copiedItem = { ...item };
+            copiedItem.splits = copiedItem.splits.map((split) => {
+                return {
+                    ...split,
+                    amount: shareOfItem
+                }
+            });
+            setItem(copiedItem);
+            const itemRef = await addDoc(collection(db, 'items'), copiedItem);
+            window.location.href = `/#/view-item/${itemRef.id}`;
+        } catch (error) {
+            setError(error.message);
+        }
     }
 
     const handleUpdateItem = async () => {
-        if (!isValidated()) {
-            return;
-        }
-        const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
-        let copiedItem = { ...item };
-        copiedItem.splits = copiedItem.splits.map((split) => {
-            return {
-                ...split,
-                amount: shareOfItem
+        try {
+            if (!isValidated()) {
+                return;
             }
-        });
-        const itemRef = getItemRef(itemId);
-        await updateItem(itemRef, copiedItem);
-        window.location.href = `/#/view-item/${itemId}`;
+            const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
+            let copiedItem = { ...item };
+            copiedItem.splits = copiedItem.splits.map((split) => {
+                return {
+                    ...split,
+                    amount: shareOfItem
+                }
+            });
+            const itemRef = getItemRef(itemId);
+            await updateItem(itemRef, copiedItem);
+            window.location.href = `/#/view-item/${itemId}`;
+        } catch (error) {
+            setError(error.message);
+        }
     }
 
     return (
