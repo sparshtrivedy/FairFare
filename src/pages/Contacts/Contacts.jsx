@@ -12,19 +12,18 @@ import {
     Table,
     Form,
     Button,
-    Alert,
     Spinner,
 } from "react-bootstrap";
 import {
     GoPerson,
     GoInfo,
     GoPersonAdd,
-    GoAlert,
-    GoCheckCircle,
     GoPeople,
     GoTrash,
 } from "react-icons/go";
 import ConfirmationModal from "./Components/ConfirmationModal";
+import SuccessAlert from "../../Components/Alerts/SuccessAlert";
+import ErrorAlert from "../../Components/Alerts/ErrorAlert";
 
 const Contacts = () => {
     const { userEmail } = useContext(AuthContext);
@@ -65,6 +64,10 @@ const Contacts = () => {
 
     const handleAddContact = async () => {
         // Add contact to user's contacts and add user to new contact's contacts
+        if (newContact.trim().length === 0) {
+            setMemberError('Please provide a valid email.');
+            return;
+        }
         if (memberError.length !== 0) return;
         if (contacts.includes(newContact)) {
             setMemberError('Contact already exists.');
@@ -148,14 +151,8 @@ const Contacts = () => {
                                         </div>
                                     </Card.Header>
                                     <Card.Body>
-                                        <Alert variant='danger' className="d-flex align-items-center" show={memberError.length !== 0}>
-                                            <GoAlert size={20} style={{ marginRight: '10px' }} />
-                                            {memberError}
-                                        </Alert>
-                                        <Alert variant='success' className="d-flex align-items-center" show={success.length !== 0}>
-                                            <GoCheckCircle size={20} style={{ marginRight: '10px' }} />
-                                            {success}
-                                        </Alert>
+                                        <ErrorAlert message={memberError} />
+                                        <SuccessAlert message={success} />
                                         <Form.Group as={Row} controlId="formPlaintextEmail">
                                             <Form.Label column sm="2">
                                                 User email

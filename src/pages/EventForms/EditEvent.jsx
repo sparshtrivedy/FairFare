@@ -6,10 +6,9 @@ import {
     Col,
     Spinner,
     Button,
-    Alert,
     Breadcrumb,
 } from "react-bootstrap";
-import { GoPencil, GoFileDirectory, GoAlert } from "react-icons/go";
+import { GoPencil, GoFileDirectory } from "react-icons/go";
 import EditEventForm from "./Components/EditEventForm";
 import { 
     addItem, 
@@ -22,6 +21,7 @@ import {
 } from "../../Utils";
 import { useParams } from "react-router-dom";
 import '../pages.css';
+import ErrorAlert from "../../Components/Alerts/ErrorAlert";
 
 const EditEvent = () => {
     const eventId = useParams().eventId;
@@ -155,12 +155,7 @@ const EditEvent = () => {
                             Edit event
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa', paddingBottom: 0 }}>
-                            {error && 
-                                <Alert variant='danger' className="d-flex align-items-center">
-                                    <GoAlert size={20} style={{ marginRight: '10px' }} />
-                                    {error}
-                                </Alert>
-                            }
+                            <ErrorAlert message={error} />
                             {isLoading? 
                                 <div className='d-flex justify-content-center my-3'>
                                     <Spinner animation="border" size='lg' />

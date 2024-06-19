@@ -2,7 +2,6 @@ import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../App";
 import { 
     Card,
-    Alert,
     Form,
     Row,
     Col,
@@ -12,7 +11,6 @@ import {
     GoPeople,
     GoTrash,
     GoPersonAdd,
-    GoAlert,
     GoInfo,
 } from "react-icons/go";
 import { userWithEmailQuery } from "../../../Utils";
@@ -103,11 +101,6 @@ const MembersCard = ({ members, memberError, setMemberError, event, setEvent, it
                         contacts
                     </Button>
                 </Card.Subtitle>
-                {!disabled &&
-                <Alert variant='danger' className="d-flex align-items-center" show={memberError.length !== 0}>
-                    <GoAlert size={20} style={{ marginRight: '10px' }} />
-                    {memberError}
-                </Alert>}
                 {members?.length? members.map((member, index) => (
                     <Form.Group key={`member-${index}`} as={Row} className={index === members.length-1? "mb-1": "mb-3"}>
                         <Form.Label column sm="2" className='d-flex align-items-center'>

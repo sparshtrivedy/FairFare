@@ -5,18 +5,17 @@ import {
     Col, 
     Card,
     Button,
-    Alert,
     Breadcrumb,
 } from "react-bootstrap";
 import { 
     GoPlusCircle,
     GoProjectSymlink,
-    GoAlert,
-    GoInfo
 } from "react-icons/go";
 import { addEvent, addItem } from "../../Utils";
 import CreateEventForm from "./Components/CreateEventForm";
 import '../pages.css';
+import ErrorAlert from "../../Components/Alerts/ErrorAlert";
+import InfoAlert from "../../Components/Alerts/InfoAlert";
 
 const CreateEvent = () => {
     const [memberError, setMemberError] = useState('');
@@ -114,17 +113,12 @@ const CreateEvent = () => {
                             Create new event
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa', paddingBottom: 0}}>
-                            {error && 
-                                <Alert variant='danger' className="d-flex align-items-center">
-                                    <GoAlert size={20} style={{ marginRight: '10px' }} />
-                                    {error}
-                                </Alert>
-                            }
-                            <Alert variant={'primary'} className="d-flex align-items-center">
-                                <GoInfo size={30} style={{ marginRight: '10px' }} />
-                                Recommended for events with multiple items. If this is a stand-alone item,{' '}
-                                <Alert.Link href="/#/create-item" style={{ marginLeft: '5px' }}>create an item</Alert.Link>.
-                            </Alert>
+                            <ErrorAlert message={error} />
+                            <InfoAlert 
+                                message={"Recommended for events with multiple items. If this is a stand-alone item,"} 
+                                altText={"create an item"}
+                                altLink={"/#/create-item"}
+                            />
                             <CreateEventForm
                                 memberError={memberError}
                                 setMemberError={setMemberError}

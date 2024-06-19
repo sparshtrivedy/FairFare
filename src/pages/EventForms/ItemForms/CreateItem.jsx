@@ -7,7 +7,6 @@ import {
     Card,
     Button,
     Form,
-    Alert,
     Spinner,
 } from "react-bootstrap";
 import { 
@@ -19,7 +18,6 @@ import {
     GoEye, 
     GoPencil, 
     GoFileDirectory, 
-    GoAlert, 
     GoInfo
 } from "react-icons/go";
 import FairFareControl from "../Components/FairFareControl";
@@ -28,6 +26,8 @@ import { getItemById, userWithEmailQuery, getItemRef, updateItem } from "../../.
 import { addDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { useParams } from "react-router-dom";
+import ErrorAlert from "../../../Components/Alerts/ErrorAlert";
+import InfoAlert from "../../../Components/Alerts/InfoAlert";
 
 const CreateItem = ({ disabled = false, mode = '' }) => {
     const { userEmail } = useContext(AuthContext);
@@ -169,19 +169,14 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                     </>)}
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa', paddingBottom: 0}}>
-                            {error && 
-                                <Alert variant='danger' className="d-flex align-items-center">
-                                    <GoAlert size={20} style={{ marginRight: '10px' }} />
-                                    {error}
-                                </Alert>
-                            }
+                            <ErrorAlert message={error} />
                             {
                                 mode !== 'edit' && !disabled &&
-                                <Alert variant={'primary'} className="d-flex align-items-center">
-                                    <GoInfo size={30} style={{ marginRight: '10px' }} />
-                                    Recommended for stand-alone items that are not part of an event. If this item is part of an event,{' '}
-                                    <Alert.Link href="/#/create-event" style={{ marginLeft: '5px' }}>create an event</Alert.Link>.
-                                </Alert>
+                                <InfoAlert 
+                                    message={"Recommended for stand-alone items that are not part of an event. If this item is part of an event,"} 
+                                    altText={"create an event"}
+                                    altLink={"/#/create-event"}
+                                />
                             }
                             {isLoading? (
                             <div className='d-flex justify-content-center my-3'>

@@ -4,14 +4,11 @@ import {
     Row, 
     Col, 
     Button, 
-    Alert, 
     Container,
     Card,
-    Spinner,
     InputGroup
 } from 'react-bootstrap';
 import { 
-    GoAlert,
     GoIssueClosed,
 } from 'react-icons/go';
 import { 
@@ -25,6 +22,8 @@ import { GoLaw } from "react-icons/go";
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../App';
 import { addDoc, collection } from 'firebase/firestore';
+import ErrorAlert from '../../../Components/Alerts/ErrorAlert';
+import SuccessAlert from '../../../Components/Alerts/SuccessAlert';
 
 const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
     const navigate = useNavigate();
@@ -145,24 +144,8 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
                             </h4>
                         </Card.Header>
                         <Card.Body style={{backgroundColor: '#f7fafa'}}>
-                            {error &&
-                                <Alert variant='danger' className="d-flex align-items-center">
-                                    <GoAlert size={20} style={{ marginRight: '10px' }} />
-                                    {error}
-                                </Alert>
-                            }
-                            {success &&
-                                <Alert variant='success' className='d-flex align-items-center justify-content-center'>
-                                    <Spinner
-                                        as="span"
-                                        animation="border"
-                                        size="sm"
-                                        role="status"
-                                        style={{ marginRight: '10px' }}
-                                    />
-                                    {success}
-                                </Alert>
-                            }
+                            <ErrorAlert message={error} />
+                            <SuccessAlert message={success} />
                             <Form>
                                 <Form.Group className="mb-3" controlId="formPlaintextEmail">
                                     <Form.Label>
