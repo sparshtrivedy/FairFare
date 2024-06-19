@@ -147,8 +147,12 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
         const itemsForEventQuery = itemsInEventQuery(doc.ref);
         const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
         const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
-            return doc.data();
+            return {
+                id: doc.id,
+                ...doc.data()
+            }
         });
+        console.log(itemsForEventData);
         itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
         for (const item of itemsForEventData) {
             const splits = item.splits;
@@ -156,14 +160,14 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
             for (const split of splits) {
                 if (split.email === userEmail && split.isChecked && !split.isSettled && item.transferTo !== userEmail) {
                     unSettledItems.push({
-                        id: doc.id,
-                        eventId: item.event.id,
+                        id: item.id,
+                        eventId: item.event?.id || '',
                         eventName: doc.data().name,
                         eventDate: doc.data().date,
                         itemName: item.itemName,
                         itemPrice: item.itemPrice,
                         itemQuantity: item.itemQuantity,
-                        youOwe: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                        amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                         members: item.splits.filter(member => member.isChecked),
                         transferTo: item.transferTo
                     });
@@ -185,7 +189,7 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                     itemName: item.itemName,
                     itemPrice: item.itemPrice,
                     itemQuantity: item.itemQuantity,
-                    youOwe: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                    amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                     members: item.splits.filter(member => member.isChecked),
                     transferTo: item.transferTo
                 });

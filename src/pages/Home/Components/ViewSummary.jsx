@@ -1,5 +1,5 @@
 import React from "react";
-import { Offcanvas, Form, Row, Col, Button, Card, Accordion } from "react-bootstrap";
+import { Offcanvas, Button, Card, Accordion } from "react-bootstrap";
 import { 
     GoReply, 
     GoCheckCircle,
@@ -12,21 +12,30 @@ import {
     updateDoc,
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
+import OffcanvasControl from "../../../Components/FormControls/OffcanvasControl";
 
 const ViewSummary = ({
     userEmail, 
     showSummary, 
     setShowSummary, 
-    itemList, 
-    labels, 
-    values, 
-    isSettled,
-    settleUnsettle,
-    setSelectedOweItem,
-    selectedOweItem,
-    setSelectedOwedItem,
-    selectedOwedItem
+    splits,
+    transferTo,
+    selectedItem,
+    setSelectedItem,
 }) => {
+    const handleSettleUnsettle = (setSelectedOweItem, selectedOweItem, member) => {
+        const copiedItem = { ...selectedOweItem };
+        copiedItem.splits = selectedOweItem?.members.map((m) => {
+            if (m.email === member.email) {
+                m.isSettled = !m.isSettled;
+            }
+            return m;
+        });
+        setSelectedOweItem(copiedItem);
+        const itemRef = doc(db, "items", copiedItem.id);
+        updateDoc(itemRef, copiedItem);
+    }
+
     return (
         <Offcanvas
             show={showSummary}
@@ -40,25 +49,12 @@ const ViewSummary = ({
                 </Offcanvas.Title>
             </Offcanvas.Header>
             <Offcanvas.Body className="p-0">
-                <div className="p-3">
-                    {labels.map((label, index) => (
-                        <Form.Group
-                            as={Row}
-                            className="mb-3"
-                            key={index}
-                        >
-                            <Form.Label column sm="4">
-                                {label}
-                            </Form.Label>
-                            <Col sm="8">
-                                <Form.Control
-                                    type="text"
-                                    disabled={true}
-                                    value={values[index]}
-                                />
-                            </Col>
-                        </Form.Group>
-                    ))}
+                <div className="m-3">
+                    <OffcanvasControl label="Item name" type="text" value={selectedItem?.itemName} />
+                    <OffcanvasControl label="Event name" type="text" value={selectedItem?.eventName} />
+                    <OffcanvasControl label="Item price" type="number" value={selectedItem?.itemPrice} />
+                    <OffcanvasControl label="Item quantity" type="number" value={selectedItem?.itemQuantity} />
+                    <OffcanvasControl label="Pending" type="number" value={selectedItem?.amount} />
                 </div>
                 <Card style={{ border: 0 }} className="my-3">
                     <Card.Header
@@ -70,65 +66,37 @@ const ViewSummary = ({
                         <span>Detailed breakdown</span>
                     </Card.Header>
                     <Accordion>
-                        {itemList.items && itemList.items.map((item, index) => (
+                        {splits?.map((split, index) => (
                             <Accordion.Item eventKey={index} key={index}>
                                 <Accordion.Header>
-                                    {item[itemList.title]}
+                                    {split.email}
                                 </Accordion.Header>
                                 <Accordion.Body className="p-0">
-                                    <div style={{ padding: "15px", paddingBottom: "0px" }}>
-                                        {itemList.labels.map((label, index) => (
-                                            <Form.Group
-                                                as={Row}
-                                                className="mb-3"
-                                                key={index}
-                                            >
-                                                <Form.Label column sm="4">
-                                                    {label}
-                                                </Form.Label>
-                                                <Col sm="8">
-                                                    <Form.Control
-                                                        type="text"
-                                                        disabled={true}
-                                                        value={item[itemList.values[index]]}
-                                                    />
-                                                </Col>
-                                            </Form.Group>
-                                        ))}
+                                    <div className="my-3 mx-3">
+                                        <OffcanvasControl label="Share" type="number" value={split?.amount} />
                                     </div>
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        {
-                                        // itemList.transferTo === userEmail || 
-                                        (settleUnsettle !== "youOwe" && item[itemList.title] === userEmail) || 
-                                        item.share === 0 ||
-                                        itemList.transferTo === item[itemList.title]?
-                                            <Button variant="secondary" disabled>
-                                                <div style={{ display: "flex", alignItems: "center" }}>
-                                                    <GoCircleSlash size={20} />
-                                                    <span style={{marginLeft: "10px"}}>No action required</span>
-                                                </div>
-                                            </Button>:
-                                            <Button
-                                                variant={
-                                                    isSettled(item, userEmail)? "danger": "success"
-                                                }
-                                                onClick={() =>
-                                                    settleUnsettle === "youOwe"?
-                                                    settleUnsettleYouOwe(setSelectedOweItem, selectedOweItem, item):
-                                                    settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, item)
-                                                }
-                                            >
-                                                {isSettled(item, userEmail)? 
-                                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                                        <GoReply size={20} />
-                                                        <span style={{marginLeft: "10px"}}>Unsettle</span>
-                                                    </div>:
-                                                    <div style={{ display: "flex", alignItems: "center" }}>
-                                                        <GoCheckCircle size={20} />
-                                                        <span style={{marginLeft: "10px"}}>Settle</span>
-                                                    </div>}
-                                            </Button>
-                                        }
+                                        {(!transferTo && split.email === userEmail) || split.email === transferTo || split.amount === 0 ?
+                                        <Button variant="secondary" disabled>
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoCircleSlash size={20} />
+                                                <span style={{marginLeft: "10px"}}>No action required</span>
+                                            </div>
+                                        </Button>:
+                                        <Button
+                                            variant={split?.isSettled? "danger": "success"}
+                                            onClick={() => handleSettleUnsettle(setSelectedItem, selectedItem, split)}
+                                        >
+                                            {split?.isSettled? 
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoReply size={20} />
+                                                <span style={{marginLeft: "10px"}}>Unsettle</span>
+                                            </div>:
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoCheckCircle size={20} />
+                                                <span style={{marginLeft: "10px"}}>Settle</span>
+                                            </div>}
+                                        </Button>}
                                     </div>
                                 </Accordion.Body>
                             </Accordion.Item>
@@ -138,40 +106,6 @@ const ViewSummary = ({
             </Offcanvas.Body>
         </Offcanvas>
     );
-}
-
-function settleUnsettleOwedToYou(setSelectedOwedItem, selectedOwedItem, member) {
-    setSelectedOwedItem({
-        ...selectedOwedItem,
-        members: selectedOwedItem?.members.map((m) => {
-            if (m.email === member.email) {
-                m.isSettled = !m.isSettled;
-            }
-            return m;
-        })
-    });
-
-    const itemRef = doc(db, "items", selectedOwedItem.id);
-    updateDoc(itemRef, {
-        splits: selectedOwedItem?.members,
-    });
-}
-
-function settleUnsettleYouOwe(setSelectedOweItem, selectedOweItem, member) {
-    setSelectedOweItem({
-        ...selectedOweItem,
-        members: selectedOweItem?.members.map((m) => {
-            if (m.email === member.email) {
-                m.isSettled = !m.isSettled;
-            }
-            return m;
-        })
-    });
-
-    const itemRef = doc(db, "items", selectedOweItem.id);
-    updateDoc(itemRef, {
-        splits: selectedOweItem?.members,
-    });
 }
 
 export default ViewSummary;

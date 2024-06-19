@@ -148,7 +148,7 @@ async function fetchItemsOwedToMember(userEmail) {
             itemName: itemOwedToMember.itemName,
             itemPrice: itemOwedToMember.itemPrice,
             itemQuantity: itemOwedToMember.itemQuantity,
-            youAreOwed: settledItemTotal.toFixed(2),
+            amount: settledItemTotal.toFixed(2),
             members: settledMembers
         });
     }

@@ -18,7 +18,6 @@ import {
     userWithEmailQuery,
 } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
-import ViewSummary from "./Components/ViewSummary";
 import { 
     GoTable,
     GoFoldDown,
@@ -33,12 +32,7 @@ const Home = () => {
 
     const [eventsLentToUser, setEventsLentToUser] = useState([]);
     const [itemsOwedToUser, setItemsOwedToUser] = useState([]);
-
-    const [showSettlementSummary, setShowSettlementSummary] = useState(false);
-    const [showOwingBreakdown, setShowOwingBreakdown] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedOweItem, setSelectedOweItem] = useState(null);
-    const [selectedOwedItem, setSelectedOwedItem] = useState(null);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
@@ -74,125 +68,53 @@ const Home = () => {
         fetchOwedAndLent();
     }, [userEmail]);
 
-    const handleClickSettle = async (item) => {
-        setSelectedOweItem(item);
-        setShowSettlementSummary(true);
-    };
-
-    const handleClickBreakdown = async (item) => {
-        setSelectedOwedItem(item);
-        setShowOwingBreakdown(true);
-    };
-
     return (
-        <>
-            <Container style={{ height: "100%" }}>
-                <Row className="justify-content-center">
-                    <Col sm={10} xs={12}>
-                        <EmailVerificationAlert />
-                        <Breadcrumb className="my-2">
-                            <Breadcrumb.Item active>Home</Breadcrumb.Item>
-                        </Breadcrumb>
-                        <Card style={{ border: 0 }} className="my-3">
-                            <Card.Header
-                                style={{ backgroundColor: "#80b1b3" }}
-                                as="h4"
-                                className="d-flex align-items-center justify-content-center"
-                            >
-                                <GoTable size={30} style={{ marginRight: "10px" }} />
-                                Dashboard
-                            </Card.Header>
-                            <Card.Body>
-                                <Card.Title as="h3">Welcome, {userEmail}!</Card.Title>
-                                <Card.Subtitle className="mb-2 text-muted">
-                                    Simplify your bill splitting with FairFare. Create an event
-                                    and invite your friends to join.
-                                </Card.Subtitle>
-                                <DashboardCard 
-                                    title="You owe"
-                                    itemList={eventsLentToUser}
-                                    headers={["Item name", "Event name", "Amount", "To", "Actions"]}
-                                    values={["itemName", "eventName", "youOwe", "transferTo"]}
-                                    isLoading={isLoading}
-                                    settleHandler={handleClickSettle}
-                                    icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}
-                                />
-                                <br />
-                                <DashboardCard
-                                    title="You are owed"
-                                    itemList={itemsOwedToUser}
-                                    headers={["Item name", "Event name", "Amount", "From", "Actions"]}
-                                    values={["itemName", "eventName", "youAreOwed", "unsettledMembers"]}
-                                    isLoading={isLoading}
-                                    settleHandler={handleClickBreakdown}
-                                    icon={<GoFoldDown size={30} style={{ marginRight: "10px" }} />}
-                                />
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
-            <ViewSummary
-                userEmail={userEmail}
-                showSummary={showSettlementSummary}
-                setShowSummary={setShowSettlementSummary}
-                itemList={{
-                    title: "email",
-                    items: selectedOweItem?.members,
-                    labels: ["Owes"],
-                    values: ["amount"],
-                    transferTo: selectedOweItem?.transferTo,
-                }}
-                labels={["Event name", "Item name", "Price", "Quantity", "You owe"]}
-                values={[
-                    selectedOweItem?.eventName,
-                    selectedOweItem?.itemName,
-                    selectedOweItem?.itemPrice,
-                    selectedOweItem?.itemQuantity,
-                    selectedOweItem?.youOwe,
-                ]}
-                isSettled={isSettled}
-                settleUnsettle="youOwe"
-                setSelectedOwedItem={setSelectedOwedItem}
-                selectedOwedItem={selectedOwedItem}
-                setSelectedOweItem={setSelectedOweItem}
-                selectedOweItem={selectedOweItem}
-            />
-            <ViewSummary
-                userEmail={userEmail}
-                showSummary={showOwingBreakdown}
-                setShowSummary={setShowOwingBreakdown}
-                itemList={{
-                    title: "email",
-                    items: selectedOwedItem?.members,
-                    labels: ["Owes"],
-                    values: ["amount"],
-                    transferTo: selectedOwedItem?.transferTo,
-                }}
-                labels={["Event name", "Item name", "Price", "Quantity", "You are owed"]}
-                values={[
-                    selectedOwedItem?.eventName,
-                    selectedOwedItem?.itemName,
-                    selectedOwedItem?.itemPrice,
-                    selectedOwedItem?.itemQuantity,
-                    selectedOwedItem?.youAreOwed,
-                ]}
-                isSettled={isSettled}
-                settleUnsettle="owedToYou"
-                setSelectedOwedItem={setSelectedOwedItem}
-                selectedOwedItem={selectedOwedItem}
-                setSelectedOweItem={setSelectedOweItem}
-                selectedOweItem={selectedOweItem}
-            />
-        </>
+        <Container style={{ height: "100%" }}>
+            <Row className="justify-content-center">
+                <Col sm={10} xs={12}>
+                    <EmailVerificationAlert />
+                    <Breadcrumb className="my-2">
+                        <Breadcrumb.Item active>Home</Breadcrumb.Item>
+                    </Breadcrumb>
+                    <Card style={{ border: 0 }} className="my-3">
+                        <Card.Header
+                            style={{ backgroundColor: "#80b1b3" }}
+                            as="h4"
+                            className="d-flex align-items-center justify-content-center"
+                        >
+                            <GoTable size={30} style={{ marginRight: "10px" }} />
+                            Dashboard
+                        </Card.Header>
+                        <Card.Body>
+                            <Card.Title as="h3">Welcome, {userEmail}!</Card.Title>
+                            <Card.Subtitle className="mb-2 text-muted">
+                                Simplify your bill splitting with FairFare. Create an event
+                                and invite your friends to join.
+                            </Card.Subtitle>
+                            <DashboardCard
+                                id="you-owe"
+                                title="You owe"
+                                itemList={eventsLentToUser}
+                                isLoading={isLoading}
+                                icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}
+                            />
+                            <br />
+                            <DashboardCard
+                                id="owed-to-you"
+                                title="Owed to you"
+                                itemList={itemsOwedToUser}
+                                isLoading={isLoading}
+                                icon={<GoFoldDown size={30} style={{ marginRight: "10px" }} />}
+                            />
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     );
 };
 
 export default Home;
-
-const isSettled = (item) => {
-    return item.isSettled;
-}
 
 async function fetchItemsOwedToMember(userEmail) {
     const itemsOwedToMemberQuery = itemsWithTransferToMemberQuery(userEmail);
@@ -227,13 +149,13 @@ async function fetchItemsOwedToMember(userEmail) {
 
         if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
             owedItems.push({
-                id: doc.id,
+                id: itemOwedToMember.id,
                 eventId: itemOwedToMember.event?.id || '',
                 eventName: event?.name || 'N/A',
                 itemName: itemOwedToMember.itemName,
                 itemPrice: itemOwedToMember.itemPrice,
                 itemQuantity: itemOwedToMember.itemQuantity,
-                youAreOwed: unsettledItemTotal.toFixed(2),
+                amount: unsettledItemTotal.toFixed(2),
                 members: itemSplits,
                 unsettledMembers: unsettledMembers
             });

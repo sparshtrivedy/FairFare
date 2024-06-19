@@ -1,10 +1,11 @@
 import React from 'react';
-import { Card, Table, Button, Spinner } from 'react-bootstrap';
-import { GoEye, GoCodeOfConduct, GoCheckCircle } from "react-icons/go";
+import { Card, Table, Spinner } from 'react-bootstrap';
+import { GoCheckCircle } from "react-icons/go";
+import ViewButton from '../../../Components/Buttons/ViewButton';
+import SettleButton from '../../../Components/Buttons/SettleButton';
 
 
-const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHandler, icon }) => {
-
+const DashboardCard = ({ id, title, itemList, isLoading, icon }) => {
     return (
         <Card className='m-0 p-0'>
             <Card.Header
@@ -24,9 +25,11 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                     <Table striped bordered hover className='p-0 m-0'>
                         <thead>
                             <tr>
-                                {headers.map((header, index) => (
-                                    <th key={index}>{header}</th>
-                                ))}
+                                <th>Item name</th>
+                                <th>Event name</th>
+                                <th>Amount</th>
+                                <th>{id === "you-owe" ? "To" : "From"}</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -43,34 +46,14 @@ const DashboardCard = ({ title, itemList, headers, values, isLoading, settleHand
                                 </tr>
                             ) : (
                                 itemList.map((item, index) => (
-                                    <tr key={index}>
-                                        {values.map((value, index) => (
-                                            <td key={index}>{item[value]}</td>
-                                        ))}
+                                    <tr key={`${id}_${index}`}>
+                                        <td>{item.itemName}</td>
+                                        <td>{item.eventName}</td>
+                                        <td>{item.amount}</td>
+                                        <td>{id === "you-owe" ? item.transferTo : item.unsettledMembers}</td>
                                         <td>
-                                            <Button
-                                                variant="primary"
-                                                onClick={() => window.location.href = item.eventId? 
-                                                    `/#/view-event/${item.eventId}`:
-                                                    `/#/view-item/${item.id}`
-                                                }
-                                                className='m-1'
-                                            >
-                                                <div style={{ display: "flex", alignItems: "center" }}>
-                                                    <GoEye size={20} />
-                                                    <span style={{marginLeft: "10px"}}>View</span>
-                                                </div>
-                                            </Button>
-                                            <Button
-                                                variant="info"
-                                                onClick={() => settleHandler(item)}
-                                                className='m-1'
-                                            >
-                                                <div style={{ display: "flex", alignItems: "center" }}>
-                                                    <GoCodeOfConduct size={20} />
-                                                    <span style={{marginLeft: "10px"}}>Settle</span>
-                                                </div>
-                                            </Button>
+                                            <ViewButton id={id} path={item.eventId ? `/#/view-event/${item.eventId}` : `/#/view-item/${item.id}`} />
+                                            <SettleButton item={item} />
                                         </td>
                                     </tr>
                                 ))
