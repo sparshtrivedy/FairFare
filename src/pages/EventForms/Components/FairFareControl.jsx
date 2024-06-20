@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 
-const FairFareControl = ({ label, type, placeholder="", onChange=null, value=null, disabled=false, required=false }) => {
+const FairFareControl = ({ label, type, placeholder="", onChange=null, value='', disabled=false, required=false }) => {
     return (
         <Form.Group as={Row} className="mb-3" controlId="formPlaintextEmail">
             <Form.Label column sm="2" className='d-flex align-items-center'>

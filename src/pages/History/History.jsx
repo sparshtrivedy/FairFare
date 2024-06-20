@@ -76,7 +76,7 @@ const History = () => {
                                         Paid by you
                                     </>}
                                 >
-                                    <div className='d-flex justify-content-center'>
+                                    <div className='d-flex justify-content-center overflow-auto'>
                                         {isLoading ? (
                                             <Spinner animation="border" size="lg" className="m-3" />
                                         ) : (
@@ -92,7 +92,7 @@ const History = () => {
                                         Paid to you
                                     </>}
                                 >
-                                    <div className='d-flex justify-content-center'>
+                                    <div className='d-flex justify-content-center overflow-auto'>
                                         {isLoading ? (
                                             <Spinner animation="border" size="lg" className="m-3" />
                                         ) : (

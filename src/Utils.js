@@ -152,7 +152,6 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                 ...doc.data()
             }
         });
-        console.log(itemsForEventData);
         itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
         for (const item of itemsForEventData) {
             const splits = item.splits;
