@@ -25,7 +25,7 @@ const ViewSummary = ({
 }) => {
     const handleSettleUnsettle = (setSelectedOweItem, selectedOweItem, member) => {
         const copiedItem = { ...selectedOweItem };
-        copiedItem.splits = selectedOweItem?.members.map((m) => {
+        copiedItem.splits = selectedOweItem?.splits.map((m) => {
             if (m.email === member.email) {
                 m.isSettled = !m.isSettled;
             }

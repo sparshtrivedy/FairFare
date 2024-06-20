@@ -27,7 +27,7 @@ const SettleButton = ({ item }) => {
                 userEmail={userEmail}
                 showSummary={showSettlementSummary}
                 setShowSummary={setShowSettlementSummary}
-                splits={item?.members}
+                splits={item?.splits}
                 transferTo={item?.transferTo}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}

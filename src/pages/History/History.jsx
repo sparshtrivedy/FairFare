@@ -9,18 +9,19 @@ import {
     Col,
     Card,
     Breadcrumb,
+    Spinner
 } from 'react-bootstrap';
 import { 
     GoHistory,
     GoFoldDown,
     GoFoldUp,
 } from "react-icons/go";
-import HistoryTable from './Components/HistoryTable';
 import {
     itemsWithTransferToMemberQuery,
     fetchItemsSettledByMember
 } from '../../Utils';
 import '../pages.css';
+import SummaryTable from '../../Components/Tables/SummaryTable';
 
 const History = () => {
     const {userEmail} = useContext(AuthContext);
@@ -45,66 +46,66 @@ const History = () => {
     }, [userEmail]);
 
     return (
-        <>
-            <Container style={{ height: "100%" }}>
-                <Row className="justify-content-center">
-                    <Col sm={10} xs={12}>
-                        <Breadcrumb className="my-2">
-                            <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
-                            <Breadcrumb.Item active>History</Breadcrumb.Item>
-                        </Breadcrumb>
-                        <Card style={{ border: 0 }} className="my-3">
-                            <Card.Header
-                                style={{ backgroundColor: "#80b1b3" }}
-                                as="h4"
-                                className="d-flex align-items-center justify-content-center"
+        <Container style={{ height: "100%" }}>
+            <Row className="justify-content-center">
+                <Col sm={10} xs={12}>
+                    <Breadcrumb className="my-2">
+                        <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
+                        <Breadcrumb.Item active>History</Breadcrumb.Item>
+                    </Breadcrumb>
+                    <Card style={{ border: 0 }} className="my-3">
+                        <Card.Header
+                            style={{ backgroundColor: "#80b1b3" }}
+                            as="h4"
+                            className="d-flex align-items-center justify-content-center"
+                        >
+                            <GoHistory size={30} style={{ marginRight: "10px" }} />
+                            History
+                        </Card.Header>
+                        <Card.Body>
+                            <Tabs
+                                defaultActiveKey="paid-by-you"
+                                id="uncontrolled-tab-example"
+                                className="mb-3"
                             >
-                                <GoHistory size={30} style={{ marginRight: "10px" }} />
-                                History
-                            </Card.Header>
-                            <Card.Body>
-                                <Tabs
-                                    defaultActiveKey="paid-by-you"
-                                    id="uncontrolled-tab-example"
-                                    className="mb-3"
+                                <Tab 
+                                    eventKey="paid-by-you" 
+                                    title={
+                                    <>
+                                        <GoFoldUp size={30} style={{ marginRight: "10px" }} /> 
+                                        Paid by you
+                                    </>}
                                 >
-                                    <Tab 
-                                        eventKey="paid-by-you" 
-                                        title={
-                                            <>
-                                                <GoFoldUp size={30} style={{ marginRight: "10px" }} /> 
-                                                Paid by you
-                                            </>}
-                                    >
-                                        <HistoryTable 
-                                            isLoading={isLoading} 
-                                            headers={['Event name', 'Item name', 'To', 'Amount', "Actions"]} 
-                                            values={['eventName', 'itemName', 'transferTo', 'youPaid']} 
-                                            items={owedItems} 
-                                        />
-                                    </Tab>
-                                    <Tab 
-                                        eventKey="paid-to-you" 
-                                        title={
-                                        <>
-                                            <GoFoldDown size={30} style={{ marginRight: "10px" }} /> 
-                                            Paid to you
-                                        </>}
-                                    >
-                                        <HistoryTable 
-                                            isLoading={isLoading} 
-                                            headers={['Event name', 'Item name', 'From', 'Amount', "Actions"]} 
-                                            values={['eventName', 'itemName', 'members', 'youAreOwed']} 
-                                            items={lentItems} 
-                                        />
-                                    </Tab>
-                                </Tabs>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
-        </>
+                                    <div className='d-flex justify-content-center'>
+                                        {isLoading ? (
+                                            <Spinner animation="border" size="lg" className="m-3" />
+                                        ) : (
+                                            <SummaryTable items={owedItems} id="you-owe" />
+                                        )}
+                                    </div>
+                                </Tab>
+                                <Tab 
+                                    eventKey="paid-to-you" 
+                                    title={
+                                    <>
+                                        <GoFoldDown size={30} style={{ marginRight: "10px" }} /> 
+                                        Paid to you
+                                    </>}
+                                >
+                                    <div className='d-flex justify-content-center'>
+                                        {isLoading ? (
+                                            <Spinner animation="border" size="lg" className="m-3" />
+                                        ) : (
+                                            <SummaryTable items={lentItems} id="owed-to-you" />
+                                        )}
+                                    </div>
+                                </Tab>
+                            </Tabs>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+        </Container>
     )
 }
 
@@ -138,8 +139,7 @@ async function fetchItemsOwedToMember(userEmail) {
 
         const settledMembers = itemSplits
             .filter(member => member.isSettled && member.email !== userEmail)
-            .map(member => member.email)
-            .join(", ");
+            .map(member => member.email);
 
         settledItemTotal && owedItems.push({
             id: doc.id,
@@ -149,7 +149,8 @@ async function fetchItemsOwedToMember(userEmail) {
             itemPrice: itemOwedToMember.itemPrice,
             itemQuantity: itemOwedToMember.itemQuantity,
             amount: settledItemTotal.toFixed(2),
-            members: settledMembers
+            members: settledMembers,
+            splits: itemSplits.filter(split => split.isChecked)
         });
     }
 

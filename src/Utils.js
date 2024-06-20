@@ -168,8 +168,8 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                         itemPrice: item.itemPrice,
                         itemQuantity: item.itemQuantity,
                         amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                        members: item.splits.filter(member => member.isChecked),
-                        transferTo: item.transferTo
+                        splits: item.splits.filter(member => member.isChecked),
+                        members: [item.transferTo]
                     });
                 }
             }
@@ -190,8 +190,8 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                     itemPrice: item.itemPrice,
                     itemQuantity: item.itemQuantity,
                     amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                    members: item.splits.filter(member => member.isChecked),
-                    transferTo: item.transferTo
+                    splits: item.splits.filter(member => member.isChecked),
+                    members: [item.transferTo]
                 });
             }
         }
@@ -214,7 +214,10 @@ export const fetchItemsSettledByMember = async (userEmail) => {
         const itemsForEventQuery = itemsInEventQuery(doc.ref);
         const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
         const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
-            return doc.data();
+            return {
+                id: doc.id,
+                ...doc.data()
+            }
         });
         itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
         for (const item of itemsForEventData) {
@@ -223,15 +226,16 @@ export const fetchItemsSettledByMember = async (userEmail) => {
             for (const split of splits) {
                 if (split.email === userEmail && split.isChecked && split.isSettled && item.transferTo !== userEmail) {
                     settledItems.push({
-                        id: doc.id,
+                        id: item.id,
                         eventId: item.event.id,
                         eventName: doc.data().name,
                         eventDate: doc.data().date,
                         itemName: item.itemName,
                         itemPrice: item.itemPrice,
                         itemQuantity: item.itemQuantity,
-                        youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                        transferTo: item.transferTo
+                        amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                        splits: item.splits.filter(member => member.isChecked),
+                        members: [item.transferTo]
                     });
                 }
             }
@@ -252,7 +256,7 @@ export const fetchItemsSettledByMember = async (userEmail) => {
                     itemPrice: item.itemPrice,
                     itemQuantity: item.itemQuantity,
                     youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                    transferTo: item.transferTo
+                    members: [item.transferTo]
                 });
             }
         }

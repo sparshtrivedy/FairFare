@@ -144,8 +144,7 @@ async function fetchItemsOwedToMember(userEmail) {
 
         const unsettledMembers = itemSplits
             .filter(member => !member.isSettled && member.email !== userEmail)
-            .map(member => member.email)
-            .join(", ");
+            .map(member => member.email);
 
         if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
             owedItems.push({
@@ -156,8 +155,8 @@ async function fetchItemsOwedToMember(userEmail) {
                 itemPrice: itemOwedToMember.itemPrice,
                 itemQuantity: itemOwedToMember.itemQuantity,
                 amount: unsettledItemTotal.toFixed(2),
-                members: itemSplits,
-                unsettledMembers: unsettledMembers
+                splits: itemSplits,
+                members: unsettledMembers
             });
         }
     }
