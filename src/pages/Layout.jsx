@@ -13,11 +13,11 @@ import {
 import Home from './Home/Home'
 import SignIn from './Authentication/SignIn'
 import SignUp from './Authentication/SignUp'
-import EditEvent from './EventForms/EditEvent'
-import ViewEvent from './EventForms/ViewEvent';
+import EditEvent from './Forms/EditEvent'
+import ViewEvent from './Forms/ViewEvent';
 import History from './History/History'
-import CreateEvent from './EventForms/CreateEvent';
-import CreateItem from './EventForms/ItemForms/CreateItem'
+import CreateEvent from './Forms/CreateEvent';
+import CreateItem from './Forms/ItemForms/CreateItem'
 import Contacts from './Contacts/Contacts'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
