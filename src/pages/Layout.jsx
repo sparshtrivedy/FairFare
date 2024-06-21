@@ -13,10 +13,8 @@ import {
 import Home from './Home/Home'
 import SignIn from './Authentication/SignIn'
 import SignUp from './Authentication/SignUp'
-import EditEvent from './Forms/EditEvent'
-import ViewEvent from './Forms/ViewEvent';
 import History from './History/History'
-import CreateEvent from './Forms/CreateEvent';
+import CreateEvent from './Forms/EventForms/CreateEvent';
 import CreateItem from './Forms/ItemForms/CreateItem'
 import Contacts from './Contacts/Contacts'
 import { useNavigate } from 'react-router-dom';
@@ -99,12 +97,15 @@ const Layout = () => {
             {isLoggedIn ? (
                 <Routes>
                     <Route path="/home" element={<Home />} />
-                    <Route path="/create-event" element={<CreateEvent />} />
+
+                    <Route path="/create-event" element={<CreateEvent mode={'create'} />} />
+                    <Route path="/view-event/:eventId" element={<CreateEvent mode={'view'} />} />
+                    <Route path="/edit-event/:eventId" element={<CreateEvent mode={'edit'} />} />
+
                     <Route path="/create-item" element={<CreateItem />} />
-                    <Route path="/view-event/:eventId" element={<ViewEvent />} />
                     <Route path="/view-item/:itemId" element={<CreateItem disabled={true} />} />
-                    <Route path="/edit-event/:eventId" element={<EditEvent />} />
                     <Route path="/edit-item/:itemId" element={<CreateItem mode={'edit'} />} />
+
                     <Route path="/history" element={<History />} />
                     <Route path="/contacts" element={<Contacts />} />
                     <Route path="*" element={<Navigate to="/home" />} />

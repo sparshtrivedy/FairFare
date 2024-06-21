@@ -1,15 +1,12 @@
 import React from 'react';
 import { 
     Card,
-    Row,
-    Col,
     Button,
-    Form,
     Accordion
 } from 'react-bootstrap';
 import { GoRows, GoWorkflow, GoTrash, GoInfo } from 'react-icons/go';
-import FairFareControl from './FairFareControl';
 import { updateMemberSplits } from '../../../Utils';
+import ItemBody from './ItemBody';
 
 const ItemsCard = ({ event, items, setItems, disabled=false }) => {
     const handleAddItems = () => {
@@ -49,129 +46,50 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                                 <h6>{item.itemName}</h6>
                             </Accordion.Header>
                             <Accordion.Body className='p-0'>
-                                <div style={{ padding: "15px", paddingBottom: "0px" }}>
-                                    <FairFareControl
-                                        label="Item name"
-                                        type="text"
-                                        placeholder="Enter item name"
-                                        onChange={(e) => {
-                                            let copiedItems = [...items];
-                                            copiedItems[index].itemName = e.target.value;
-                                            setItems(copiedItems);
-                                        }}
-                                        value={item.itemName}
-                                        disabled={disabled}
-                                        required={true}
-                                    />
-                                    <FairFareControl
-                                        label="Item price"
-                                        type="number"
-                                        placeholder="Enter item price"
-                                        onChange={(e) => {
-                                            let copiedItems = [...items];
-                                            copiedItems[index].itemPrice = e.target.value;
-                                            setItems(copiedItems);
-                                        }}
-                                        value={item.itemPrice}
-                                        disabled={disabled}
-                                        required={true}
-                                    />
-                                    <FairFareControl
-                                        label="Item quantity"
-                                        type="number"
-                                        placeholder="Enter item quantity"
-                                        onChange={(e) => {
-                                            let copiedItems = [...items];
-                                            copiedItems[index].itemQuantity = e.target.value;
-                                            setItems(copiedItems);
-                                        }}
-                                        value={item.itemQuantity}
-                                        disabled={disabled}
-                                        required={true}
-                                    />
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="2" className='d-flex align-items-center'>
-                                            Transfer to
-                                            <span style={{ color: 'red', marginLeft: '5px' }}>
-                                                *
-                                            </span>
-                                        </Form.Label>
-                                        <Col sm="10">
-                                            <Form.Select
-                                                onChange={(e) => {
-                                                    let copiedItems = [...items];
-                                                    copiedItems[index].transferTo = e.target.value;
-                                                    setItems(copiedItems);
-                                                }}
-                                                value={item.transferTo}
-                                                disabled={disabled}
-                                                required={true}
-                                            >
-                                                <option>Select a member</option>
-                                                {event.members.map((member, i) => (
-                                                    <option key={`item-${index}-member-${i}`} value={member.email}>{member.email}</option>
-                                                ))}
-                                            </Form.Select>
-                                        </Col>
-                                    </Form.Group>
-                                    <Form.Group as={Row} className="mb-3">
-                                        <Form.Label column sm="2" className='d-flex align-items-center'>
-                                            Shared among
-                                            <span style={{ color: 'red', marginLeft: '5px' }}>
-                                                *
-                                            </span>
-                                        </Form.Label>
-                                        <Col sm="10">
-                                        {event.members.length?
-                                            event.members.map((member, i) => (
-                                                <Form.Check 
-                                                    key={`item-${index}-member-${i}`}
-                                                    type="checkbox" 
-                                                    label={member.email}
-                                                    onChange={() => handleItemSplitChange(index, i)}
-                                                    checked={item?.splits[i]?.isChecked}
-                                                    disabled={disabled}
-                                                />
-                                            )):
-                                            <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
-                                                <GoInfo size={20} />
-                                                <span style={{marginLeft: "10px"}}>
-                                                    No members to display. Add members to split the expenses.
-                                                </span>
-                                            </div>
-                                        }
-                                        </Col>
-                                    </Form.Group>
-                                </div>
+                                <ItemBody
+                                    index={index}
+                                    items={items}
+                                    setItems={setItems}
+                                    disabled={disabled}
+                                    options={event.members}
+                                    handleItemSplitChange={handleItemSplitChange}
+                                />
                                 {!disabled &&
-                                <div className="d-flex p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                    <Button variant='danger' onClick={() => {
-                                        let copiedItems = [...items];
-                                        copiedItems.splice(index, 1);
-                                        setItems(copiedItems);
-                                    }}>
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <GoTrash size={20} />
-                                            <span style={{marginLeft: "10px"}}>Remove item</span>
-                                        </div>
-                                    </Button>
-                                </div>}
+                                    <div className="d-flex p-2" style={{ backgroundColor: "#CFE2FF" }} >
+                                        <Button variant='danger' onClick={() => {
+                                            let copiedItems = [...items];
+                                            copiedItems.splice(index, 1);
+                                            setItems(copiedItems);
+                                        }}>
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                <GoTrash size={20} />
+                                                <span style={{marginLeft: "10px"}}>Remove item</span>
+                                            </div>
+                                        </Button>
+                                    </div>
+                                }
                             </Accordion.Body>
                         </Accordion.Item>
                     ))}
-                </Accordion>:
-                <p>No items added</p>
+                </Accordion> :
+                <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
+                    <GoInfo size={20} />
+                    <span style={{marginLeft: "10px"}}>
+                        No items to display. Add items to split the expenses.
+                    </span>
+                </div>
             }
             </Card.Body>
             {!disabled &&
-            <Card.Footer style={{backgroundColor: '#80b1b3'}}>
-                <Button variant='primary' onClick={handleAddItems}>   
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <GoWorkflow size={20} />
-                        <span style={{marginLeft: "10px"}}>Add item</span>
-                    </div>
-                </Button>
-            </Card.Footer>}
+                <Card.Footer style={{backgroundColor: '#80b1b3'}}>
+                    <Button variant='primary' onClick={handleAddItems}>   
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                            <GoWorkflow size={20} />
+                            <span style={{marginLeft: "10px"}}>Add item</span>
+                        </div>
+                    </Button>
+                </Card.Footer>
+            }
         </Card>
     )
 }

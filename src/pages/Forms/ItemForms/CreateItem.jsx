@@ -22,12 +22,19 @@ import {
 } from "react-icons/go";
 import FairFareControl from "../Components/FairFareControl";
 import { AuthContext } from "../../../App";
-import { getItemById, userWithEmailQuery, getItemRef, updateItem } from "../../../Utils";
+import {
+    getItemById,
+    userWithEmailQuery,
+    getItemRef,
+    updateItem,
+    
+} from "../../../Utils";
 import { addDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { useParams } from "react-router-dom";
 import ErrorAlert from "../../../Components/Alerts/ErrorAlert";
 import InfoAlert from "../../../Components/Alerts/InfoAlert";
+import MembersCard from "../Components/MembersCard";
 
 const CreateItem = ({ disabled = false, mode = '' }) => {
     const { userEmail } = useContext(AuthContext);
@@ -252,6 +259,14 @@ const CreateItem = ({ disabled = false, mode = '' }) => {
                                             </Form.Select>
                                         </Col>
                                     </Form.Group>
+                                    <MembersCard
+                                        items={item}
+                                        setItems={setItem}
+                                        members={[]}
+                                        disabled={disabled}
+                                        event={null}
+                                        setEvent={() => {}}
+                                    />
                                     <Card className='my-3'>
                                         <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
                                             <GoPeople size={25} />
