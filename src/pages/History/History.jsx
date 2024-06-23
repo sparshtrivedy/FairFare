@@ -12,7 +12,6 @@ import {
     Spinner
 } from 'react-bootstrap';
 import { 
-    GoHistory,
     GoFoldDown,
     GoFoldUp,
 } from "react-icons/go";
@@ -22,6 +21,7 @@ import {
 } from '../../Utils';
 import '../pages.css';
 import SummaryTable from '../../Components/Tables/SummaryTable';
+import FormHeader from '../Forms/Components/FormHeader';
 
 const History = () => {
     const {userEmail} = useContext(AuthContext);
@@ -54,14 +54,7 @@ const History = () => {
                         <Breadcrumb.Item active>History</Breadcrumb.Item>
                     </Breadcrumb>
                     <Card style={{ border: 0 }} className="my-3">
-                        <Card.Header
-                            style={{ backgroundColor: "#80b1b3" }}
-                            as="h4"
-                            className="d-flex align-items-center justify-content-center"
-                        >
-                            <GoHistory size={30} style={{ marginRight: "10px" }} />
-                            History
-                        </Card.Header>
+                        <FormHeader title="History" />
                         <Card.Body>
                             <Tabs
                                 defaultActiveKey="paid-by-you"

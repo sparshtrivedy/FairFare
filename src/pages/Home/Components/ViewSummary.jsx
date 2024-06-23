@@ -3,7 +3,6 @@ import { Offcanvas, Button, Card, Accordion } from "react-bootstrap";
 import { 
     GoReply, 
     GoCheckCircle,
-    GoTasklist,
     GoBook,
     GoCircleSlash,
 } from "react-icons/go";
@@ -13,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import OffcanvasControl from "../../../Components/FormControls/OffcanvasControl";
+import CardHeader from "../../Forms/Components/CardHeader";
 
 const ViewSummary = ({
     userEmail, 
@@ -57,14 +57,7 @@ const ViewSummary = ({
                     <OffcanvasControl label="Pending" type="number" value={selectedItem?.amount} />
                 </div>
                 <Card style={{ border: 0 }} className="my-3">
-                    <Card.Header
-                        style={{ backgroundColor: "#80b1b3", border: 0, borderRadius: 0, padding: "15px" }}
-                        as="h5"
-                        className="d-flex align-items-center"
-                    >
-                        <GoTasklist size={25} style={{ marginRight: "10px" }} />{" "}
-                        <span>Detailed breakdown</span>
-                    </Card.Header>
+                    <CardHeader title="Detailed breakdown" />
                     <Accordion>
                         {splits?.map((split, index) => (
                             <Accordion.Item eventKey={index} key={index}>

@@ -11,10 +11,10 @@ import '../../pages.css';
 import ErrorAlert from "../../../Components/Alerts/ErrorAlert";
 import InfoAlert from "../../../Components/Alerts/InfoAlert";
 import FormHeader from "../Components/FormHeader";
-import FormFooter from "../Components/FormFooter";
+import CardFooter from "../Components/CardFooter";
 import FairFareControl from "../Components/FairFareControl";
-import MembersCard from "../Components/MembersCard";
-import ItemsCard from "../Components/ItemsCard";
+import EventMembersCard from "./Components/EventMembersCard";
+import ItemsCard from "./Components/ItemsCard";
 import { useParams } from "react-router-dom";
 import {
     getEventById,
@@ -25,7 +25,7 @@ import {
     updateItem
 } from "../../../Utils";
 
-const CreateEvent = ({ mode }) => {
+const EventForm = ({ mode }) => {
     const eventId = useParams().eventId;
 
     const [error, setError] = useState('');
@@ -159,7 +159,14 @@ const CreateEvent = ({ mode }) => {
                 <Col sm={10} xs={12}>
                     <Breadcrumb className="my-2">
                         <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
-                        <Breadcrumb.Item active>Create Event</Breadcrumb.Item>
+                        {mode === 'create' && <Breadcrumb.Item active>Create Event</Breadcrumb.Item>}
+                        {mode === 'edit' && 
+                            <>
+                                <Breadcrumb.Item href={`/#/view-event/${eventId}`}>View Event</Breadcrumb.Item>
+                                <Breadcrumb.Item active>Edit Event</Breadcrumb.Item>
+                            </>
+                        }
+                        {mode === 'view' && <Breadcrumb.Item active>View Event</Breadcrumb.Item>}
                     </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
                         {mode === 'view' && <FormHeader title={"View Event"} />}
@@ -199,7 +206,7 @@ const CreateEvent = ({ mode }) => {
                                 required={false}
                                 disabled={mode === 'view'}
                             />
-                            <MembersCard
+                            <EventMembersCard
                                 members={event.members}
                                 event={event}
                                 setEvent={setEvent}
@@ -214,9 +221,9 @@ const CreateEvent = ({ mode }) => {
                                 disabled={mode === 'view'}
                             />
                         </Card.Body>
-                        {mode === "create" && <FormFooter text={"Create event"} handler={handleCreateEvent} />}
-                        {mode === "view" && <FormFooter text={"Edit event"} handler={() => window.location.href = `/#/edit-event/${eventId}`} />}
-                        {mode === "edit" && <FormFooter text={"Save changes"} handler={handleUpdateEvent}/>}
+                        {mode === "create" && <CardFooter text={"Create event"} handler={handleCreateEvent} />}
+                        {mode === "view" && <CardFooter text={"Edit event"} handler={() => window.location.href = `/#/edit-event/${eventId}`} />}
+                        {mode === "edit" && <CardFooter text={"Save changes"} handler={handleUpdateEvent}/>}
                     </Card>
                 </Col>
             </Row>
@@ -224,4 +231,4 @@ const CreateEvent = ({ mode }) => {
     )
 }
 
-export default CreateEvent;
+export default EventForm;

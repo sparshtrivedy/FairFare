@@ -18,14 +18,10 @@ import {
     userWithEmailQuery,
 } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
-import { 
-    GoTable,
-    GoFoldDown,
-    GoFoldUp,
-} from "react-icons/go";
 import '../pages.css';
 import { auth } from "../../firebase-config";
 import EmailVerificationAlert from "../../Components/Alerts/EmailVerificationAlert";
+import FormHeader from "../Forms/Components/FormHeader";
 
 const Home = () => {
     const { userEmail } = useContext(AuthContext);
@@ -77,14 +73,7 @@ const Home = () => {
                         <Breadcrumb.Item active>Home</Breadcrumb.Item>
                     </Breadcrumb>
                     <Card style={{ border: 0 }} className="my-3">
-                        <Card.Header
-                            style={{ backgroundColor: "#80b1b3" }}
-                            as="h4"
-                            className="d-flex align-items-center justify-content-center"
-                        >
-                            <GoTable size={30} style={{ marginRight: "10px" }} />
-                            Dashboard
-                        </Card.Header>
+                        <FormHeader title="Dashboard" />
                         <Card.Body>
                             <Card.Title as="h3">Welcome, {userEmail}!</Card.Title>
                             <Card.Subtitle className="mb-2 text-muted">
@@ -96,7 +85,6 @@ const Home = () => {
                                 title="You owe"
                                 itemList={eventsLentToUser}
                                 isLoading={isLoading}
-                                icon={<GoFoldUp size={30} style={{ marginRight: "10px" }} />}
                             />
                             <br />
                             <DashboardCard
@@ -104,7 +92,6 @@ const Home = () => {
                                 title="Owed to you"
                                 itemList={itemsOwedToUser}
                                 isLoading={isLoading}
-                                icon={<GoFoldDown size={30} style={{ marginRight: "10px" }} />}
                             />
                         </Card.Body>
                     </Card>
@@ -148,7 +135,7 @@ async function fetchItemsOwedToMember(userEmail) {
 
         if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
             owedItems.push({
-                id: itemOwedToMember.id,
+                id: doc.id,
                 eventId: itemOwedToMember.event?.id || '',
                 eventName: event?.name || 'N/A',
                 itemName: itemOwedToMember.itemName,

@@ -1,6 +1,6 @@
 import React from "react";
-import FairFareControl from "../Components/FairFareControl";
-import MemberSelectControl from "../../../Components/FormControls/MemberSelectControl";
+import FairFareControl from "../../Components/FairFareControl";
+import MemberSelectControl from "../../../../Components/FormControls/MemberSelectControl";
 import {
     Form,
     Col,
@@ -73,22 +73,25 @@ const ItemBody = ({ index, items, setItems, disabled, options, handleItemSplitCh
                 </Form.Label>
                 <Col sm="10">
                 {options.length?
-                    options.map((member, i) => (
-                        <Form.Check 
-                            key={`item-${index}-member-${i}`}
-                            type="checkbox" 
-                            label={member.email}
-                            onChange={() => handleItemSplitChange(index, i)}
-                            checked={items[index].splits[i]?.isChecked}
-                            disabled={disabled}
-                        />
-                    )):
-                    <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
-                        <GoInfo size={20} />
-                        <span style={{marginLeft: "10px"}}>
-                            No members to display. Add members to split the expenses.
-                        </span>
-                    </div>
+                    (
+                        options.map((member, i) => (
+                            <Form.Check 
+                                key={`item-${index}-member-${i}`}
+                                type="checkbox" 
+                                label={member.email}
+                                onChange={() => handleItemSplitChange(index, i)}
+                                checked={items[index].splits[i]?.isChecked}
+                                disabled={disabled}
+                            />
+                        ))
+                    ) : (
+                        <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
+                            <GoInfo size={20} />
+                            <span style={{marginLeft: "10px"}}>
+                                No members to display. Add members to split the expenses.
+                            </span>
+                        </div>
+                    )
                 }
                 </Col>
             </Form.Group>

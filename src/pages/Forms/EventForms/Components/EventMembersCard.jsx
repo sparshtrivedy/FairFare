@@ -1,5 +1,5 @@
 import React, { useEffect, useContext, useState } from "react";
-import { AuthContext } from "../../../App";
+import { AuthContext } from "../../../../App";
 import { 
     Card,
     Button,
@@ -7,14 +7,14 @@ import {
 import {
     GoInfo,
 } from "react-icons/go";
-import { userWithEmailQuery } from "../../../Utils";
+import { userWithEmailQuery } from "../../../../Utils";
 import { getDocs } from "firebase/firestore";
-import { updateMemberSplits } from "../../../Utils";
-import CardHeader from "./CardHeader";
-import CardFooter from "./CardFooter";
-import MemberSelectControl from "../../../Components/FormControls/MemberSelectControl";
+import { updateMemberSplits } from "../../../../Utils";
+import CardHeader from "../../Components/CardHeader";
+import CardFooter from "../../Components/CardFooter";
+import MemberSelectControl from "../../../../Components/FormControls/MemberSelectControl";
 
-const MembersCard = ({ members, event, setEvent, items, setItems, disabled=false }) => {
+const EventMembersCard = ({ members, event, setEvent, items, setItems, disabled=false }) => {
     const { userEmail } = useContext(AuthContext);
     const [contacts, setContacts] = useState([]);
 
@@ -115,4 +115,4 @@ const MembersCard = ({ members, event, setEvent, items, setItems, disabled=false
     )
 }
 
-export default MembersCard;
+export default EventMembersCard;

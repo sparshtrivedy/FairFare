@@ -14,16 +14,13 @@ import {
     Button,
     Spinner,
 } from "react-bootstrap";
-import {
-    GoPerson,
-    GoInfo,
-    GoPersonAdd,
-    GoPeople,
-    GoTrash,
-} from "react-icons/go";
+import { GoInfo, GoTrash } from "react-icons/go";
 import ConfirmationModal from "./Components/ConfirmationModal";
 import SuccessAlert from "../../Components/Alerts/SuccessAlert";
 import ErrorAlert from "../../Components/Alerts/ErrorAlert";
+import CardFooter from "../Forms/Components/CardFooter";
+import FormHeader from "../Forms/Components/FormHeader";
+import CardHeader from "../Forms/Components/CardHeader";
 
 const Contacts = () => {
     const { userEmail } = useContext(AuthContext);
@@ -124,14 +121,7 @@ const Contacts = () => {
                             <Breadcrumb.Item active>Contacts</Breadcrumb.Item>
                         </Breadcrumb>
                         <Card style={{ border: 0 }} className="my-3">
-                            <Card.Header
-                                style={{ backgroundColor: "#80b1b3" }}
-                                as="h4"
-                                className="d-flex align-items-center justify-content-center"
-                            >
-                                <GoPerson size={30} style={{ marginRight: "10px" }} />
-                                Contacts
-                            </Card.Header>
+                            <FormHeader title="Contacts" />
                             <Card.Body>
                                 <Card.Title as="h3">
                                     Manage your contacts
@@ -140,16 +130,7 @@ const Contacts = () => {
                                     Add contacts here and start sharing expenses! Invite your friends and family to join to start splitting bills.
                                 </Card.Subtitle>
                                 <Card>
-                                    <Card.Header
-                                        style={{ backgroundColor: "#80b1b3" }}
-                                        as="h4"
-                                        className="d-flex align-items-center justify-content-center"
-                                    >
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <GoPersonAdd size={25} style={{ marginRight: "10px" }} />
-                                            <span>Add contact</span>
-                                        </div>
-                                    </Card.Header>
+                                    <CardHeader title={"Add contact"} />
                                     <Card.Body>
                                         <ErrorAlert message={memberError} />
                                         <SuccessAlert message={success} />
@@ -165,27 +146,11 @@ const Contacts = () => {
                                             </Col>
                                         </Form.Group>
                                     </Card.Body>
-                                    <Card.Footer style={{ backgroundColor: "#80b1b3" }}>
-                                        <Button variant='primary' onClick={handleAddContact}>
-                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                <GoPersonAdd size={20} />
-                                                <span style={{marginLeft: "10px"}}>Add contact</span>
-                                            </div>
-                                        </Button>
-                                    </Card.Footer>
+                                    <CardFooter text="Add contact" handler={handleAddContact} />
                                 </Card>
                                 <br />
                                 <Card>
-                                    <Card.Header
-                                        style={{ backgroundColor: "#80b1b3" }}
-                                        as="h4"
-                                        className="d-flex align-items-center justify-content-center"
-                                    >
-                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                            <GoPeople size={25} style={{ marginRight: "10px" }} />
-                                            <span>Added contacts</span>
-                                        </div>
-                                    </Card.Header>
+                                    <CardHeader title="Added contacts" />
                                     <Card.Body>
                                         {isLoading ? (
                                         <div className='d-flex justify-content-center'>

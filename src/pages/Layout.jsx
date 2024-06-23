@@ -1,9 +1,11 @@
-import React, { useEffect, useContext } from 'react'
+import React, { useEffect, useContext, useState } from 'react'
 import { 
     Navbar, 
     Container,
     Nav,
-    Button
+    Button,
+    OverlayTrigger,
+    Tooltip
 } from 'react-bootstrap'
 import {
     Routes, 
@@ -14,8 +16,8 @@ import Home from './Home/Home'
 import SignIn from './Authentication/SignIn'
 import SignUp from './Authentication/SignUp'
 import History from './History/History'
-import CreateEvent from './Forms/EventForms/CreateEvent';
-import CreateItem from './Forms/ItemForms/CreateItem'
+import EventForm from './Forms/EventForms/EventForm';
+import ItemForm from './Forms/ItemForms/ItemForm'
 import Contacts from './Contacts/Contacts'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
@@ -25,10 +27,16 @@ import {
     GoHome,
     GoPlusCircle,
     GoHistory,
-    GoPerson
+    GoPerson,
+    GoVerified,
+    GoUnverified
 } from "react-icons/go";
+import { getDocs } from 'firebase/firestore';
+import { userWithEmailQuery } from '../Utils';
 
 const Layout = () => {
+    const [isVerified, setIsVerified] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail } = useContext(AuthContext);
 
     const navigate = useNavigate();
@@ -38,7 +46,23 @@ const Layout = () => {
         const email = localStorage.getItem('userEmail') || '';
         setIsLoggedIn(loggedIn);
         setUserEmail(email);
-    }, [setIsLoggedIn, setUserEmail]);
+
+        const checkIsVerified = async () => {
+            setIsLoading(true);
+            const memberQuery = userWithEmailQuery(userEmail);
+            const memberQuerySnapshot = await getDocs(memberQuery);
+
+            if (!memberQuerySnapshot.empty) {
+                const verified = memberQuerySnapshot.docs[0].data().isVerified;
+                setIsVerified(verified);
+            }
+            setIsLoading(false);
+        }
+
+        if (loggedIn) {
+            checkIsVerified();
+        }
+    }, [setIsLoggedIn, setUserEmail, userEmail]);
 
     const handleLogout = () => {
         setIsLoggedIn(false);
@@ -83,7 +107,26 @@ const Layout = () => {
                         </Nav>
                         <Nav>
                             <Navbar.Text style={{marginRight: '15px'}}>
-                                {isLoggedIn ? `Hello, ${userEmail}` : 
+                                {isLoggedIn ?
+                                    <Container className='d-flex align-items-center'>
+                                        {isVerified && !isLoading && 
+                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Un-verified</Tooltip>}>
+                                                <span>
+                                                    <GoVerified size={20} className='text-success' />
+                                                </span>
+                                            </OverlayTrigger>
+                                        }
+                                        {!isVerified && !isLoading && 
+                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Verified</Tooltip>}>
+                                                <span>
+                                                    <GoUnverified size={20} className='text-warning' />
+                                                </span>
+                                            </OverlayTrigger>
+                                        }
+                                        <span style={{marginLeft: '5px'}}>
+                                            Hello, {userEmail}
+                                        </span>
+                                    </Container> :
                                     <Button variant='primary' href='#sign-in'>Sign-in</Button>
                                 }
                             </Navbar.Text>
@@ -98,13 +141,13 @@ const Layout = () => {
                 <Routes>
                     <Route path="/home" element={<Home />} />
 
-                    <Route path="/create-event" element={<CreateEvent mode={'create'} />} />
-                    <Route path="/view-event/:eventId" element={<CreateEvent mode={'view'} />} />
-                    <Route path="/edit-event/:eventId" element={<CreateEvent mode={'edit'} />} />
+                    <Route path="/create-event" element={<EventForm mode={'create'} />} />
+                    <Route path="/view-event/:eventId" element={<EventForm mode={'view'} />} />
+                    <Route path="/edit-event/:eventId" element={<EventForm mode={'edit'} />} />
 
-                    <Route path="/create-item" element={<CreateItem />} />
-                    <Route path="/view-item/:itemId" element={<CreateItem disabled={true} />} />
-                    <Route path="/edit-item/:itemId" element={<CreateItem mode={'edit'} />} />
+                    <Route path="/create-item" element={<ItemForm mode={'create'} />} />
+                    <Route path="/view-item/:itemId" element={<ItemForm mode={'view'} />} />
+                    <Route path="/edit-item/:itemId" element={<ItemForm mode={'edit'} />} />
 
                     <Route path="/history" element={<History />} />
                     <Route path="/contacts" element={<Contacts />} />

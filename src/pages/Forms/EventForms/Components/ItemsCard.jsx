@@ -4,9 +4,11 @@ import {
     Button,
     Accordion
 } from 'react-bootstrap';
-import { GoRows, GoWorkflow, GoTrash, GoInfo } from 'react-icons/go';
-import { updateMemberSplits } from '../../../Utils';
+import { GoTrash, GoInfo } from 'react-icons/go';
+import { updateMemberSplits } from '../../../../Utils';
 import ItemBody from './ItemBody';
+import CardFooter from '../../Components/CardFooter';
+import CardHeader from '../../Components/CardHeader';
 
 const ItemsCard = ({ event, items, setItems, disabled=false }) => {
     const handleAddItems = () => {
@@ -33,12 +35,9 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
 
     return (
         <Card className='my-3'>
-            <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className='display-flex align-items-center'>
-                <GoRows size={25} />
-                <span style={{marginLeft: '10px'}}>Items</span>
-            </Card.Header>
+            <CardHeader title="Items" />
             <Card.Body>
-            {items.length? 
+            {items.length? (
                 <Accordion>
                     {items.map((item, index) => (
                         <Accordion.Item eventKey={index} key={`item-${index}`}>
@@ -71,24 +70,18 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                             </Accordion.Body>
                         </Accordion.Item>
                     ))}
-                </Accordion> :
+                </Accordion> 
+            ) : (
                 <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
                     <GoInfo size={20} />
                     <span style={{marginLeft: "10px"}}>
                         No items to display. Add items to split the expenses.
                     </span>
                 </div>
-            }
+            )}
             </Card.Body>
             {!disabled &&
-                <Card.Footer style={{backgroundColor: '#80b1b3'}}>
-                    <Button variant='primary' onClick={handleAddItems}>   
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                            <GoWorkflow size={20} />
-                            <span style={{marginLeft: "10px"}}>Add item</span>
-                        </div>
-                    </Button>
-                </Card.Footer>
+                <CardFooter text={"Add item"} handler={handleAddItems} />
             }
         </Card>
     )
