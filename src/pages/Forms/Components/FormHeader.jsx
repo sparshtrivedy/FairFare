@@ -10,12 +10,12 @@ import {
 } from "react-icons/go";
 
 const TitleIconMap = {
-    "Create Event": <GoPlusCircle size={30} style={{ marginRight: "10px" }} />,
-    "View Event": <GoEye size={30} style={{ marginRight: "10px" }} />,  
-    "Edit Event": <GoPencil size={30} style={{ marginRight: "10px" }} />,
-    "Create Item": <GoPlusCircle size={30} style={{ marginRight: "10px" }} />,
-    "View Item": <GoEye size={30} style={{ marginRight: "10px" }} />,
-    "Edit Item": <GoPencil size={30} style={{ marginRight: "10px" }} />,
+    "Create event": <GoPlusCircle size={30} style={{ marginRight: "10px" }} />,
+    "View event": <GoEye size={30} style={{ marginRight: "10px" }} />,  
+    "Edit event": <GoPencil size={30} style={{ marginRight: "10px" }} />,
+    "Create item": <GoPlusCircle size={30} style={{ marginRight: "10px" }} />,
+    "View item": <GoEye size={30} style={{ marginRight: "10px" }} />,
+    "Edit item": <GoPencil size={30} style={{ marginRight: "10px" }} />,
     "History": <GoHistory size={30} style={{ marginRight: "10px" }} />,
     "Dashboard": <GoTable size={30} style={{ marginRight: "10px" }} />,
     "Contacts": <GoPerson size={30} style={{ marginRight: "10px" }} />,

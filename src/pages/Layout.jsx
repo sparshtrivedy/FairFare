@@ -90,11 +90,11 @@ const Layout = () => {
                             </Nav.Link>
                             <Nav.Link href="/#/create-event" className='d-flex align-items-center'>
                                 <GoPlusCircle size={20} />
-                                <span style={{ marginLeft: "5px" }}>Create Event</span>
+                                <span style={{ marginLeft: "5px" }}>Event</span>
                             </Nav.Link>
                             <Nav.Link href="/#/create-item" className='d-flex align-items-center'>
                                 <GoPlusCircle size={20} />
-                                <span style={{ marginLeft: "5px" }}>Create Item</span>
+                                <span style={{ marginLeft: "5px" }}>Item</span>
                             </Nav.Link>
                             <Nav.Link href="/#/history" className='d-flex align-items-center'>
                                 <GoHistory size={20} />
@@ -110,21 +110,21 @@ const Layout = () => {
                                 {isLoggedIn ?
                                     <Container className='d-flex align-items-center'>
                                         {isVerified && !isLoading && 
-                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Un-verified</Tooltip>}>
+                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Verified</Tooltip>}>
                                                 <span>
                                                     <GoVerified size={20} className='text-success' />
                                                 </span>
                                             </OverlayTrigger>
                                         }
                                         {!isVerified && !isLoading && 
-                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Verified</Tooltip>}>
+                                            <OverlayTrigger placement="bottom" overlay={<Tooltip>Un-verified</Tooltip>}>
                                                 <span>
                                                     <GoUnverified size={20} className='text-warning' />
                                                 </span>
                                             </OverlayTrigger>
                                         }
-                                        <span style={{marginLeft: '5px'}}>
-                                            Hello, {userEmail}
+                                        <span style={{marginLeft: '10px'}}>
+                                            {userEmail}
                                         </span>
                                     </Container> :
                                     <Button variant='primary' href='#sign-in'>Sign-in</Button>

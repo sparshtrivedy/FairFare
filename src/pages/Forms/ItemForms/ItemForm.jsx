@@ -52,15 +52,24 @@ const ItemForm = ({ mode }) => {
                 if (memberData.length > 0) setContacts(memberData);
             }
 
-            if (itemId) {
+            if (mode === 'view' || mode === 'edit') {
                 const itemWithId = await getItemById(itemId);
                 setItem(itemWithId);
+            } else {
+                setItem({
+                    event: null,
+                    itemName: '',
+                    itemPrice: 0,
+                    itemQuantity: 0,
+                    transferTo: '',
+                    splits: []
+                });
             }
             setIsLoading(false);
         }
         
         fetchContacts();
-    }, [itemId, userEmail]);
+    }, [itemId, mode, userEmail]);
 
     const isValidated = () => {
         if (item.itemName === '' ||
@@ -135,19 +144,19 @@ const ItemForm = ({ mode }) => {
                 <Col sm={10} xs={12}>
                     <Breadcrumb className="my-2">
                         <Breadcrumb.Item href='/#/home'>Home</Breadcrumb.Item>
-                        {mode === 'create' && <Breadcrumb.Item active>Create Item</Breadcrumb.Item>}
+                        {mode === 'create' && <Breadcrumb.Item active>Create item</Breadcrumb.Item>}
                         {mode === 'edit' && 
                             <>
-                                <Breadcrumb.Item href={`/#/view-item/${itemId}`}>View Item</Breadcrumb.Item>
-                                <Breadcrumb.Item active>Edit Item</Breadcrumb.Item>
+                                <Breadcrumb.Item href={`/#/view-item/${itemId}`}>View item</Breadcrumb.Item>
+                                <Breadcrumb.Item active>Edit item</Breadcrumb.Item>
                             </>
                         }
-                        {mode === 'view' && <Breadcrumb.Item active>View Item</Breadcrumb.Item>}
+                        {mode === 'view' && <Breadcrumb.Item active>View item</Breadcrumb.Item>}
                     </Breadcrumb>
                     <Card style={{border: 0}} className='my-3'>
-                        {mode === 'view' && <FormHeader title={"View Item"} />}
-                        {mode === 'create' && <FormHeader title={"Create Item"} />}
-                        {mode === 'edit' && <FormHeader title={"Edit Item"} />}
+                        {mode === 'view' && <FormHeader title={"View item"} />}
+                        {mode === 'create' && <FormHeader title={"Create item"} />}
+                        {mode === 'edit' && <FormHeader title={"Edit item"} />}
                         <Card.Body style={{backgroundColor: '#f7fafa', paddingBottom: 0}}>
                             <ErrorAlert message={error} />
                             {mode === 'create' &&

@@ -9,7 +9,7 @@ import {
     Col,
     Container,
     Breadcrumb,
-    Table,
+    ListGroup,
     Form,
     Button,
     Spinner,
@@ -129,6 +129,7 @@ const Contacts = () => {
                                 <Card.Subtitle className="mb-2 text-muted">
                                     Add contacts here and start sharing expenses! Invite your friends and family to join to start splitting bills.
                                 </Card.Subtitle>
+                                <ConfirmationModal show={showConfirmation} setShow={setShowConfirmation} handleRemove={handleRemoveContact} contact={removeContact} />
                                 <Card>
                                     <CardHeader title={"Add contact"} />
                                     <Card.Body>
@@ -151,63 +152,45 @@ const Contacts = () => {
                                 <br />
                                 <Card>
                                     <CardHeader title="Added contacts" />
-                                    <Card.Body>
-                                        {isLoading ? (
+                                    {isLoading ? (
                                         <div className='d-flex justify-content-center'>
                                             <Spinner animation="border" size='lg' className='m-3' />
                                         </div>
                                         ) : (
-                                        <div style={{ overflowX: "auto" }}>
-                                            <Table striped bordered hover className='p-0 m-0'>
-                                                <thead>
-                                                    <tr>
-                                                        <th class="col-md-1">#</th>
-                                                        <th class="col-md-10">Email</th>
-                                                        <th class="col-md-1">Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {!contacts.length ? (
-                                                        <tr>
-                                                            <td colSpan={5}>
-                                                                <div style={{ display: "flex", alignItems: "center", justifyContent: 'center' }} className='text-muted'>
-                                                                    <GoInfo size={20} />
-                                                                    <span style={{marginLeft: "10px"}}>
-                                                                        You have no contacts. Add some to get started!
-                                                                    </span>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
-                                                    ) : (
-                                                        contacts.map((email, index) => (
-                                                            <tr key={index}>
-                                                                <td>{index + 1}</td>
-                                                                <td>{email}</td>
-                                                                <td>
-                                                                    <Button variant='danger' onClick={() => {
-                                                                        setRemoveContact(email);
-                                                                        setShowConfirmation(true);
-                                                                    }}>
-                                                                        <div style={{ display: "flex", alignItems: "center" }}>
-                                                                            <GoTrash size={20} />
-                                                                            <span style={{marginLeft: "10px"}}>Remove</span>
-                                                                        </div>
-                                                                    </Button>
-                                                                </td>
-                                                            </tr>
-                                                        ))
-                                                    )}
-                                                </tbody>
-                                            </Table>
-                                        </div>)}
-                                    </Card.Body>
+                                        <>
+                                        {contacts.length ? (
+                                            <ListGroup variant="flush">
+                                                {contacts.map((contact, index) => (
+                                                    <ListGroup.Item key={index} className='d-flex justify-content-between align-items-center'>
+                                                        <span>{contact}</span>
+                                                        <Button variant='danger' onClick={() => {
+                                                            setRemoveContact(contact);
+                                                            setShowConfirmation(true);
+                                                        }}>
+                                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                                <GoTrash size={20} />
+                                                                <span style={{marginLeft: "10px"}}>Remove</span>
+                                                            </div>
+                                                        </Button>
+                                                    </ListGroup.Item>
+                                                ))}
+                                            </ListGroup>
+                                        ) : (
+                                            <Card.Text className='d-flex align-items-center text-muted p-3'>
+                                                <GoInfo size={20} />
+                                                <span style={{marginLeft: "10px"}}>
+                                                    No contacts to display. Add contacts to start sharing expenses.
+                                                </span>
+                                            </Card.Text>
+                                        )}
+                                        </>
+                                    )}
                                 </Card>
                             </Card.Body>
                         </Card>
                     </Col>
                 </Row>
             </Container>
-            <ConfirmationModal show={showConfirmation} setShow={setShowConfirmation} handleRemove={handleRemoveContact} contact={removeContact} />
         </>
     );
 }
