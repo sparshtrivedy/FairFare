@@ -168,7 +168,8 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                         itemQuantity: item.itemQuantity,
                         amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                         splits: item.splits.filter(member => member.isChecked),
-                        members: [item.transferTo]
+                        members: [item.transferTo],
+                        transferTo: item.transferTo
                     });
                 }
             }
@@ -234,7 +235,8 @@ export const fetchItemsSettledByMember = async (userEmail) => {
                         itemQuantity: item.itemQuantity,
                         amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                         splits: item.splits.filter(member => member.isChecked),
-                        members: [item.transferTo]
+                        members: [item.transferTo],
+                        transferTo: item.transferTo
                     });
                 }
             }

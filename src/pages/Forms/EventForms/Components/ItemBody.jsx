@@ -6,7 +6,7 @@ import {
     Col,
     Row,
 } from "react-bootstrap";
-import { GoInfo } from "react-icons/go";
+import EmptyListText from "../../../../Components/CardText/EmptyListText";
 
 const ItemBody = ({ index, items, setItems, disabled, options, handleItemSplitChange }) => {
     return (
@@ -85,12 +85,7 @@ const ItemBody = ({ index, items, setItems, disabled, options, handleItemSplitCh
                             />
                         ))
                     ) : (
-                        <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
-                            <GoInfo size={20} />
-                            <span style={{marginLeft: "10px"}}>
-                                No members to display. Add members to split the expenses.
-                            </span>
-                        </div>
+                        <EmptyListText id="members" />
                     )
                 }
                 </Col>

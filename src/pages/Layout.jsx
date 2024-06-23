@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState } from 'react'
+import React, { useEffect, useContext } from 'react'
 import { 
     Navbar, 
     Container,
@@ -31,44 +31,27 @@ import {
     GoVerified,
     GoUnverified
 } from "react-icons/go";
-import { getDocs } from 'firebase/firestore';
-import { userWithEmailQuery } from '../Utils';
 
 const Layout = () => {
-    const [isVerified, setIsVerified] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail } = useContext(AuthContext);
+    const { setIsLoggedIn, setUserEmail, isLoggedIn, userEmail, isVerified, setIsVerified } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
     useEffect(() => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const email = localStorage.getItem('userEmail') || '';
+        const verified = localStorage.getItem('isVerified') === 'true';
         setIsLoggedIn(loggedIn);
         setUserEmail(email);
-
-        const checkIsVerified = async () => {
-            setIsLoading(true);
-            const memberQuery = userWithEmailQuery(userEmail);
-            const memberQuerySnapshot = await getDocs(memberQuery);
-
-            if (!memberQuerySnapshot.empty) {
-                const verified = memberQuerySnapshot.docs[0].data().isVerified;
-                setIsVerified(verified);
-            }
-            setIsLoading(false);
-        }
-
-        if (loggedIn) {
-            checkIsVerified();
-        }
-    }, [setIsLoggedIn, setUserEmail, userEmail]);
+        setIsVerified(verified);
+    }, [setIsLoggedIn, setUserEmail, setIsVerified, userEmail]);
 
     const handleLogout = () => {
         setIsLoggedIn(false);
         setUserEmail('');
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userEmail');
+        localStorage.removeItem('isVerified');
         navigate('/sign-in');
     }
 
@@ -109,14 +92,12 @@ const Layout = () => {
                             <Navbar.Text style={{marginRight: '15px'}}>
                                 {isLoggedIn ?
                                     <Container className='d-flex align-items-center'>
-                                        {isVerified && !isLoading && 
+                                        {isVerified ? 
                                             <OverlayTrigger placement="bottom" overlay={<Tooltip>Verified</Tooltip>}>
                                                 <span>
                                                     <GoVerified size={20} className='text-success' />
                                                 </span>
-                                            </OverlayTrigger>
-                                        }
-                                        {!isVerified && !isLoading && 
+                                            </OverlayTrigger> :
                                             <OverlayTrigger placement="bottom" overlay={<Tooltip>Un-verified</Tooltip>}>
                                                 <span>
                                                     <GoUnverified size={20} className='text-warning' />

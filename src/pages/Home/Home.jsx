@@ -24,7 +24,7 @@ import EmailVerificationAlert from "../../Components/Alerts/EmailVerificationAle
 import FormHeader from "../Forms/Components/FormHeader";
 
 const Home = () => {
-    const { userEmail } = useContext(AuthContext);
+    const { userEmail, setIsVerified } = useContext(AuthContext);
 
     const [eventsLentToUser, setEventsLentToUser] = useState([]);
     const [itemsOwedToUser, setItemsOwedToUser] = useState([]);
@@ -44,10 +44,10 @@ const Home = () => {
             const user = auth.currentUser;
 
             const memberQuery = userWithEmailQuery(userEmail);
-            const memberQuerySnapshot = await getDocs(memberQuery);
-            const memberDoc = memberQuerySnapshot.docs[0];
+            const memberDoc = (await getDocs(memberQuery)).docs[0];
             const memberData = memberDoc.data();
             if (memberData && !memberData.isVerified) {
+                setIsVerified(user.emailVerified);
                 await updateDoc(memberDoc.ref, {
                     isVerified: user.emailVerified
                 });
@@ -62,7 +62,7 @@ const Home = () => {
         };
 
         fetchOwedAndLent();
-    }, [userEmail]);
+    }, [userEmail, setIsVerified]);
 
     return (
         <Container style={{ height: "100%" }}>
@@ -143,7 +143,8 @@ async function fetchItemsOwedToMember(userEmail) {
                 itemQuantity: itemOwedToMember.itemQuantity,
                 amount: unsettledItemTotal.toFixed(2),
                 splits: itemSplits,
-                members: unsettledMembers
+                members: unsettledMembers,
+                transferTo: itemOwedToMember.transferTo
             });
         }
     }

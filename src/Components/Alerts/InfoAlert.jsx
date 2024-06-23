@@ -5,9 +5,12 @@ import { GoInfo } from 'react-icons/go';
 const InfoAlert = ({ message, altText, altLink }) => {
     return (
         <Alert variant={'primary'} className="d-flex align-items-center">
-            <GoInfo size={30} style={{ marginRight: '10px' }} />
-            {message}
-            <Alert.Link href={altLink} style={{ marginLeft: '5px' }}>{altText}</Alert.Link>.
+            <div>
+                <GoInfo size={25} style={{ marginRight: '10px' }} />
+            </div>
+            <div>
+                {message} <Alert.Link href={altLink}>{altText}</Alert.Link>.
+            </div>
         </Alert>
     )
 }

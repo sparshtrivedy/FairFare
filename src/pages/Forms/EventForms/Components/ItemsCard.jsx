@@ -4,11 +4,12 @@ import {
     Button,
     Accordion
 } from 'react-bootstrap';
-import { GoTrash, GoInfo } from 'react-icons/go';
+import { GoTrash } from 'react-icons/go';
 import { updateMemberSplits } from '../../../../Utils';
 import ItemBody from './ItemBody';
 import CardFooter from '../../Components/CardFooter';
 import CardHeader from '../../Components/CardHeader';
+import EmptyListText from '../../../../Components/CardText/EmptyListText';
 
 const ItemsCard = ({ event, items, setItems, disabled=false }) => {
     const handleAddItems = () => {
@@ -72,12 +73,7 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
                     ))}
                 </Accordion> 
             ) : (
-                <div style={{ display: "flex", alignItems: "center" }} className='text-muted'>
-                    <GoInfo size={20} />
-                    <span style={{marginLeft: "10px"}}>
-                        No items to display. Add items to split the expenses.
-                    </span>
-                </div>
+                <EmptyListText id="items" />
             )}
             </Card.Body>
             {!disabled &&

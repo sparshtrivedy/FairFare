@@ -69,7 +69,7 @@ const ViewSummary = ({
                                         <OffcanvasControl label="Share" type="number" value={split?.amount} />
                                     </div>
                                     <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        {(!transferTo && split.email === userEmail) || split.email === transferTo || split.amount === 0 ?
+                                        {split.email === transferTo || split.amount === 0 ?
                                         <Button variant="secondary" disabled>
                                             <div style={{ display: "flex", alignItems: "center" }}>
                                                 <GoCircleSlash size={20} />

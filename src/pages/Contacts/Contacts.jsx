@@ -14,13 +14,14 @@ import {
     Button,
     Spinner,
 } from "react-bootstrap";
-import { GoInfo, GoTrash } from "react-icons/go";
+import { GoTrash } from "react-icons/go";
 import ConfirmationModal from "./Components/ConfirmationModal";
 import SuccessAlert from "../../Components/Alerts/SuccessAlert";
 import ErrorAlert from "../../Components/Alerts/ErrorAlert";
 import CardFooter from "../Forms/Components/CardFooter";
 import FormHeader from "../Forms/Components/FormHeader";
 import CardHeader from "../Forms/Components/CardHeader";
+import EmptyListText from "../../Components/CardText/EmptyListText";
 
 const Contacts = () => {
     const { userEmail } = useContext(AuthContext);
@@ -122,7 +123,7 @@ const Contacts = () => {
                         </Breadcrumb>
                         <Card style={{ border: 0 }} className="my-3">
                             <FormHeader title="Contacts" />
-                            <Card.Body>
+                            <Card.Body style={{ backgroundColor: '#f7fafa' }}>
                                 <Card.Title as="h3">
                                     Manage your contacts
                                 </Card.Title>
@@ -153,14 +154,16 @@ const Contacts = () => {
                                 <Card>
                                     <CardHeader title="Added contacts" />
                                     {isLoading ? (
-                                        <div className='d-flex justify-content-center'>
-                                            <Spinner animation="border" size='lg' className='m-3' />
-                                        </div>
+                                        <Card.Body>
+                                            <div className='d-flex justify-content-center'>
+                                                <Spinner animation="border" size='lg' className='m-3' />
+                                            </div>
+                                        </Card.Body>
                                         ) : (
                                         <>
                                         {contacts.length ? (
                                             <div style={{ overflowX: "auto", width: '100%' }}>
-                                                <ListGroup variant="flush">
+                                                <ListGroup variant="flush" className='border-0 rounded'>
                                                     {contacts.map((contact, index) => (
                                                         <ListGroup.Item key={index} className='d-flex justify-content-between align-items-center'>
                                                             <span>{contact}</span>
@@ -177,12 +180,9 @@ const Contacts = () => {
                                                 </ListGroup>
                                             </div>
                                         ) : (
-                                            <Card.Text className='d-flex align-items-center text-muted p-3'>
-                                                <GoInfo size={20} />
-                                                <span style={{marginLeft: "10px"}}>
-                                                    No contacts to display. Add contacts to start sharing expenses.
-                                                </span>
-                                            </Card.Text>
+                                            <Card.Body>
+                                                <EmptyListText id="contacts" />
+                                            </Card.Body>
                                         )}
                                         </>
                                     )}
