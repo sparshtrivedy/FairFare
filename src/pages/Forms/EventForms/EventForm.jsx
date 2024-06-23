@@ -7,7 +7,6 @@ import {
     Breadcrumb,
     Spinner
 } from "react-bootstrap";
-import { addEvent, addItem } from "../../../Utils";
 import '../../pages.css';
 import ErrorAlert from "../../../Components/Alerts/ErrorAlert";
 import InfoAlert from "../../../Components/Alerts/InfoAlert";
@@ -17,14 +16,8 @@ import FairFareControl from "../Components/FairFareControl";
 import EventMembersCard from "./Components/EventMembersCard";
 import ItemsCard from "./Components/ItemsCard";
 import { useParams } from "react-router-dom";
-import {
-    getEventById,
-    getItemsByEventId,
-    updateEvent,
-    getEventRef,
-    getItemRef,
-    updateItem
-} from "../../../Utils";
+import { getItemsByEventId } from "../../../Utils";
+import { getEventRef, getItemRef, updateEvent, updateItem, addEvent, addItem, getEventById } from "../../../Queries";
 
 const EventForm = ({ mode }) => {
     const eventId = useParams().eventId;
@@ -42,11 +35,13 @@ const EventForm = ({ mode }) => {
     useEffect(() => {
         const getEvent = async () => {
             setIsLoading(true);
+
             const eventForEventId = await getEventById(eventId);
             setEvent(eventForEventId);
 
             const itemsForEvent = await getItemsByEventId(eventId);
             setItems(itemsForEvent);
+
             setIsLoading(false);
         }
 
@@ -110,6 +105,7 @@ const EventForm = ({ mode }) => {
                 return;
             }
             setError('');
+
             const eventRef = await addEvent(event);
 
             for (const item of items) {
@@ -131,8 +127,11 @@ const EventForm = ({ mode }) => {
             
             const eventRef = getEventRef(eventId);
             await updateEvent(eventRef, event);
+
             for (const item of items) {
-                const shareOfItem = (item.itemPrice * item.itemQuantity) / item.splits.filter(split => split.isChecked && !split.isSettled).length;
+                const numChecked = item.splits.filter(split => split.isChecked).length;
+                const shareOfItem = (item.itemPrice * item.itemQuantity) / numChecked;
+
                 let copiedItem = { ...item };
                 copiedItem.splits = copiedItem.splits.map((split) => {
                     return {
@@ -140,6 +139,7 @@ const EventForm = ({ mode }) => {
                         amount: shareOfItem.toFixed(2)
                     }
                 });
+                
                 if (!item.id) {
                     const itemRef = await addItem(copiedItem, eventRef);
                     item.id = itemRef.id;

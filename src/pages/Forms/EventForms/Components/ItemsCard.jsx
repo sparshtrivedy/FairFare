@@ -30,7 +30,7 @@ const ItemsCard = ({ event, items, setItems, disabled=false }) => {
     const handleItemSplitChange = (index, i) => {
         let copiedItems = [...items];
         copiedItems[index].splits[i].isChecked = !copiedItems[index].splits[i].isChecked;
-        updateMemberSplits(event.members, copiedItems, index);
+        updateMemberSplits(copiedItems, index);
         setItems(copiedItems);
     }
 

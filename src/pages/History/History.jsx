@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
 import { AuthContext } from '../../App';
-import { getDocs, getDoc } from "firebase/firestore";
 import {
     Tabs,
     Tab,
@@ -15,10 +14,7 @@ import {
     GoFoldDown,
     GoFoldUp,
 } from "react-icons/go";
-import {
-    itemsWithTransferToMemberQuery,
-    fetchItemsSettledByMember
-} from '../../Utils';
+import { getItemsYouOwe, getItemsOwedToYou } from '../../Utils';
 import '../pages.css';
 import SummaryTable from '../../Components/Tables/SummaryTable';
 import FormHeader from '../Forms/Components/FormHeader';
@@ -33,10 +29,10 @@ const History = () => {
         const fetchOwedAndLent = async () => {
             setIsLoading(true);
 
-            const eventsLentToMember = await fetchItemsSettledByMember(userEmail);
+            const eventsLentToMember = await getItemsYouOwe(userEmail, 'settled');
             setOwedItems(eventsLentToMember);
 
-            const settledOwedItems = await fetchItemsOwedToMember(userEmail);
+            const settledOwedItems = await getItemsOwedToYou(userEmail, 'settled');
             setLentItems(settledOwedItems);
 
             setIsLoading(false);
@@ -104,59 +100,3 @@ const History = () => {
 }
 
 export default History;
-
-async function fetchItemsOwedToMember(userEmail) {
-    const itemsOwedToMemberQuery = itemsWithTransferToMemberQuery(userEmail);
-    const itemsOwedToMemberSnapshot = await getDocs(itemsOwedToMemberQuery);
-    const itemsOwedToMemberDocs = itemsOwedToMemberSnapshot.docs;
-
-    const owedItems = [];
-
-    for (const doc of itemsOwedToMemberDocs) {
-        const itemOwedToMember = doc.data();
-        let event = '';
-
-        if (itemOwedToMember.event !== null) {
-            const eventRef = await getDoc(itemOwedToMember.event);
-            event = eventRef.data();
-        }
-
-        const itemSplits = itemOwedToMember.splits.filter(
-            split => split.isChecked
-        );
-
-        const settledItemTotal = calculateSettledTotal(
-            itemSplits,
-            itemOwedToMember,
-            userEmail
-        );
-
-        const settledMembers = itemSplits
-            .filter(member => member.isSettled && member.email !== userEmail)
-            .map(member => member.email);
-
-        settledItemTotal && owedItems.push({
-            id: doc.id,
-            eventId: itemOwedToMember.event?.id || '',
-            eventName: event?.name || 'N/A',
-            itemName: itemOwedToMember.itemName,
-            itemPrice: itemOwedToMember.itemPrice,
-            itemQuantity: itemOwedToMember.itemQuantity,
-            amount: settledItemTotal.toFixed(2),
-            members: settledMembers,
-            splits: itemSplits.filter(split => split.isChecked),
-            transferTo: itemOwedToMember.transferTo
-        });
-    }
-
-    return owedItems;
-}
-
-function calculateSettledTotal(itemSplits, itemOwedToMember, userEmail) {
-    const numSettled = itemSplits.filter((split) => split.isSettled && split.email !== userEmail).length;
-    const numMembers = itemSplits.length;
-
-    const settledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numSettled) / numMembers;
-    
-    return settledTotal;
-}
