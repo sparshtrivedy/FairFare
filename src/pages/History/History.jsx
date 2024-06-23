@@ -55,13 +55,14 @@ const History = () => {
                     </Breadcrumb>
                     <Card style={{ border: 0 }} className="my-3">
                         <FormHeader title="History" />
-                        <Card.Body>
+                        <Card.Body style={{ backgroundColor: '#f7fafa' }}>
                             <Tabs
                                 defaultActiveKey="paid-by-you"
                                 id="uncontrolled-tab-example"
                                 className="mb-3"
+                                fill
                             >
-                                <Tab 
+                                <Tab
                                     eventKey="paid-by-you" 
                                     title={
                                     <>
@@ -143,7 +144,8 @@ async function fetchItemsOwedToMember(userEmail) {
             itemQuantity: itemOwedToMember.itemQuantity,
             amount: settledItemTotal.toFixed(2),
             members: settledMembers,
-            splits: itemSplits.filter(split => split.isChecked)
+            splits: itemSplits.filter(split => split.isChecked),
+            transferTo: itemOwedToMember.transferTo
         });
     }
 
