@@ -30,6 +30,7 @@ const ItemMembersCard = ({ item, setItem, contacts, mode }) => {
                 </Card.Text>}
                 {item.splits.map((split, index) => (
                     <MemberSelectControl
+                        key={index}
                         index={index}
                         disabled={mode === 'view'}
                         handleChange={(e) => {

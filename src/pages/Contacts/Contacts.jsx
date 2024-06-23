@@ -159,22 +159,23 @@ const Contacts = () => {
                                         ) : (
                                         <>
                                         {contacts.length ? (
-                                            <ListGroup variant="flush">
-                                                {contacts.map((contact, index) => (
-                                                    <ListGroup.Item key={index} className='d-flex justify-content-between align-items-center'>
-                                                        <span>{contact}</span>
-                                                        <Button variant='danger' onClick={() => {
-                                                            setRemoveContact(contact);
-                                                            setShowConfirmation(true);
-                                                        }}>
-                                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                                <GoTrash size={20} />
-                                                                <span style={{marginLeft: "10px"}}>Remove</span>
-                                                            </div>
-                                                        </Button>
-                                                    </ListGroup.Item>
-                                                ))}
-                                            </ListGroup>
+                                            <div style={{ overflowX: "auto", width: '100%' }}>
+                                                <ListGroup variant="flush">
+                                                    {contacts.map((contact, index) => (
+                                                        <ListGroup.Item key={index} className='d-flex justify-content-between align-items-center'>
+                                                            <span>{contact}</span>
+                                                            <Button variant='danger' onClick={() => {
+                                                                setRemoveContact(contact);
+                                                                setShowConfirmation(true);
+                                                            }}>
+                                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                                    <GoTrash size={20} />
+                                                                </div>
+                                                            </Button>
+                                                        </ListGroup.Item>
+                                                    ))}
+                                                </ListGroup>
+                                            </div>
                                         ) : (
                                             <Card.Text className='d-flex align-items-center text-muted p-3'>
                                                 <GoInfo size={20} />
