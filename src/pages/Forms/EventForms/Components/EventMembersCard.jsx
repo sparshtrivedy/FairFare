@@ -92,6 +92,7 @@ const EventMembersCard = ({ members, event, setEvent, items, setItems, disabled=
                 {members?.length ? 
                     members.map((member, index) => (
                         <MemberSelectControl
+                            key={index}
                             index={index}
                             disabled={disabled}
                             handleChange={handleUpdateMember}
