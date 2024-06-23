@@ -5,93 +5,22 @@ import {
     where,
     getDoc,
     getDocs,
-    addDoc,
     doc,
-    updateDoc,
 } from "firebase/firestore";
+import {
+    eventsContainingMemberQuery,
+    itemsInEventQuery,
+    itemsWithoutEventQuery,
+    itemsWithTransferToMemberQuery,
+} from './Queries';
 
-export const eventsContainingMemberQuery = (userEmail) => {
-    return query(
-        collection(db, "events"), 
-        where("members", "array-contains", {
-            email: userEmail
-        })
-    );
-};
+export const updateMemberSplits = (copiedItems, index) => {
+    const totalChecked = copiedItems[index].splits.filter(item => item.isChecked).length;
+    const sharedAmount = (copiedItems[index].itemPrice * copiedItems[index].itemQuantity) / totalChecked;
 
-export const itemsWithTransferToMemberQuery = (userEmail) => {
-    return query(
-        collection(db, "items"), 
-        where("transferTo", "==", userEmail)
-    );
-};
-
-export const itemsInEventQuery = (eventRef) => {
-    return query(
-        collection(db, "items"), 
-        where("event", "==", eventRef)
-    );
-};
-
-export const itemsWithoutEventQuery = () => {
-    return query(
-        collection(db, "items"), 
-        where("event", "==", null),
-    );
-}
-
-export const userWithEmailQuery = (email) => {
-    return query(
-        collection(db, 'users'), 
-        where('email', '==', email)
-    );
-}
-
-export const updateMemberSplits = (members, copiedItems, index) => {
-    const totalChecked = copiedItems[index].splits.reduce((acc, split) => {
-        if (split.isChecked) {
-            return acc + 1;
-        }
-        return acc;
-    }, 0);
-
-    for (let j = 0; j < members.length; j++) {
-        if (copiedItems[index].splits[j].isChecked) {
-            copiedItems[index].splits[j].amount = (copiedItems[index].itemPrice * copiedItems[index].itemQuantity) / totalChecked;
-        } else {
-            copiedItems[index].splits[j].amount = 0;
-        }
-    }
-}
-
-export const addEvent = async (event) => {
-    return await addDoc(collection(db, 'events'), {
-        name: event.name,
-        date: event.date,
-        description: event.description,
-        members: event.members,
+    copiedItems[index].splits.forEach(split => {
+        split.amount = split.isChecked ? sharedAmount : 0;
     });
-}
-
-export const addItem = async (item, eventRef) => {
-    return await addDoc(collection(db, 'items'), {
-        event: eventRef,
-        itemName: item.itemName,
-        itemPrice: item.itemPrice,
-        itemQuantity: item.itemQuantity,
-        transferTo: item.transferTo,
-        splits: item.splits
-    });
-}
-
-export const getEventById = async (eventId) => {
-    const eventRef = await getDoc(doc(db, 'events', eventId));
-    return eventRef.data();
-}
-
-export const getItemById = async (itemId) => {
-    const itemRef = await getDoc(doc(db, 'items', itemId));
-    return itemRef.data();
 }
 
 export const getItemsByEventId = async (eventId) => {
@@ -106,63 +35,34 @@ export const getItemsByEventId = async (eventId) => {
     });
 }
 
-export const updateEvent = async (eventRef, event) => {
-    return await updateDoc(eventRef, {
-        name: event.name,
-        date: event.date,
-        description: event.description,
-        members: event.members,
-    });
-}
+export const getItemsYouOwe = async (userEmail, type) => {
+    const itemsYouOwe = [];
 
-export const updateItem = async (itemRef, item) => {
-    return await updateDoc(itemRef, {
-        itemName: item.itemName,
-        itemPrice: item.itemPrice,
-        itemQuantity: item.itemQuantity,
-        transferTo: item.transferTo,
-        splits: item.splits,
-    });
-}
-
-export const getEventRef = (eventId) => {
-    return doc(db, 'events', eventId);
-}
-
-export const getItemRef = (itemId) => {
-    return doc(db, 'items', itemId);
-}
-
-export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
     const itemsWithMemberQuery = eventsContainingMemberQuery(userEmail);
     const itemsWithMemberSnapshot = await getDocs(itemsWithMemberQuery);
-    const itemsWithMemberDocs = itemsWithMemberSnapshot.docs;
-
-    const isolatedItemsQuery = itemsWithoutEventQuery();
-    const isolatedItemsSnapshot = await getDocs(isolatedItemsQuery);
-    const isolatedItemsDocs = isolatedItemsSnapshot.docs;
-
-    const unSettledItems = [];
-    itemsWithMemberDocs.forEach(async (doc) => {
-        const itemsForEventQuery = itemsInEventQuery(doc.ref);
-        const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
-        const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
-            return {
-                id: doc.id,
-                ...doc.data()
-            }
-        });
-        itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
-        for (const item of itemsForEventData) {
-            const splits = item.splits;
-            const numChecked = splits.filter(split => split.isChecked).length;
-            for (const split of splits) {
-                if (split.email === userEmail && split.isChecked && !split.isSettled && item.transferTo !== userEmail) {
-                    unSettledItems.push({
+    itemsWithMemberSnapshot.docs
+        .forEach(async (event) => {
+            const itemsForEventQuery = itemsInEventQuery(event.ref);
+            const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
+            itemsForEventSnapshot.docs
+                .map(item => {
+                    return {
                         id: item.id,
-                        eventId: item.event?.id || '',
-                        eventName: doc.data().name,
-                        eventDate: doc.data().date,
+                        ...item.data()
+                    };
+                })
+                .filter(item => {
+                    return item.splits.find(split => 
+                        item.transferTo !== userEmail && split.email === userEmail && split.isChecked && (type === 'settled' ? split.isSettled : !split.isSettled)
+                    );
+                })
+                .forEach(item => {
+                    const numChecked = item.splits.filter(item => item.isChecked).length;
+                    itemsYouOwe.push({
+                        id: item.id,
+                        eventId: event.id,
+                        eventName: event.data().name,
+                        eventDate: event.data().date,
                         itemName: item.itemName,
                         itemPrice: item.itemPrice,
                         itemQuantity: item.itemQuantity,
@@ -171,129 +71,91 @@ export const fetchEventsWithMember = async (userEmail, isCalculateSettled) => {
                         members: [item.transferTo],
                         transferTo: item.transferTo
                     });
-                }
-            }
-        }
-    });
-
-    isolatedItemsDocs.forEach(async (doc) => {
-        const item = doc.data();
-        const numChecked = item.splits.filter(split => split.isChecked).length;
-        for (const split of item.splits) {
-            if (split.email === userEmail && split.isChecked && !split.isSettled && item.transferTo !== userEmail) {
-                unSettledItems.push({
-                    id: doc.id,
-                    eventId: '',
-                    eventName: 'N/A',
-                    eventDate: 'N/A',
-                    itemName: item.itemName,
-                    itemPrice: item.itemPrice,
-                    itemQuantity: item.itemQuantity,
-                    amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                    splits: item.splits.filter(member => member.isChecked),
-                    members: [item.transferTo]
                 });
-            }
-        }
-    });
-
-    return unSettledItems;
-}
-
-export const fetchItemsSettledByMember = async (userEmail) => {
-    const itemsWithMemberQuery = eventsContainingMemberQuery(userEmail);
-    const itemsWithMemberSnapshot = await getDocs(itemsWithMemberQuery);
-    const itemsWithMemberDocs = itemsWithMemberSnapshot.docs;
+        });
 
     const isolatedItemsQuery = itemsWithoutEventQuery();
     const isolatedItemsSnapshot = await getDocs(isolatedItemsQuery);
-    const isolatedItemsDocs = isolatedItemsSnapshot.docs;
-
-    const settledItems = [];
-    itemsWithMemberDocs.forEach(async (doc) => {
-        const itemsForEventQuery = itemsInEventQuery(doc.ref);
-        const itemsForEventSnapshot = await getDocs(itemsForEventQuery);
-        const itemsForEventData = itemsForEventSnapshot.docs.map((doc) => {
+    isolatedItemsSnapshot.docs
+        .map(item => {
             return {
-                id: doc.id,
-                ...doc.data()
-            }
+                id: item.id,
+                ...item.data()
+            };
+        })
+        .filter(item => {
+            return item.splits.find(split =>
+                split.email === userEmail && split.isChecked && split.isSettled
+            );
+        })
+        .forEach(item => {
+            const numChecked = item.splits.filter(split => split.isChecked).length;
+            itemsYouOwe.push({
+                id: item.id,
+                eventId: '',
+                eventName: 'N/A',
+                eventDate: 'N/A',
+                itemName: item.itemName,
+                itemPrice: item.itemPrice,
+                itemQuantity: item.itemQuantity,
+                youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
+                members: [item.transferTo],
+                transferTo: item.transferTo
+            });
         });
-        itemsForEventData.filter(item => item.splits.find(user => user.email === userEmail && user.isChecked && user.isSettled));
-        for (const item of itemsForEventData) {
-            const splits = item.splits;
-            const numChecked = splits.filter(split => split.isChecked).length;
-            for (const split of splits) {
-                if (split.email === userEmail && split.isChecked && split.isSettled && item.transferTo !== userEmail) {
-                    settledItems.push({
-                        id: item.id,
-                        eventId: item.event.id,
-                        eventName: doc.data().name,
-                        eventDate: doc.data().date,
-                        itemName: item.itemName,
-                        itemPrice: item.itemPrice,
-                        itemQuantity: item.itemQuantity,
-                        amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                        splits: item.splits.filter(member => member.isChecked),
-                        members: [item.transferTo],
-                        transferTo: item.transferTo
-                    });
-                }
-            }
-        }
-    });
 
-    isolatedItemsDocs.forEach(async (doc) => {
-        const item = doc.data();
-        const numChecked = item.splits.filter(split => split.isChecked).length;
-        for (const split of item.splits) {
-            if (split.email === userEmail && split.isChecked && split.isSettled && item.transferTo !== userEmail) {
-                settledItems.push({
-                    id: doc.id,
-                    eventId: '',
-                    eventName: 'N/A',
-                    eventDate: 'N/A',
-                    itemName: item.itemName,
-                    itemPrice: item.itemPrice,
-                    itemQuantity: item.itemQuantity,
-                    youPaid: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
-                    members: [item.transferTo]
-                });
-            }
-        }
-    });
-
-    return settledItems;
+    return itemsYouOwe;
 }
 
-export const calculateUnsettledItemTotal = (itemSplits, userEmail) => {
-    let unsettledItemTotal = 0;
+export const getItemsOwedToYou = async (userEmail, type) => {
+    const itemsOwedToYou = [];
 
-    for (const split of itemSplits) {
-        if (split.transferTo !== userEmail) {
-            for (const user of split) {
-                if (user.email === userEmail && !user.isSettled) {
-                    unsettledItemTotal += user.amount;
-                }
-            }
+    const itemsOwedToMemberQuery = itemsWithTransferToMemberQuery(userEmail);
+    const itemsOwedToMemberSnapshot = await getDocs(itemsOwedToMemberQuery);
+    const itemsOwedToMemberDocs = itemsOwedToMemberSnapshot.docs;
+
+    for (const doc of itemsOwedToMemberDocs) {
+        const itemOwedToMember = doc.data();
+        let event = '';
+
+        if (itemOwedToMember.event !== null) {
+            const eventRef = await getDoc(itemOwedToMember.event);
+            event = eventRef.data();
         }
+
+        const itemSplits = itemOwedToMember.splits.filter(
+            split => split.isChecked
+        );
+
+        const members = itemSplits
+            .filter(member => 
+                member.email !== userEmail && (type === 'settled' ? member.isSettled : !member.isSettled)
+            )
+            .map(member => 
+                member.email
+            );
+        
+        const numMembers = itemSplits.length;
+        const numSettled = itemSplits.filter(split => split.isSettled && split.email !== userEmail).length;
+        const numUnSettled = itemSplits.filter(split => !split.isSettled && split.email !== userEmail).length;
+        
+        const settledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numSettled) / numMembers;
+        const unSettledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numUnSettled) / numMembers;
+        const total = type === 'settled' ? settledTotal : unSettledTotal;
+
+        total && itemsOwedToYou.push({
+            id: doc.id,
+            eventId: itemOwedToMember.event?.id || '',
+            eventName: event?.name || 'N/A',
+            itemName: itemOwedToMember.itemName,
+            itemPrice: itemOwedToMember.itemPrice,
+            itemQuantity: itemOwedToMember.itemQuantity,
+            amount: total.toFixed(2),
+            members: members,
+            splits: itemSplits.filter(split => split.isChecked),
+            transferTo: itemOwedToMember.transferTo
+        });
     }
 
-    return unsettledItemTotal;
-}
-
-export const calculateSettledItemTotal = (itemSplits, userEmail) => {
-    let settledItemTotal = 0;
-
-    for (const split of itemSplits) {
-        if (split.transferTo !== userEmail) {
-            for (const user of split) {
-                if (user.email === userEmail && user.isSettled) {
-                    settledItemTotal += user.amount;
-                }
-            }
-        }
-    }
-
-    return settledItemTotal;
+    return itemsOwedToYou;
 }

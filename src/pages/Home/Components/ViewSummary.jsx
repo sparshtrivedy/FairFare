@@ -32,6 +32,7 @@ const ViewSummary = ({
             return m;
         });
         setSelectedOweItem(copiedItem);
+        
         const itemRef = doc(db, "items", copiedItem.id);
         updateDoc(itemRef, copiedItem);
     }

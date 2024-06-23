@@ -1,10 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../App";
-import {
-    getDocs,
-    getDoc,
-    updateDoc,
-} from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
 import {
     Container,
     Row,
@@ -12,11 +8,8 @@ import {
     Card,
     Breadcrumb,
 } from "react-bootstrap";
-import {
-    itemsWithTransferToMemberQuery,
-    fetchEventsWithMember,
-    userWithEmailQuery,
-} from "../../Utils";
+import { getUserByEmail } from "../../Queries";
+import { getItemsYouOwe, getItemsOwedToYou } from "../../Utils";
 import DashboardCard from './Components/DashboardCard';
 import '../pages.css';
 import { auth } from "../../firebase-config";
@@ -26,34 +19,32 @@ import FormHeader from "../Forms/Components/FormHeader";
 const Home = () => {
     const { userEmail, setIsVerified } = useContext(AuthContext);
 
+    const [isLoading, setIsLoading] = useState(false);
     const [eventsLentToUser, setEventsLentToUser] = useState([]);
     const [itemsOwedToUser, setItemsOwedToUser] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
             setIsLoading(true);
 
             setEventsLentToUser([]);
-            const eventsLentToMember = await fetchEventsWithMember(userEmail, false);
+            const eventsLentToMember = await getItemsYouOwe(userEmail, 'unsettled');
             setEventsLentToUser(eventsLentToMember);
 
-            const itemsOwedToMember = await fetchItemsOwedToMember(userEmail);
+            const itemsOwedToMember = await getItemsOwedToYou(userEmail, 'unsettled');
             setItemsOwedToUser(itemsOwedToMember);
 
             const user = auth.currentUser;
 
-            const memberQuery = userWithEmailQuery(userEmail);
-            const memberDoc = (await getDocs(memberQuery)).docs[0];
-            const memberData = memberDoc.data();
-            if (memberData && !memberData.isVerified) {
+            const member = await getUserByEmail(userEmail);
+            if (member && !member.data().isVerified) {
                 setIsVerified(user.emailVerified);
-                await updateDoc(memberDoc.ref, {
+                await updateDoc(member.ref, {
                     isVerified: user.emailVerified
                 });
             }
-            if (memberData && !memberData.uid) {
-                await updateDoc(memberDoc.ref, {
+            if (member && !member.data().uid) {
+                await updateDoc(member.ref, {
                     uid: user.uid
                 });
             }
@@ -102,61 +93,3 @@ const Home = () => {
 };
 
 export default Home;
-
-async function fetchItemsOwedToMember(userEmail) {
-    const itemsOwedToMemberQuery = itemsWithTransferToMemberQuery(userEmail);
-    const itemsOwedToMemberSnapshot = await getDocs(itemsOwedToMemberQuery);
-    const itemsOwedToMemberDocs = itemsOwedToMemberSnapshot.docs;
-
-    const owedItems = [];
-
-    for (const doc of itemsOwedToMemberDocs) {
-        const itemOwedToMember = doc.data();
-        let event = '';
-
-        if (itemOwedToMember.event !== null) {
-            const eventRef = await getDoc(itemOwedToMember.event);
-            event = eventRef.data();
-        }
-
-        const itemSplits = itemOwedToMember.splits.filter(
-            split => split.isChecked
-        );
-
-        const unsettledItemTotal = calculateUnsettledTotal(
-            itemSplits,
-            itemOwedToMember,
-            userEmail
-        );
-
-        const unsettledMembers = itemSplits
-            .filter(member => !member.isSettled && member.email !== userEmail)
-            .map(member => member.email);
-
-        if (unsettledItemTotal > 0 && unsettledMembers.length > 0) {
-            owedItems.push({
-                id: doc.id,
-                eventId: itemOwedToMember.event?.id || '',
-                eventName: event?.name || 'N/A',
-                itemName: itemOwedToMember.itemName,
-                itemPrice: itemOwedToMember.itemPrice,
-                itemQuantity: itemOwedToMember.itemQuantity,
-                amount: unsettledItemTotal.toFixed(2),
-                splits: itemSplits,
-                members: unsettledMembers,
-                transferTo: itemOwedToMember.transferTo
-            });
-        }
-    }
-
-    return owedItems;
-}
-
-function calculateUnsettledTotal(itemSplits, itemOwedToMember, userEmail) {
-    const numUnSettled = itemSplits.filter((split) => !split.isSettled && split.email !== userEmail).length;
-    const numMembers = itemSplits.length;
-
-    const unsettledTotal = (parseFloat(itemOwedToMember.itemPrice) * itemOwedToMember.itemQuantity * numUnSettled) / numMembers;
-    
-    return unsettledTotal;
-}

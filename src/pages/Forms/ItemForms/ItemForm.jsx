@@ -9,14 +9,8 @@ import {
 } from "react-bootstrap";
 import FairFareControl from "../Components/FairFareControl";
 import { AuthContext } from "../../../App";
-import {
-    getItemById,
-    userWithEmailQuery,
-    getItemRef,
-    updateItem,
-    
-} from "../../../Utils";
-import { addDoc, getDocs, collection } from "firebase/firestore";
+import { getUserByEmail, updateItem, getItemRef, getItemById } from "../../../Queries";
+import { addDoc, collection } from "firebase/firestore";
 import { db } from "../../../firebase-config";
 import { useParams } from "react-router-dom";
 import ErrorAlert from "../../../Components/Alerts/ErrorAlert";
@@ -27,10 +21,12 @@ import ItemMembersCard from "./Components/ItemMembersCard";
 import MemberSelectControl from "../../../Components/FormControls/MemberSelectControl";
 
 const ItemForm = ({ mode }) => {
+    const { itemId } = useParams();
     const { userEmail } = useContext(AuthContext);
-    const [contacts, setContacts] = useState([]);
-    const [error, setError] = useState('');
+
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [contacts, setContacts] = useState([]);
     const [item, setItem] = useState({
         event: null,
         itemName: '',
@@ -39,17 +35,15 @@ const ItemForm = ({ mode }) => {
         transferTo: '',
         splits: []
     });
-    const { itemId } = useParams();
 
     useEffect(() => {
         const fetchContacts = async () => {
             setIsLoading(true);
-            const memberQuery = userWithEmailQuery(userEmail);
-            const memberQuerySnapshot = await getDocs(memberQuery);
 
-            if (!memberQuerySnapshot.empty) {
-                const memberData = memberQuerySnapshot.docs[0].data().contacts.sort();
-                if (memberData.length > 0) setContacts(memberData);
+            const member = await getUserByEmail(userEmail);
+            if (member) {
+                const memberContacts = member.data().contacts.sort();
+                setContacts(memberContacts);
             }
 
             if (mode === 'view' || mode === 'edit') {
@@ -65,6 +59,7 @@ const ItemForm = ({ mode }) => {
                     splits: []
                 });
             }
+
             setIsLoading(false);
         }
         
@@ -101,7 +96,9 @@ const ItemForm = ({ mode }) => {
             if (!isValidated()) {
                 return;
             }
+
             const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
+
             let copiedItem = { ...item };
             copiedItem.splits = copiedItem.splits.map((split) => {
                 return {
@@ -109,8 +106,9 @@ const ItemForm = ({ mode }) => {
                     amount: shareOfItem
                 }
             });
-            setItem(copiedItem);
+
             const itemRef = await addDoc(collection(db, 'items'), copiedItem);
+            
             window.location.href = `/#/view-item/${itemRef.id}`;
         } catch (error) {
             setError(error.message);
@@ -122,7 +120,9 @@ const ItemForm = ({ mode }) => {
             if (!isValidated()) {
                 return;
             }
+
             const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
+
             let copiedItem = { ...item };
             copiedItem.splits = copiedItem.splits.map((split) => {
                 return {
@@ -130,8 +130,10 @@ const ItemForm = ({ mode }) => {
                     amount: shareOfItem
                 }
             });
+
             const itemRef = getItemRef(itemId);
             await updateItem(itemRef, copiedItem);
+
             window.location.href = `/#/view-item/${itemId}`;
         } catch (error) {
             setError(error.message);

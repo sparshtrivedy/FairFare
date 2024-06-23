@@ -41,6 +41,7 @@ const Layout = () => {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const email = localStorage.getItem('userEmail') || '';
         const verified = localStorage.getItem('isVerified') === 'true';
+
         setIsLoggedIn(loggedIn);
         setUserEmail(email);
         setIsVerified(verified);
@@ -49,9 +50,11 @@ const Layout = () => {
     const handleLogout = () => {
         setIsLoggedIn(false);
         setUserEmail('');
+
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('isVerified');
+        
         navigate('/sign-in');
     }
 

@@ -1,8 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import { AuthContext } from "../../../../App";
 import { Card } from "react-bootstrap";
-import { userWithEmailQuery } from "../../../../Utils";
-import { getDocs } from "firebase/firestore";
+import { getUserByEmail } from "../../../../Queries";
 import { updateMemberSplits } from "../../../../Utils";
 import CardHeader from "../../Components/CardHeader";
 import CardFooter from "../../Components/CardFooter";
@@ -12,6 +11,18 @@ import EmptyListText from "../../../../Components/CardText/EmptyListText";
 const EventMembersCard = ({ members, event, setEvent, items, setItems, disabled=false }) => {
     const { userEmail } = useContext(AuthContext);
     const [contacts, setContacts] = useState([]);
+
+    useEffect(() => {
+        const fetchContacts = async () => {
+            const member = await getUserByEmail(userEmail);
+            if (member) {
+                const memberContacts = member.data().contacts.sort();
+                setContacts(memberContacts);
+            }
+        }
+
+        fetchContacts();
+    }, [userEmail]);
 
     const handleAddMember = () => {
         setEvent({ ...event, 
@@ -55,24 +66,11 @@ const EventMembersCard = ({ members, event, setEvent, items, setItems, disabled=
         let copiedItems = [...items];
         copiedItems.forEach((item, i) => {
             item.splits.splice(index, 1);
-            updateMemberSplits(copiedMembers, copiedItems, i);
+            updateMemberSplits(copiedItems, i);
         });
 
         setItems(copiedItems);
     }
-
-    useEffect(() => {
-        const fetchContacts = async () => {
-            const memberQuery = userWithEmailQuery(userEmail);
-            const memberQuerySnapshot = await getDocs(memberQuery);
-
-            if (!memberQuerySnapshot.empty) {
-                const memberData = memberQuerySnapshot.docs[0].data().contacts.sort();
-                if (memberData.length > 0) setContacts(memberData);
-            }
-        }
-        fetchContacts();
-    }, [userEmail]);
 
     return (
         <Card className='my-3'>
