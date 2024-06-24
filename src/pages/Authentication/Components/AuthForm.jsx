@@ -39,14 +39,15 @@ const SignIn = ({ title, buttonText, footerText, footerButtonText }) => {
     const handleSignIn = async () => {
         try {
             const userCredentials = await signInWithEmailAndPassword(auth, email, password);
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('isLoggedIn', true);
+            localStorage.setItem('isVerified', userCredentials.user.emailVerified);
+            
             setSuccess('Signed in successfully. Redirecting...');
             setTimeout(() => {
                 setSuccess('');
                 setIsLoggedIn(true);
                 setUserEmail(email);
-                localStorage.setItem('userEmail', email);
-                localStorage.setItem('isLoggedIn', true);
-                localStorage.setItem('isVerified', userCredentials.user.emailVerified);
                 navigate('/home');
             }, 3000);
         } catch (error) {
