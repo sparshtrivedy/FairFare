@@ -7,6 +7,7 @@ import {
     GoHistory,
     GoTable,
     GoPerson,
+    GoDiff
 } from "react-icons/go";
 
 const TitleIconMap = {
@@ -19,6 +20,7 @@ const TitleIconMap = {
     "History": <GoHistory size={30} style={{ marginRight: "10px" }} />,
     "Dashboard": <GoTable size={30} style={{ marginRight: "10px" }} />,
     "Contacts": <GoPerson size={30} style={{ marginRight: "10px" }} />,
+    "Calculator": <GoDiff size={30} style={{ marginRight: "10px" }} />,
 }
 
 const FormHeader = ({ title }) => {

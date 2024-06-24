@@ -19,6 +19,7 @@ import History from './History/History'
 import EventForm from './Forms/EventForms/EventForm';
 import ItemForm from './Forms/ItemForms/ItemForm'
 import Contacts from './Contacts/Contacts'
+import Calculator from './Calculator/Calculator'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { 
@@ -29,7 +30,8 @@ import {
     GoHistory,
     GoPerson,
     GoVerified,
-    GoUnverified
+    GoUnverified,
+    GoDiff
 } from "react-icons/go";
 
 const Layout = () => {
@@ -54,7 +56,7 @@ const Layout = () => {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userEmail');
         localStorage.removeItem('isVerified');
-        
+
         navigate('/sign-in');
     }
 
@@ -89,6 +91,10 @@ const Layout = () => {
                             <Nav.Link href="/#/contacts" className='d-flex align-items-center'>
                                 <GoPerson size={20} />
                                 <span style={{ marginLeft: "5px" }}>Contacts</span>
+                            </Nav.Link>
+                            <Nav.Link href="/#/calculator" className='d-flex align-items-center'>
+                                <GoDiff size={20} />
+                                <span style={{ marginLeft: "5px" }}>Calculator</span>
                             </Nav.Link>
                         </Nav>
                         <Nav>
@@ -135,6 +141,7 @@ const Layout = () => {
 
                     <Route path="/history" element={<History />} />
                     <Route path="/contacts" element={<Contacts />} />
+                    <Route path="/calculator" element={<Calculator />} />
                     <Route path="*" element={<Navigate to="/home" />} />
                 </Routes>
             ) : (

@@ -6,7 +6,8 @@ import {
     GoTasklist,
     GoPersonAdd,
     GoFoldUp,
-    GoFoldDown
+    GoFoldDown,
+    GoProjectRoadmap
 } from "react-icons/go";
 
 const TitleIconMap = {
@@ -18,6 +19,7 @@ const TitleIconMap = {
     "Added contacts": <GoPeople size={25} style={{ marginRight: "10px" }} />,
     "You owe": <GoFoldUp size={30} style={{ marginRight: "10px" }} />,
     "Owed to you": <GoFoldDown size={30} style={{ marginRight: "10px" }} />,
+    "Results": <GoProjectRoadmap size={25} style={{ marginRight: "10px" }} />,
 }
 
 const CardHeader = ({ title }) => {

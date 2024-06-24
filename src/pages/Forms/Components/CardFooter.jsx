@@ -6,7 +6,8 @@ import {
     GoPlus,
     GoFileDirectory,
     GoPencil,
-    GoProjectSymlink
+    GoProjectSymlink,
+    GoCheckCircle
 } from "react-icons/go";
 
 const TextIconMap = {
@@ -18,6 +19,7 @@ const TextIconMap = {
     "Save changes": <GoFileDirectory size={20} style={{ marginRight: "10px" }} />,
     "Create item": <GoProjectSymlink size={20} style={{ marginRight: "10px" }} />,
     "Edit item": <GoPencil size={20} style={{ marginRight: "10px" }} />,
+    "Calculate": <GoCheckCircle size={20} style={{ marginRight: "10px" }} />,
 }
 
 const CardFooter = ({ text, handler }) => {
