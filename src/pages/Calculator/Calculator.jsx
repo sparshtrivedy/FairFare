@@ -13,6 +13,7 @@ import FairFareControl from "../Forms/Components/FairFareControl";
 import CardFooter from "../Forms/Components/CardFooter";
 import CardHeader from "../Forms/Components/CardHeader";
 
+
 const Calculator = () => {
     const [showResult, setShowResult] = useState(false);
     const [data, setData] = useState({
