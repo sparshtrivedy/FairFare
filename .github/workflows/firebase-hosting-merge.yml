@@ -45,7 +45,7 @@ jobs:
       - name: Read file content
         id: read_file
         run: |
-          FILE_PATH="../../README.md"
+          FILE_PATH="README.md"
           FILE_CONTENT=$(cat $FILE_PATH)
           echo "::set-output name=file_content::$FILE_CONTENT"
 
