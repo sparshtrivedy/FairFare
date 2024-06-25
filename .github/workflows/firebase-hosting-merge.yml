@@ -41,3 +41,11 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_FAIRFARE_CBB02 }}
           channelId: live
           projectId: fairfare-cbb02
+      
+      - name: Send notification to Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' --data \
+          '{"text":"New push to the repository: ${{ github.repository }} by ${{ github.actor }}\n\nCommit message: ${{ github.event.head_commit.message }}"}' \
+          $SLACK_WEBHOOK_URL
