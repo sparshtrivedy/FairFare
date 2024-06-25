@@ -42,10 +42,18 @@ jobs:
           channelId: live
           projectId: fairfare-cbb02
       
+      - name: Read file content
+        id: read_file
+        run: |
+          FILE_PATH="../../README.md"
+          FILE_CONTENT=$(cat $FILE_PATH)
+          echo "::set-output name=file_content::$FILE_CONTENT"
+
       - name: Send notification to Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
+          FILE_CONTENT="${{ steps.read_file.outputs.file_content }}"
           curl -X POST -H 'Content-type: application/json' --data \
-          '{"text":"New push to the repository: ${{ github.repository }} by ${{ github.actor }}\n\nCommit message: ${{ github.event.head_commit.message }}"}' \
+          '{"text":"New push to the repository: ${{ github.repository }} by ${{ github.actor }}\n\nCommit message: ${{ github.event.head_commit.message }}\n\nFile content:\n'$FILE_CONTENT'"}' \
           $SLACK_WEBHOOK_URL
