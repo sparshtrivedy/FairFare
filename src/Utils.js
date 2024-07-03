@@ -85,14 +85,14 @@ export const getItemsYouOwe = async (userEmail, type) => {
         })
         .filter(item => {
             return item.splits.find(split =>
-                item.transferTo !== userEmail && split.email === userEmail && split.isChecked && !split.isSettled
+                item.transferTo !== userEmail && split.email === userEmail && split.isChecked && (type === 'settled' ? split.isSettled : !split.isSettled)
             );
         })
         .forEach(item => {
             const numChecked = item.splits.filter(split => split.isChecked).length;
             itemsYouOwe.push({
                 id: item.id,
-                eventId: 'N/A',
+                eventId: null,
                 eventName: 'N/A',
                 eventDate: 'N/A',
                 itemName: item.itemName,
