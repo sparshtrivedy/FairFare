@@ -45,17 +45,19 @@ const Contacts = () => {
     }, [userEmail, success]);
 
     const isValidEmail = () => {
-        if (memberError.length !== 0) return;
+        if (memberError.length !== 0) return false;
 
         if (newContact.trim().length === 0) {
             setMemberError('Please provide a valid email.');
-            return;
+            return false;
         }
 
         if (contacts.includes(newContact)) {
             setMemberError('Contact already exists.');
-            return;
+            return false;
         }
+
+        return true;
     }
 
     const handleUpdateMember = async (e) => {
@@ -76,10 +78,12 @@ const Contacts = () => {
         }
         setMemberError('');
 
+        console.log(newContact);
         const member = await getUserByEmail(userEmail);
         await updateDoc(member.ref, {
             contacts: [...contacts, newContact]
         });
+        console.log(contacts);
 
         setNewContact('');
         setSuccess('Contact added successfully.');
