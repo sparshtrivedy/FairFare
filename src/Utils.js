@@ -69,7 +69,9 @@ export const getItemsYouOwe = async (userEmail, type) => {
                         amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                         splits: item.splits.filter(member => member.isChecked),
                         members: [item.transferTo],
-                        transferTo: item.transferTo
+                        transferTo: item.transferTo,
+                        createdAt: item.createdAt || null,
+                        settledAt: item.splits.filter(split => split.email === userEmail)[0].settledAt || null,
                     });
                 });
         });
@@ -101,7 +103,9 @@ export const getItemsYouOwe = async (userEmail, type) => {
                 amount: ((item.itemPrice * item.itemQuantity) / numChecked).toFixed(2),
                 splits: item.splits.filter(member => member.isChecked),
                 members: [item.transferTo],
-                transferTo: item.transferTo
+                transferTo: item.transferTo,
+                createdAt: item.createdAt || null,
+                settledAt: item.splits.filter(split => split.email === userEmail)[0].settledAt || null,
             });
         });
 

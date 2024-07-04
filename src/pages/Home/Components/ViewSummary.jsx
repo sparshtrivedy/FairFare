@@ -31,6 +31,7 @@ const ViewSummary = ({
         copiedItem.splits = selectedOweItem?.splits.map((m) => {
             if (m.email === member.email) {
                 m.isSettled = !m.isSettled;
+                m.settledAt = new Date().toISOString();
             }
             return m;
         });
