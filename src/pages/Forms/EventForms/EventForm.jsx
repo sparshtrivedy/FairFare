@@ -18,6 +18,7 @@ import ItemsCard from "./Components/ItemsCard";
 import { useParams } from "react-router-dom";
 import { getItemsByEventId } from "../../../Utils";
 import { getEventRef, getItemRef, updateEvent, updateItem, addEvent, addItem, getEventById } from "../../../Queries";
+import { deleteDoc } from "firebase/firestore";
 
 const EventForm = ({ mode }) => {
     const eventId = useParams().eventId;
@@ -127,6 +128,16 @@ const EventForm = ({ mode }) => {
             
             const eventRef = getEventRef(eventId);
             await updateEvent(eventRef, event);
+
+            const itemsForEventIds = await getItemsByEventId(eventId).then(items => items.map(item => item.id));
+
+            // check if item is deleted
+            for (const id of itemsForEventIds) {
+                if (!items.find(i => i.id === id)) {
+                    const itemRef = getItemRef(id);
+                    await deleteDoc(itemRef);
+                }
+            }
 
             for (const item of items) {
                 const numChecked = item.splits.filter(split => split.isChecked).length;

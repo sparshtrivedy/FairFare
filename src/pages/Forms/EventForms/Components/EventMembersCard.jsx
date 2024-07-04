@@ -50,7 +50,6 @@ const EventMembersCard = ({ members, event, setEvent, items, setItems, disabled=
         let copiedMembers = [...event.members];
         copiedMembers[index].email = e.target.value;
         setEvent({ ...event, members: copiedMembers });
-        console.log(copiedMembers);
         for (let i = 0; i < items.length; i++) {
             let copiedItems = [...items];
             copiedItems[i].splits[index].email = e.target.value;

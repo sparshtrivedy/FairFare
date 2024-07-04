@@ -44,6 +44,7 @@ export const updateItem = async (itemRef, item) => {
         itemQuantity: item.itemQuantity,
         transferTo: item.transferTo,
         splits: item.splits,
+        lastUpdated: new Date().toISOString(),
     });
 }
 
@@ -63,7 +64,9 @@ export const addItem = async (item, eventRef) => {
         itemPrice: item.itemPrice,
         itemQuantity: item.itemQuantity,
         transferTo: item.transferTo,
-        splits: item.splits
+        splits: item.splits,
+        createdAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
     });
 }
 

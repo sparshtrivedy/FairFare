@@ -78,12 +78,10 @@ const Contacts = () => {
         }
         setMemberError('');
 
-        console.log(newContact);
         const member = await getUserByEmail(userEmail);
         await updateDoc(member.ref, {
             contacts: [...contacts, newContact]
         });
-        console.log(contacts);
 
         setNewContact('');
         setSuccess('Contact added successfully.');

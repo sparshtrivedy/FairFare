@@ -99,7 +99,11 @@ const ItemForm = ({ mode }) => {
 
             const shareOfItem = (item.itemPrice * item.itemQuantity / item.splits.length).toFixed(2);
 
-            let copiedItem = { ...item };
+            let copiedItem = {
+                ...item,
+                createdAt: new Date().toISOString(),
+                lastUpdated: new Date().toISOString()
+            };
             copiedItem.splits = copiedItem.splits.map((split) => {
                 return {
                     ...split,

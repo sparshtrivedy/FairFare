@@ -48,7 +48,6 @@ const Calculator = () => {
                                     });
                                 }}
                                 value={data.people}
-                                required={true}
                             />
                             {data.people !== 0 && Array.from({ length: data.people }).map((_, index) => (
                                 <Form.Group as={Row} key={index} className="mb-3">
@@ -83,7 +82,6 @@ const Calculator = () => {
                                     setData({...data, tax: parseFloat(e.target.value)});
                                 }}
                                 value={data.tax}
-                                required={true}
                             />
                             <FairFareControl
                                 label="Tip"
@@ -94,7 +92,6 @@ const Calculator = () => {
                                     setData({ ...data, tip: parseFloat(e.target.value)});
                                 }}
                                 value={data.tip}
-                                required={true}
                             />
                             {showResult && 
                                 <Card>

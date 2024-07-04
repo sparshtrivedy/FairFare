@@ -24,7 +24,10 @@ const ViewSummary = ({
     setSelectedItem,
 }) => {
     const handleSettleUnsettle = (setSelectedOweItem, selectedOweItem, member) => {
-        const copiedItem = { ...selectedOweItem };
+        const copiedItem = { 
+            ...selectedOweItem,
+            lastUpdated: new Date().toISOString(),
+        };
         copiedItem.splits = selectedOweItem?.splits.map((m) => {
             if (m.email === member.email) {
                 m.isSettled = !m.isSettled;
