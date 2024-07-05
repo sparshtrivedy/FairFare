@@ -158,7 +158,9 @@ export const getItemsOwedToYou = async (userEmail, type) => {
             amount: total.toFixed(2),
             members: members,
             splits: itemSplits.filter(split => split.isChecked),
-            transferTo: itemOwedToMember.transferTo
+            transferTo: itemOwedToMember.transferTo,
+            settledAt: numUnSettled === 0 ? itemOwedToMember.lastUpdated : null,
+            createdAt: itemOwedToMember.createdAt || null,
         });
     }
 

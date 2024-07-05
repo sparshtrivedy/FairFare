@@ -16,9 +16,14 @@ import { auth } from "../../firebase-config";
 import EmailVerificationAlert from "../../Components/Alerts/EmailVerificationAlert";
 import FormHeader from "../Forms/Components/FormHeader";
 import { GoInfo, GoIssueOpened, GoHourglass } from "react-icons/go";
+import { BarChart } from '@mui/x-charts/BarChart';
+import CardHeader from "../Forms/Components/CardHeader";
 
 const Home = () => {
     const { userEmail, setIsVerified } = useContext(AuthContext);
+    const currentMonth = new Date().getMonth();
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    const lastThreeMonths = [currentMonth - 2, currentMonth - 1, currentMonth].map(month => monthNames[month]);
 
     const [isLoading, setIsLoading] = useState(false);
     const [eventsLentToUser, setEventsLentToUser] = useState([]);
@@ -26,6 +31,8 @@ const Home = () => {
     const [totalOwedToUser, setTotalOwedToUser] = useState(0);
     const [totalOwedByUser, setTotalOwedByUser] = useState(0);
     const [averageSettlementTime, setAverageSettlementTime] = useState(0);
+    const [settledLentLastThreeMonths, setSettledLentLastThreeMonths] = useState([]);
+    const [settledOwedLastThreeMonths, setSettledOwedLastThreeMonths] = useState([]);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
@@ -64,13 +71,30 @@ const Home = () => {
                 acc 
                 + ((Date.parse(item.settledAt) - Date.parse(item.createdAt)) / (1000 * 60 * 60 * 24))
                 , 0);
+            
+            const itemsSettledOwedToMember = (await getItemsOwedToYou(userEmail, 'settled')).filter(item => item.createdAt && item.settledAt);
+
             setAverageSettlementTime(itemsSettledByMember.length > 0 ? timeToSettle / itemsSettledByMember.length : 0);
+
+            const settledLentPerMonth = itemsSettledByMember.reduce((acc, item) => {
+                const month = new Date(item.settledAt).getMonth();
+                acc[month] = acc[month] ? acc[month] + parseFloat(item.amount) : parseFloat(item.amount);
+                return acc;
+            }, {});
+            setSettledLentLastThreeMonths([settledLentPerMonth[currentMonth - 2] || 0, settledLentPerMonth[currentMonth - 1] || 0, settledLentPerMonth[currentMonth] || 0]);
+
+            const settledOwedPerMonth = itemsSettledOwedToMember.reduce((acc, item) => {
+                const month = new Date(item.settledAt).getMonth();
+                acc[month] = acc[month] ? acc[month] + parseFloat(item.amount) : parseFloat(item.amount);
+                return acc;
+            }, {});
+            setSettledOwedLastThreeMonths([settledOwedPerMonth[currentMonth - 2] || 0, settledOwedPerMonth[currentMonth - 1] || 0, settledOwedPerMonth[currentMonth] || 0]);
 
             setIsLoading(false);
         };
 
         fetchOwedAndLent();
-    }, [userEmail, setIsVerified]);
+    }, [userEmail, setIsVerified, currentMonth]);
 
     return (
         <Container style={{ height: "100%" }}>
@@ -90,8 +114,8 @@ const Home = () => {
                             </Card.Subtitle>
                             <br/>
                             <Row>
-                                <Col md={4} sm={6} xs={12} className="mb-4">
-                                    <Card bg="primary" className="bg-opacity-50 border-2 h-100" border="primary">
+                                <Col md={3} sm={12} className="mb-4">
+                                    <Card bg="primary" className="bg-opacity-50 border-2 mb-2" border="primary">
                                         <Card.Body>
                                             <Card.Title className="d-flex align-items-center">
                                                 <GoIssueOpened size={30} style={{ marginRight: "10px" }} />
@@ -107,9 +131,9 @@ const Home = () => {
                                             </Card.Text>
                                         </Card.Body>
                                     </Card>
-                                </Col>
-                                <Col md={4} sm={6} xs={12} className="mb-4">
-                                    <Card bg="danger" className="bg-opacity-50 border-2 h-100" border="danger">
+                                {/* </Col> */}
+                                {/* <Col md={4} sm={12} className="mb-4"> */}
+                                    <Card bg="danger" className="bg-opacity-50 border-2 mb-2" border="danger">
                                         <Card.Body>
                                             <Card.Title className="d-flex align-items-center">
                                                 <GoHourglass size={30} style={{ marginRight: "10px" }} />
@@ -125,9 +149,9 @@ const Home = () => {
                                             </Card.Text>
                                         </Card.Body>
                                     </Card>
-                                </Col>
-                                <Col md={4} sm={12} className="mb-4">
-                                    <Card bg="success" className="bg-opacity-50 border-2 h-100" border="success">
+                                {/* </Col> */}
+                                {/* <Col md={4} sm={12} className="mb-4"> */}
+                                    <Card bg="success" className="bg-opacity-50 border-2" border="success">
                                         <Card.Body>
                                             <Card.Title className="d-flex align-items-center">
                                                 <GoInfo size={30} style={{ marginRight: "10px" }} />
@@ -144,6 +168,19 @@ const Home = () => {
                                         </Card.Body>
                                     </Card>
                                 </Col>
+                                <Col md={9} sm={12} className="mb-4">
+                            <Card className="h-100">
+                                <CardHeader title="Settlement summary" />
+                                <BarChart
+                                    xAxis={[{ scaleType: 'band', data: lastThreeMonths }]}
+                                    series={[
+                                        { label: 'You paid', data: settledLentLastThreeMonths }, 
+                                        {  label: 'Paid to you', data: settledOwedLastThreeMonths }
+                                    ]}
+                                    height={300}
+                                />
+                            </Card>
+                            </Col>
                             </Row>
                             <DashboardCard
                                 id="you-owe"
