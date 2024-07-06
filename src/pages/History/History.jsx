@@ -66,13 +66,15 @@ const History = () => {
                                         Paid by you
                                     </>}
                                 >
-                                    <div className='d-flex justify-content-center overflow-auto'>
-                                        {isLoading ? (
+                                    {isLoading ? (
+                                        <div className='d-flex justify-content-center overflow-auto'>
                                             <Skeleton variant="rounded" width='100%' height={100} />
-                                        ) : (
+                                        </div>
+                                    ) : (
+                                        <div className='overflow-auto'>
                                             <SummaryTable items={owedItems} id="you-owe" />
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </Tab>
                                 <Tab 
                                     eventKey="paid-to-you" 
@@ -82,13 +84,16 @@ const History = () => {
                                         Paid to you
                                     </>}
                                 >
-                                    <div className='d-flex justify-content-center overflow-auto'>
-                                        {isLoading ? (
+                                    
+                                    {isLoading ? (
+                                        <div className='d-flex justify-content-center overflow-auto'>
                                             <Skeleton variant="rounded" width='100%' height={100} />
-                                        ) : (
+                                        </div>
+                                    ) : (
+                                        <div className='overflow-auto'>
                                             <SummaryTable items={lentItems} id="owed-to-you" />
-                                        )}
-                                    </div>
+                                        </div>
+                                    )}
                                 </Tab>
                             </Tabs>
                         </Card.Body>
