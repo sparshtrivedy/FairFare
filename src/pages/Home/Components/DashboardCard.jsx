@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, Spinner } from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import SummaryTable from '../../../Components/Tables/SummaryTable';
 import CardHeader from '../../Forms/Components/CardHeader';
+import Skeleton from '@mui/material/Skeleton';
 
 const DashboardCard = ({ id, title, itemList, isLoading }) => {
     return (
@@ -9,7 +10,7 @@ const DashboardCard = ({ id, title, itemList, isLoading }) => {
             <CardHeader title={title} />
             <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-3" style={{ overflowX: "auto" }}>
                 {isLoading ? (
-                    <Spinner animation="border" size="lg" className="m-3" />
+                    <Skeleton variant="rounded" width='100%' height={70} />
                 ) : (
                     <SummaryTable items={itemList} id={id} />
                 )}

@@ -18,6 +18,7 @@ import FormHeader from "../Forms/Components/FormHeader";
 import { GoInfo, GoIssueOpened, GoHourglass } from "react-icons/go";
 import { BarChart } from '@mui/x-charts/BarChart';
 import CardHeader from "../Forms/Components/CardHeader";
+import Skeleton from '@mui/material/Skeleton';
 
 const Home = () => {
     const { userEmail, setIsVerified } = useContext(AuthContext);
@@ -117,70 +118,90 @@ const Home = () => {
                                 <Col md={3} sm={12} className="mb-4">
                                     <Card bg="primary" className="bg-opacity-50 border-2 mb-2" border="primary">
                                         <Card.Body>
-                                            <Card.Title className="d-flex align-items-center">
-                                                <GoIssueOpened size={30} style={{ marginRight: "10px" }} />
-                                                Total owed to you
-                                            </Card.Title>
-                                            <Card.Subtitle className="mb-2 text-muted">
-                                                Unsettled dues owed to you
-                                            </Card.Subtitle>
-                                            <Card.Text>
-                                                <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
-                                                    $ {totalOwedToUser.toFixed(2) || 0}
-                                                </span>
-                                            </Card.Text>
+                                            {isLoading? (
+                                                <Skeleton variant="rounded" width='100%' height={100} />
+                                            ): (
+                                                <>
+                                                    <Card.Title className="d-flex align-items-center">
+                                                        <GoIssueOpened size={30} style={{ marginRight: "10px" }} />
+                                                        Total owed to you
+                                                    </Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        Unsettled dues owed to you
+                                                    </Card.Subtitle>
+                                                    <Card.Text>
+                                                        <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
+                                                            $ {totalOwedToUser.toFixed(2) || 0}
+                                                        </span>
+                                                    </Card.Text>
+                                                </>
+                                            )}
                                         </Card.Body>
                                     </Card>
-                                {/* </Col> */}
-                                {/* <Col md={4} sm={12} className="mb-4"> */}
                                     <Card bg="danger" className="bg-opacity-50 border-2 mb-2" border="danger">
                                         <Card.Body>
-                                            <Card.Title className="d-flex align-items-center">
-                                                <GoHourglass size={30} style={{ marginRight: "10px" }} />
-                                                Total you owe
-                                            </Card.Title>
-                                            <Card.Subtitle className="mb-2 text-muted">
-                                                Unsettled dues you owe
-                                            </Card.Subtitle>
-                                            <Card.Text>
-                                                <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
-                                                    $ {totalOwedByUser.toFixed(2) || 0}
-                                                </span>
-                                            </Card.Text>
+                                            {isLoading? (
+                                                <Skeleton variant="rounded" width='100%' height={100} />
+                                            ): (
+                                                <>
+                                                    <Card.Title className="d-flex align-items-center">
+                                                        <GoHourglass size={30} style={{ marginRight: "10px" }} />
+                                                        Total you owe
+                                                    </Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        Unsettled dues you owe
+                                                    </Card.Subtitle>
+                                                    <Card.Text>
+                                                        <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
+                                                            $ {totalOwedByUser.toFixed(2) || 0}
+                                                        </span>
+                                                    </Card.Text>
+                                                </>
+                                            )}
                                         </Card.Body>
                                     </Card>
-                                {/* </Col> */}
-                                {/* <Col md={4} sm={12} className="mb-4"> */}
                                     <Card bg="success" className="bg-opacity-50 border-2" border="success">
                                         <Card.Body>
-                                            <Card.Title className="d-flex align-items-center">
-                                                <GoInfo size={30} style={{ marginRight: "10px" }} />
-                                                Typically settle in
-                                            </Card.Title>
-                                            <Card.Subtitle className="mb-2 text-muted">
-                                                Average time to settle dues
-                                            </Card.Subtitle>
-                                            <Card.Text>
-                                                <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
-                                                    {averageSettlementTime.toFixed(2) || 0} days
-                                                </span>
-                                            </Card.Text>
+                                            {isLoading? (
+                                                <Skeleton variant="rounded" width='100%' height={100} />
+                                            ): (
+                                                <>
+                                                    <Card.Title className="d-flex align-items-center">
+                                                        <GoInfo size={30} style={{ marginRight: "10px" }} />
+                                                        Typically settle in
+                                                    </Card.Title>
+                                                    <Card.Subtitle className="mb-2 text-muted">
+                                                        Average time to settle dues
+                                                    </Card.Subtitle>
+                                                    <Card.Text>
+                                                        <span style={{ fontSize: "1.5rem", fontWeight: 500 }}>
+                                                            {averageSettlementTime.toFixed(2) || 0} days
+                                                        </span>
+                                                    </Card.Text>
+                                                </>
+                                            )}
                                         </Card.Body>
                                     </Card>
                                 </Col>
                                 <Col md={9} sm={12} className="mb-4">
-                            <Card className="h-100">
-                                <CardHeader title="Settlement summary" />
-                                <BarChart
-                                    xAxis={[{ scaleType: 'band', data: lastThreeMonths }]}
-                                    series={[
-                                        { label: 'You paid', data: settledLentLastThreeMonths }, 
-                                        {  label: 'Paid to you', data: settledOwedLastThreeMonths }
-                                    ]}
-                                    height={300}
-                                />
-                            </Card>
-                            </Col>
+                                    <Card className="h-100">
+                                        <CardHeader title="Settlement summary" />
+                                        <Card.Body>
+                                        {isLoading? (
+                                            <Skeleton variant="rounded" width='100%' height={350} />
+                                        ): (
+                                            <BarChart
+                                                xAxis={[{ scaleType: 'band', data: lastThreeMonths }]}
+                                                series={[
+                                                    { label: 'You paid', data: settledLentLastThreeMonths }, 
+                                                    {  label: 'Paid to you', data: settledOwedLastThreeMonths }
+                                                ]}
+                                                height={320}
+                                            />
+                                        )}
+                                        </Card.Body>
+                                    </Card>
+                                </Col>
                             </Row>
                             <DashboardCard
                                 id="you-owe"

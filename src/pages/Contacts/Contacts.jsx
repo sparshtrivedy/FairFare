@@ -11,7 +11,6 @@ import {
     ListGroup,
     Form,
     Button,
-    Spinner,
 } from "react-bootstrap";
 import { GoTrash } from "react-icons/go";
 import ConfirmationModal from "./Components/ConfirmationModal";
@@ -21,6 +20,7 @@ import CardFooter from "../Forms/Components/CardFooter";
 import FormHeader from "../Forms/Components/FormHeader";
 import CardHeader from "../Forms/Components/CardHeader";
 import EmptyListText from "../../Components/CardText/EmptyListText";
+import Skeleton from "@mui/material/Skeleton";
 
 const Contacts = () => {
     const { userEmail } = useContext(AuthContext);
@@ -151,9 +151,7 @@ const Contacts = () => {
                                 <CardHeader title="Added contacts" />
                                 {isLoading ? (
                                     <Card.Body>
-                                        <div className='d-flex justify-content-center'>
-                                            <Spinner animation="border" size='lg' className='m-3' />
-                                        </div>
+                                        <Skeleton variant="rounded" width='100%' height={100} />
                                     </Card.Body>
                                     ) : (
                                     <Card.Body className="p-0">

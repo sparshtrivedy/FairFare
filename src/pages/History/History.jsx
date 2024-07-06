@@ -8,7 +8,6 @@ import {
     Col,
     Card,
     Breadcrumb,
-    Spinner
 } from 'react-bootstrap';
 import { 
     GoFoldDown,
@@ -18,6 +17,7 @@ import { getItemsYouOwe, getItemsOwedToYou } from '../../Utils';
 import '../pages.css';
 import SummaryTable from '../../Components/Tables/SummaryTable';
 import FormHeader from '../Forms/Components/FormHeader';
+import Skeleton from '@mui/material/Skeleton';
 
 const History = () => {
     const {userEmail} = useContext(AuthContext);
@@ -68,7 +68,7 @@ const History = () => {
                                 >
                                     <div className='d-flex justify-content-center overflow-auto'>
                                         {isLoading ? (
-                                            <Spinner animation="border" size="lg" className="m-3" />
+                                            <Skeleton variant="rounded" width='100%' height={100} />
                                         ) : (
                                             <SummaryTable items={owedItems} id="you-owe" />
                                         )}
@@ -84,7 +84,7 @@ const History = () => {
                                 >
                                     <div className='d-flex justify-content-center overflow-auto'>
                                         {isLoading ? (
-                                            <Spinner animation="border" size="lg" className="m-3" />
+                                            <Skeleton variant="rounded" width='100%' height={100} />
                                         ) : (
                                             <SummaryTable items={lentItems} id="owed-to-you" />
                                         )}
