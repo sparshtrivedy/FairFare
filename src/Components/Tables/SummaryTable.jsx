@@ -6,7 +6,7 @@ import ViewButton from "../Buttons/ViewButton";
 
 const SummaryTable = ({ items, id }) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 2;
+    const itemsPerPage = 5;
 
     const handleClick = (number) => {
         setCurrentPage(number);
