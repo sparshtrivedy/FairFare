@@ -8,7 +8,7 @@ const DashboardCard = ({ id, title, itemList, isLoading }) => {
     return (
         <Card className='m-0 p-0'>
             <CardHeader title={title} />
-            <Card.Body className="d-flex flex-wrap justify-content-center m-0 p-3" style={{ overflowX: "auto" }}>
+            <Card.Body className="d-flex flex-wrap m-0 p-3" style={{ overflowX: "auto" }}>
                 {isLoading ? (
                     <Skeleton variant="rounded" width='100%' height={70} />
                 ) : (
