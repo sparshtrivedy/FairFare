@@ -79,15 +79,17 @@ const SummaryTable = ({ items, id }) => {
                 )}
                 </tbody>
             </Table>
-            <Pagination className="mt-3">
-                <Pagination.Prev onClick={handlePrev} disabled={currentPage === 1} />
-                {pageNumbers.map(number => (
-                    <Pagination.Item key={number} active={number === currentPage} onClick={() => handleClick(number)}>
-                        {number}
-                    </Pagination.Item>
-                ))}
-                <Pagination.Next onClick={handleNext} disabled={currentPage === pageNumbers.length} />
-            </Pagination>
+            {items.length > 0 &&
+                <Pagination className="mt-3">
+                    <Pagination.Prev onClick={handlePrev} disabled={currentPage === 1} />
+                    {pageNumbers.map(number => (
+                        <Pagination.Item key={number} active={number === currentPage} onClick={() => handleClick(number)}>
+                            {number}
+                        </Pagination.Item>
+                    ))}
+                    <Pagination.Next onClick={handleNext} disabled={currentPage === pageNumbers.length} />
+                </Pagination>
+            }
         </>
     );
 };
