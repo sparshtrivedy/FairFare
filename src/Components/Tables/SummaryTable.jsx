@@ -38,7 +38,7 @@ const SummaryTable = ({ items, id }) => {
             <Table striped bordered hover className='p-0 m-0 w-100'>
                 <thead>
                     <tr>
-                        <th>item</th>
+                        <th>Item</th>
                         <th>{id === "you-owe" ? "To" : "From"}</th>
                         <th>Actions</th>
                     </tr>
@@ -61,7 +61,7 @@ const SummaryTable = ({ items, id }) => {
                             <td>
                                 <div className="d-flex justify-content-between">
                                     <div className="d-flex flex-column" style={{ paddingRight: '10px' }}>
-                                        <span className="fw-normal text-nowrap">
+                                        <span className="fw-bold text-muted text-nowrap">
                                         {item.itemName}
                                         </span>
                                         <p className="text-muted fw-light text-nowrap">{item.eventName}</p>
@@ -80,7 +80,7 @@ const SummaryTable = ({ items, id }) => {
                                     </div>
                                 </div>
                             </td>
-                            <td className="p-0">
+                            <td style={{ width: '10px', padding: 0 }}>
                                 <ListGroup variant="flush">
                                 {item.members.map((member, index) => (
                                     <ListGroup.Item key={index} style={{ background: 'transparent' }}>{member}</ListGroup.Item>
