@@ -1,0 +1,17 @@
+
+.list-group-item.active {
+    background-color: #cfe2ff !important;
+    box-shadow: 0 0 0 0.2rem rgba(57, 136, 255, 0.5) !important;
+    color: #212121 !important;
+}
+
+.responsive-justify {
+    display: flex;
+    justify-content: flex-start; /* Default for small screens */
+}
+  
+@media (min-width: 768px) { /* md breakpoint */
+    .responsive-justify {
+        justify-content: flex-end;
+    }
+}

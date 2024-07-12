@@ -10,7 +10,6 @@ import {
 } from "react-bootstrap";
 import { getUserByEmail } from "../../Queries";
 import { getItemsYouOwe, getItemsOwedToYou } from "../../Utils";
-import DashboardCard from './Components/DashboardCard';
 import '../pages.css';
 import { auth } from "../../firebase-config";
 import EmailVerificationAlert from "../../Components/Alerts/EmailVerificationAlert";
@@ -19,6 +18,7 @@ import { GoInfo, GoIssueOpened, GoHourglass } from "react-icons/go";
 import { BarChart } from '@mui/x-charts/BarChart';
 import CardHeader from "../Forms/Components/CardHeader";
 import Skeleton from '@mui/material/Skeleton';
+import SummaryTable from "../../Components/Tables/SummaryTable";
 
 const Home = () => {
     const { userEmail, setIsVerified } = useContext(AuthContext);
@@ -203,17 +203,17 @@ const Home = () => {
                                     </Card>
                                 </Col>
                             </Row>
-                            <DashboardCard
+                            <SummaryTable
                                 id="you-owe"
                                 title="You owe"
-                                itemList={eventsLentToUser}
+                                items={eventsLentToUser}
                                 isLoading={isLoading}
                             />
                             <br />
-                            <DashboardCard
+                            <SummaryTable
                                 id="owed-to-you"
                                 title="Owed to you"
-                                itemList={itemsOwedToUser}
+                                items={itemsOwedToUser}
                                 isLoading={isLoading}
                             />
                         </Card.Body>

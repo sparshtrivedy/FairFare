@@ -1,15 +1,15 @@
 import React from "react";
 import { Button, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { GoEye } from "react-icons/go";
+import { GoPencil } from "react-icons/go";
 
-const ViewButton = ({ path, disabled }) => {
+const EditButton = ({ path, disabled }) => {
     const handleClickView = () => {
         window.location.href = path;
     }
 
     const renderTooltip = (props) => (
         <Tooltip id="button-tooltip" {...props}>
-            View
+            Edit
         </Tooltip>
     );
 
@@ -19,11 +19,11 @@ const ViewButton = ({ path, disabled }) => {
             delay={{ show: 250, hide: 400 }}
             overlay={renderTooltip}
         >
-            <Button variant="primary" onClick={handleClickView} className='m-1' disabled={disabled}>
-                <GoEye size={20} />
+            <Button variant="info" onClick={handleClickView} className='m-1' disabled={disabled}>
+                <GoPencil size={20} />
             </Button>
         </OverlayTrigger>
     );
 }
 
-export default ViewButton;
+export default EditButton;

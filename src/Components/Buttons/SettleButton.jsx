@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 import { GoCodeOfConduct } from "react-icons/go";
 import ViewSummary from "../../pages/Home/Components/ViewSummary";
 import { AuthContext } from "../../App";
 
-const SettleButton = ({ item }) => {
+const SettleButton = ({ item, disabled }) => {
     const { userEmail } = useContext(AuthContext);
 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -15,14 +15,23 @@ const SettleButton = ({ item }) => {
         setShowSettlementSummary(true);
     }
 
+    const renderTooltip = (props) => (
+        <Tooltip id="button-tooltip" {...props}>
+            Settle
+        </Tooltip>
+    );
+
     return (
         <>
-            <Button variant="success" onClick={handleClickSettle} className='m-1'>
-                <div style={{ display: "flex", alignItems: "center" }}>
-                    <GoCodeOfConduct size={20} />
-                    <span style={{marginLeft: "10px"}}>Settle</span>
-                </div>
-            </Button>
+            <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={renderTooltip}
+            >
+                <Button variant="success" onClick={handleClickSettle} className='m-1' disabled={disabled}>
+                    <GoCodeOfConduct size={20} rounded />
+                </Button>
+            </OverlayTrigger>
             <ViewSummary
                 userEmail={userEmail}
                 showSummary={showSettlementSummary}

@@ -17,7 +17,6 @@ import { getItemsYouOwe, getItemsOwedToYou } from '../../Utils';
 import '../pages.css';
 import SummaryTable from '../../Components/Tables/SummaryTable';
 import FormHeader from '../Forms/Components/FormHeader';
-import Skeleton from '@mui/material/Skeleton';
 
 const History = () => {
     const {userEmail} = useContext(AuthContext);
@@ -66,15 +65,7 @@ const History = () => {
                                         Paid by you
                                     </>}
                                 >
-                                    {isLoading ? (
-                                        <div className='d-flex justify-content-center overflow-auto'>
-                                            <Skeleton variant="rounded" width='100%' height={100} />
-                                        </div>
-                                    ) : (
-                                        <div className='overflow-auto'>
-                                            <SummaryTable items={owedItems} id="you-owe" />
-                                        </div>
-                                    )}
+                                    <SummaryTable items={owedItems} id="you-owe" isLoading={isLoading} />
                                 </Tab>
                                 <Tab 
                                     eventKey="paid-to-you" 
@@ -84,16 +75,7 @@ const History = () => {
                                         Paid to you
                                     </>}
                                 >
-                                    
-                                    {isLoading ? (
-                                        <div className='d-flex justify-content-center overflow-auto'>
-                                            <Skeleton variant="rounded" width='100%' height={100} />
-                                        </div>
-                                    ) : (
-                                        <div className='overflow-auto'>
-                                            <SummaryTable items={lentItems} id="owed-to-you" />
-                                        </div>
-                                    )}
+                                    <SummaryTable items={lentItems} id="owed-to-you" isLoading={isLoading} />
                                 </Tab>
                             </Tabs>
                         </Card.Body>
