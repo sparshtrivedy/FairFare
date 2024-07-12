@@ -46,7 +46,7 @@ const SummaryTable = ({ items, id, isLoading, title = null }) => {
 
     return (
         <Card className="w-100">
-            <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className="p-2">
+            <Card.Header style={{backgroundColor: '#80b1b3'}} as="h5" className="py-1">
                 <Container style={{ display: "flex", alignItems: "center", justifyContent: 'space-between', padding: 0, flexWrap: 'wrap' }}>
                     <Col md={6} xs={12} style={{ display: "flex", alignItems: "center" }}>
                         {TitleIconMap[title]}
@@ -120,7 +120,7 @@ const SummaryTable = ({ items, id, isLoading, title = null }) => {
                     </ListGroup>
                 )}
             </Card.Body>
-            <Card.Footer style={{backgroundColor: '#80b1b3'}} className="p-2">
+            <Card.Footer style={{backgroundColor: '#80b1b3'}} className="py-2">
                 <Pagination className="m-0">
                     <Pagination.Prev onClick={handlePrev} disabled={currentPage === 1} />
                     {pageNumbers.map(number => (
