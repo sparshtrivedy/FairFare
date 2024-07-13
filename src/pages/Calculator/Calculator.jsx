@@ -59,15 +59,14 @@ const Calculator = () => {
                                             <InputGroup.Text id="basic-addon1">$</InputGroup.Text>
                                             <Form.Control
                                                 placeholder={`Enter share for person ${index + 1}`}
-                                                value={data.shares[index].toFixed(2)}
                                                 type="number"
                                                 onChange={(e) => {
                                                     setShowResult(false);
-
                                                     const newShares = [...data.shares];
                                                     newShares[index] = parseFloat(e.target.value);
                                                     setData({ ...data, shares: newShares });
                                                 }}
+                                                value={data.shares[index]}
                                             />
                                         </InputGroup>
                                     </Col>
@@ -108,7 +107,7 @@ const Calculator = () => {
                                                         <Form.Control
                                                             placeholder={`Person ${index + 1} owes $${result.toFixed(2)}`}
                                                             value={result.toFixed(2)}
-                                                            type="text"
+                                                            type="number"
                                                             disabled
                                                         />
                                                     </InputGroup>
