@@ -1,5 +1,12 @@
-import React from "react";
-import { Offcanvas, Button, Card, Accordion } from "react-bootstrap";
+import React, { useState } from "react";
+import { 
+    Offcanvas, 
+    Button, 
+    Card, 
+    Accordion,
+    Alert,
+    Modal,
+} from "react-bootstrap";
 import { 
     GoReply, 
     GoCheckCircle,
@@ -23,6 +30,8 @@ const ViewSummary = ({
     selectedItem,
     setSelectedItem,
 }) => {
+    const [open, setOpen] = useState(false);
+
     const handleSettleUnsettle = (setSelectedOweItem, selectedOweItem, member) => {
         const copiedItem = { 
             ...selectedOweItem,
@@ -39,70 +48,97 @@ const ViewSummary = ({
         
         const itemRef = doc(db, "items", copiedItem.id);
         updateDoc(itemRef, copiedItem);
+
+        setShowSummary(false);
+        setOpen(true);
     }
 
     return (
-        <Offcanvas
-            show={showSummary}
-            placement="end"
-            onHide={() => setShowSummary(false)}
-        >
-            <Offcanvas.Header style={{ backgroundColor: "#80b1b3" }} closeButton>
-                <Offcanvas.Title as="h5" className="d-flex align-items-center">
-                    <GoBook size={25} style={{ marginRight: "10px" }} /> 
-                    <span>Settlement summary</span>
-                </Offcanvas.Title>
-            </Offcanvas.Header>
-            <Offcanvas.Body className="p-0">
-                <div className="m-3">
-                    <OffcanvasControl label="Item name" type="text" value={selectedItem?.itemName} />
-                    <OffcanvasControl label="Event name" type="text" value={selectedItem?.eventName} />
-                    <OffcanvasControl label="Item price" type="number" value={selectedItem?.itemPrice} />
-                    <OffcanvasControl label="Item quantity" type="number" value={selectedItem?.itemQuantity} />
-                    <OffcanvasControl label="Pending" type="number" value={selectedItem?.amount} />
-                </div>
-                <Card style={{ border: 0 }} className="my-3">
-                    <CardHeader title="Detailed breakdown" />
-                    <Accordion>
-                        {splits?.map((split, index) => (
-                            <Accordion.Item eventKey={index} key={index}>
-                                <Accordion.Header>
-                                    {split.email}
-                                </Accordion.Header>
-                                <Accordion.Body className="p-0">
-                                    <div className="my-3 mx-3">
-                                        <OffcanvasControl label="Share" type="number" value={split?.amount} />
-                                    </div>
-                                    <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
-                                        {split.email === transferTo || split.amount === 0 ?
-                                        <Button variant="secondary" disabled>
-                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                <GoCircleSlash size={20} />
-                                                <span style={{marginLeft: "10px"}}>No action required</span>
-                                            </div>
-                                        </Button>:
-                                        <Button
-                                            variant={split?.isSettled? "danger": "success"}
-                                            onClick={() => handleSettleUnsettle(setSelectedItem, selectedItem, split)}
-                                        >
-                                            {split?.isSettled? 
-                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                <GoReply size={20} />
-                                                <span style={{marginLeft: "10px"}}>Unsettle</span>
-                                            </div>:
-                                            <div style={{ display: "flex", alignItems: "center" }}>
-                                                <GoCheckCircle size={20} />
-                                                <span style={{marginLeft: "10px"}}>Settle</span>
-                                            </div>}
-                                        </Button>}
-                                    </div>
-                                </Accordion.Body>
-                            </Accordion.Item>
-                        ))}
-                    </Accordion>
-                </Card>
-            </Offcanvas.Body>
-        </Offcanvas>
+        <>
+            <Modal show={open} onHide={() => setOpen(false)}>
+                <Alert variant={'success'} className="m-0">
+                    <Alert.Heading className="d-flex align-items-center">
+                        <GoCheckCircle size={30} style={{ marginRight: '10px' }} />
+                        Item {selectedItem?.splits?.find((m) => m.email === userEmail)?.isSettled? "settled": "unsettled"} successfully!
+                    </Alert.Heading>
+                    {selectedItem?.splits?.find((m) => m.email === userEmail)?.isSettled? (
+                        <p>
+                            You can view the item in the History tab. Refresh the page to see the changes.
+                        </p>
+                    ) : (
+                        <p>
+                            You can view the item in the Home tab. Refresh the page to see the changes.
+                        </p>
+                    )}
+                    <div className="d-flex justify-content-end">
+                        <Button onClick={() => setOpen(false)} variant="outline-success">
+                            Close
+                        </Button>
+                    </div>
+                </Alert>
+            </Modal>
+            <Offcanvas
+                show={showSummary}
+                placement="end"
+                onHide={() => setShowSummary(false)}
+            >
+                <Offcanvas.Header style={{ backgroundColor: "#80b1b3" }} closeButton>
+                    <Offcanvas.Title as="h5" className="d-flex align-items-center">
+                        <GoBook size={25} style={{ marginRight: "10px" }} /> 
+                        <span>Settlement summary</span>
+                    </Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body className="p-0">
+                    <div className="m-3">
+                        <OffcanvasControl label="Item name" type="text" value={selectedItem?.itemName} />
+                        <OffcanvasControl label="Event name" type="text" value={selectedItem?.eventName} />
+                        <OffcanvasControl label="Item price" type="number" value={selectedItem?.itemPrice} />
+                        <OffcanvasControl label="Item quantity" type="number" value={selectedItem?.itemQuantity} />
+                        <OffcanvasControl label="Pending" type="number" value={selectedItem?.amount} />
+                    </div>
+                    <Card style={{ border: 0 }} className="my-3">
+                        <CardHeader title="Detailed breakdown" />
+                        <Accordion>
+                            {splits?.map((split, index) => (
+                                <Accordion.Item eventKey={index} key={index}>
+                                    <Accordion.Header>
+                                        {split.email}
+                                    </Accordion.Header>
+                                    <Accordion.Body className="p-0">
+                                        <div className="my-3 mx-3">
+                                            <OffcanvasControl label="Share" type="number" value={split?.amount} />
+                                        </div>
+                                        <div className="d-flex justify-content-center p-2" style={{ backgroundColor: "#CFE2FF" }} >
+                                            {split.email === transferTo || split.amount === 0 ?
+                                            <Button variant="secondary" disabled>
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoCircleSlash size={20} />
+                                                    <span style={{marginLeft: "10px"}}>No action required</span>
+                                                </div>
+                                            </Button>:
+                                            <Button
+                                                variant={split?.isSettled? "danger": "success"}
+                                                onClick={() => handleSettleUnsettle(setSelectedItem, selectedItem, split)}
+                                            >
+                                                {split?.isSettled? 
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoReply size={20} />
+                                                    <span style={{marginLeft: "10px"}}>Unsettle</span>
+                                                </div>:
+                                                <div style={{ display: "flex", alignItems: "center" }}>
+                                                    <GoCheckCircle size={20} />
+                                                    <span style={{marginLeft: "10px"}}>Settle</span>
+                                                </div>}
+                                            </Button>}
+                                        </div>
+                                    </Accordion.Body>
+                                </Accordion.Item>
+                            ))}
+                        </Accordion>
+                    </Card>
+                </Offcanvas.Body>
+            </Offcanvas>
+        </>
     );
 }
 
