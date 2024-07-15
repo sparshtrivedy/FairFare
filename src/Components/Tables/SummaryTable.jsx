@@ -14,7 +14,7 @@ const TitleIconMap = {
     "Owed to you": <GoFoldDown size={30} style={{ marginRight: "10px" }} />,
 }
 
-const SummaryTable = ({ items, id, isLoading, title = null }) => {
+const SummaryTable = ({ items, id, isLoading, refresh, setRefresh, title = null }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedItem, setSelectedItem] = useState(null);
     const itemsPerPage = 5;
@@ -56,7 +56,7 @@ const SummaryTable = ({ items, id, isLoading, title = null }) => {
                         <CreateButton id={id} />
                         <ViewButton id={id} disabled={selectedItem === null} path={selectedItem && (selectedItem.eventId ? `/#/view-event/${selectedItem.eventId}` : `/#/view-item/${selectedItem.id}`)} />
                         <EditButton id={id} disabled={selectedItem === null} path={selectedItem && (selectedItem.eventId ? `/#/edit-event/${selectedItem.eventId}` : `/#/edit-item/${selectedItem.id}`)} />
-                        <SettleButton disabled={selectedItem === null} item={selectedItem} />
+                        <SettleButton disabled={selectedItem === null} item={selectedItem} refresh={refresh} setRefresh={setRefresh} />
                     </Col>
                 </Container>
             </Card.Header>

@@ -23,6 +23,7 @@ const History = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [owedItems, setOwedItems] = useState([]);
     const [lentItems, setLentItems] = useState([]);
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
@@ -38,7 +39,7 @@ const History = () => {
         };
 
         fetchOwedAndLent();
-    }, [userEmail]);
+    }, [userEmail, refresh]);
 
     return (
         <Container style={{ height: "100%" }}>
@@ -65,7 +66,13 @@ const History = () => {
                                         Paid by you
                                     </>}
                                 >
-                                    <SummaryTable items={owedItems} id="you-owe" isLoading={isLoading} />
+                                    <SummaryTable 
+                                        items={owedItems} 
+                                        id="you-owe" 
+                                        isLoading={isLoading}
+                                        refresh={refresh}
+                                        setRefresh={setRefresh}
+                                    />
                                 </Tab>
                                 <Tab 
                                     eventKey="paid-to-you" 
@@ -75,7 +82,13 @@ const History = () => {
                                         Paid to you
                                     </>}
                                 >
-                                    <SummaryTable items={lentItems} id="owed-to-you" isLoading={isLoading} />
+                                    <SummaryTable 
+                                        items={lentItems} 
+                                        id="owed-to-you" 
+                                        isLoading={isLoading} 
+                                        refresh={refresh}
+                                        setRefresh={setRefresh}
+                                    />
                                 </Tab>
                             </Tabs>
                         </Card.Body>

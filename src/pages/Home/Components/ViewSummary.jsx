@@ -29,6 +29,8 @@ const ViewSummary = ({
     transferTo,
     selectedItem,
     setSelectedItem,
+    refresh,
+    setRefresh,
 }) => {
     const [open, setOpen] = useState(false);
 
@@ -49,6 +51,8 @@ const ViewSummary = ({
         const itemRef = doc(db, "items", copiedItem.id);
         updateDoc(itemRef, copiedItem);
 
+        setRefresh(!refresh);
+
         setShowSummary(false);
         setOpen(true);
     }
@@ -63,11 +67,11 @@ const ViewSummary = ({
                     </Alert.Heading>
                     {selectedItem?.splits?.find((m) => m.email === userEmail)?.isSettled? (
                         <p>
-                            You can view the item in the History tab. Refresh the page to see the changes.
+                            You can view the item in the History tab. If this was a mistake, you can unsettle the item there.
                         </p>
                     ) : (
                         <p>
-                            You can view the item in the Home tab. Refresh the page to see the changes.
+                            You can view the item in the Home tab. If you want to settle the item, you can do so there.
                         </p>
                     )}
                     <div className="d-flex justify-content-end">

@@ -34,6 +34,7 @@ const Home = () => {
     const [averageSettlementTime, setAverageSettlementTime] = useState(0);
     const [settledLentLastThreeMonths, setSettledLentLastThreeMonths] = useState([]);
     const [settledOwedLastThreeMonths, setSettledOwedLastThreeMonths] = useState([]);
+    const [refresh, setRefresh] = useState(false);
 
     useEffect(() => {
         const fetchOwedAndLent = async () => {
@@ -95,7 +96,7 @@ const Home = () => {
         };
 
         fetchOwedAndLent();
-    }, [userEmail, setIsVerified, currentMonth]);
+    }, [userEmail, setIsVerified, currentMonth, refresh]);
 
     return (
         <Container style={{ height: "100%" }}>
@@ -208,6 +209,8 @@ const Home = () => {
                                 title="You owe"
                                 items={eventsLentToUser}
                                 isLoading={isLoading}
+                                refresh={refresh}
+                                setRefresh={setRefresh}
                             />
                             <br />
                             <SummaryTable
@@ -215,6 +218,8 @@ const Home = () => {
                                 title="Owed to you"
                                 items={itemsOwedToUser}
                                 isLoading={isLoading}
+                                refresh={refresh}
+                                setRefresh={setRefresh}
                             />
                         </Card.Body>
                     </Card>

@@ -4,7 +4,7 @@ import { GoCodeOfConduct } from "react-icons/go";
 import ViewSummary from "../../pages/Home/Components/ViewSummary";
 import { AuthContext } from "../../App";
 
-const SettleButton = ({ item, disabled }) => {
+const SettleButton = ({ item, disabled, refresh, setRefresh }) => {
     const { userEmail } = useContext(AuthContext);
 
     const [selectedItem, setSelectedItem] = useState(null);
@@ -40,6 +40,8 @@ const SettleButton = ({ item, disabled }) => {
                 transferTo={item?.transferTo}
                 selectedItem={selectedItem}
                 setSelectedItem={setSelectedItem}
+                refresh={refresh}
+                setRefresh={setRefresh}
             />
         </>
     );
